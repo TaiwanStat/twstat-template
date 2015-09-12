@@ -1,0 +1,21 @@
+{
+  "name": "twstat-template",
+  "version": "0.0.0",
+  "authors": [
+    "chihsuan <chihsuan.huang.7@gmail.com>"
+  ],
+  "description": "",
+  "keywords": [
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "semantic": "~2.0.6"
+  }
+}

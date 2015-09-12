@@ -1,0 +1,14 @@
+{
+  "data": {
+    "page": [
+      {
+        "title": "title",
+        "url": "example",
+        "img": "images/assert/background.png",
+        "description": "description"
+      }
+    ]
+  },
+  "layout": "./index.hbs",
+  "filename": "index.html"
+}

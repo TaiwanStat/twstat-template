@@ -1,0 +1,7 @@
+venv/
+node_modules
+npm-debug.log
+*.swp
+.DS_Store
+*~
+bower_components
