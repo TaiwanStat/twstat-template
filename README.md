@@ -44,7 +44,9 @@ Once this is running, go to http://localhost:8000/.
   // 專案的圖片一律存在 images 這個 folder 的下面
   "img": "images/garbage.png",
   // 當你在 fb fans page po 的文複製到 description
-  "description": "台灣每年產生 700 萬噸以上的垃圾(一天2萬噸)，這麼大量的垃圾如何處理是一個重要的課題。究竟衛生掩埋、焚化、資源回收，哪個才是台灣垃圾處理最大宗？而2002年環保暑發佈了《垃圾回收再利用法》是否改變了台灣垃圾處理的方式？"
+  "description": "台灣每年產生 700 萬噸以上的垃圾(一天2萬噸)，這麼大量的垃圾如何處理是一個重要的課題。究竟衛生掩埋、焚化、資源回收，哪個才是台灣垃圾處理最大宗？而2002年環保暑發佈了《垃圾回收再利用法》是否改變了台灣垃圾處理的方式？",
+  // 作者姓名
+  "author": "you name"
 }
 ```
 
@@ -127,7 +129,6 @@ header 引入了 mdl 的 header & nav links
       <a class="mdl-navigation__link" href="http://global.taiwanstat.com/l/">世界統計資訊</a>
       <a class="mdl-navigation__link" href="http://taiwanstat.com/opendata">開放資料分析部落格</a>
       <a class="mdl-navigation__link" href="https://www.facebook.com/taiwanstat">Facebook 粉專</a>
-      qG
       </nav>
     </div>
 
