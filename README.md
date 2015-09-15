@@ -93,10 +93,6 @@ head 區塊會 include 下面這些東西, `semantic`, `d3.js`, `jquery`, `meta`
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.2/material.indigo-pink.min.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-<script src="/bower_components/semantic/dist/semantic.min.js"></script>
-<script src="https://storage.googleapis.com/code.getmdl.io/1.0.2/material.min.js"></script>
 ```
 
 ### `{{> header}}`
@@ -162,6 +158,10 @@ end:
 ```html
 </main>
 </div>
+<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="/bower_components/semantic/dist/semantic.min.js"></script>
+<script src="https://storage.googleapis.com/code.getmdl.io/1.0.2/material.min.js"></script>
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -191,7 +191,7 @@ footer:
 ```html
 <footer class="mdl-mini-footer">
   <div class="mdl-mini-footer__left-section">© 2015 <a href="#">用數據看台灣團隊</a> | 
-    <a href="http://www.csie.ncku.edu.tw/ncku_csie/">NCKU-NetDB</a>
+    <a href="http://netdb.csie.ncku.edu.tw">NCKU-NetDB</a>
     {{#if chart_description.collaborators}}{{#each chart_description.collaborators}} | 
     <a href="{{url}}">{{name}}</a>{{/each}}{{/if}}
   </div>
