@@ -5,7 +5,8 @@
         "title": "title",
         "url": "example",
         "img": "images/assert/background.png",
-        "description": "description"
+        "description": "description",
+        "author": "Your Name"
       }
     ]
   },
