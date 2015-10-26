@@ -6,17 +6,34 @@
 	<script>
 
 		$().ready(function (){
-			svgSection = d3.select("body")
-					.append("svg")
-					.attr("width", 200)
-					.attr("height", 200);
 
-			svgSection.append("circle")
-					.attr("cx", 25)
-					.attr("cy", 25)
-					.attr("r", 25)
-					.style("fill", "purple");
-			alert("asd");
+			var svgSection = d3.select("body")
+					.append("svg")
+					.attr("width", 800)
+					.attr("height", 500);
+
+			$.post("https://raw.githubusercontent.com/nekoneko/data-visualization-proj/gh-pages/D3JS_Test/Typhon_201001-201510.json", function (data){
+				
+				alert("request done");
+				jsondata = JSON.parse(data);
+
+				var index = 0;
+				var circles = svgSection.selectAll("circle")
+					.data(jsondata.json_content)
+					.enter()
+					.append("circle")
+					.attr("cx", function (d){
+						index++;
+						return index * 25;
+					})
+					.attr("cy", 50)
+					.attr("r",  function (d){
+						return parseInt(d.max_range7)/10;
+					})
+					.style("fill", "red");
+
+			});
+
 		});
 
 	</script>
