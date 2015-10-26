@@ -1,0 +1,29 @@
+<html>
+
+<head>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+	<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+	<script>
+
+		$().ready(function (){
+			svgSection = d3.select("body")
+					.append("svg")
+					.attr("width", 200)
+					.attr("height", 200);
+
+			svgSection.append("circle")
+					.attr("cx", 25)
+					.attr("cy", 25)
+					.attr("r", 25)
+					.style("fill", "purple");
+			alert("asd");
+		});
+
+	</script>
+</head>
+
+<body>
+
+</body>
+
+</html>
