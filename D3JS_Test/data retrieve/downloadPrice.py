@@ -14,25 +14,47 @@ def loadAllContent (yy, mm, dd) :
 			data = 'tclassSel=0%A5%FE%B3%A1%B8%EA%AE%C6&yy=' + str(yy) + '&mm=' + str(mm) + '&dd=' + str(dd) + '&subm=%B6%7D%A9l%ACd%B8%DF'
 		)
 		return urllib2.urlopen(req).read()
+
 	except:
 		return None
 
-content = loadAllContent(104, 10, 22).decode('big5').encode('utf-8')
-
-
 ####################################
 
+import time
+from datetime import timedelta, date
+
+start_date = date(2015, 9, 1)
+end_date = date.today() - timedelta(days=1)
+
+d = start_date
+delta = timedelta(days = 1)
 
 jsonfile = '[\n'
 
-it = re.finditer('<TD>.*</TD>\n<TD ALIGN="RIGHT">\d{1,4}\.\d</TD>', content)
-for match in it:
-	jsonfile += match.group().replace('<TD>', '\t{\n\t\t"item": "').replace('</TD>\n<TD ALIGN="RIGHT">', '",\n\t\t"price":').replace('</TD>', '\n\t},\n')
+while d <= end_date:
 
-jsonfile = jsonfile[:-2]
+	content = loadAllContent(d.year - 1911, d.month, d.day).decode('big5').encode('utf-8')
+
+	jsonfile += '{"date": "' + d.strftime("%Y-%m-%d") + '",\n'
+	jsonfile += '"pricelist":[\n'
+
+	it = re.finditer('<TD>.*</TD>\n<TD ALIGN="RIGHT">\d{1,4}\.\d</TD>', content)
+	for match in it:
+		jsonfile += match.group().replace('<TD>', '\t{\n\t\t"item": "').replace('</TD>\n<TD ALIGN="RIGHT">', '",\n\t\t"price":').replace('</TD>', '\n\t},\n')
+
+	if jsonfile[-2] is ',':
+		jsonfile = jsonfile[:-2]
+	jsonfile += '\n]},\n'
+
+	d += delta
+
+if jsonfile[-2] is ',':
+	jsonfile = jsonfile[:-2]
+
 jsonfile += '\n]\n'
 
-print jsonfile
+outputfile = open('test.json', 'w+')
+outputfile.write(jsonfile)
 
 
 ####################################
@@ -43,7 +65,7 @@ if __name__ == '__main__':
 	url = 'https://ikdde-team6.firebaseio.com'
 	path = '/'
 	name = 'agriculturePrice'
- 
+
 	jsonObj = json.loads(jsonfile)
 
 	firebase = firebase.FirebaseApplication(url, None)
