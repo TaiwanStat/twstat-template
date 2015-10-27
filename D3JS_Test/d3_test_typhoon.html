@@ -48,7 +48,7 @@
 				 */
 
 				var index = 0;
-				var startTime = Date.parse(data[0].sea_start_datetime);
+				var startTime = Date.parse(data[0].sea_start_datetime.split(" ")[0]);
 
 				// bind data to svg group (although the group is not created yet)
 				var dataBind = svgSection
@@ -67,7 +67,8 @@
 					// and transform drawing coordinate to desired position
 					.attr("transform", function (d) {
 						index++;
-						scaledtime = (Date.parse(d.sea_start_datetime) - startTime) / 190000000 + 50;
+						time = Date.parse(d.sea_start_datetime.split(" ")[0])
+						scaledtime = (time - startTime) / 190000000 + 50;
 						return "translate(" + scaledtime + ", " + (index*20+25) + ")";
 					});
 
