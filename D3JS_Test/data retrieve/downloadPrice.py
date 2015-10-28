@@ -38,9 +38,13 @@ while d <= end_date:
 	jsonfile += '{"date": "' + d.strftime("%Y-%m-%d") + '",\n'
 	jsonfile += '"pricelist":[\n'
 
+	count = 0;
 	it = re.finditer('<TD>.*</TD>\n<TD ALIGN="RIGHT">\d{1,4}\.\d</TD>', content)
 	for match in it:
 		jsonfile += match.group().replace('<TD>', '\t{\n\t\t"item": "').replace('</TD>\n<TD ALIGN="RIGHT">', '",\n\t\t"price":').replace('</TD>', '\n\t},\n')
+		count += 1
+		if count > 20 :
+			break
 
 	if jsonfile[-2] is ',':
 		jsonfile = jsonfile[:-2]
@@ -55,7 +59,7 @@ if jsonfile[-2] is ',':
 
 jsonfile += '\n]\n'
 
-outputfile = open('test.json', 'w+')
+outputfile = open('test_reduced.json', 'w+')
 outputfile.write(jsonfile)
 
 
@@ -66,7 +70,7 @@ if __name__ == '__main__':
  
 	url = 'https://ikdde-team6.firebaseio.com'
 	path = '/'
-	name = 'agriculturePrice'
+	name = 'agriculturePriceReduced'
 
 	jsonObj = json.loads(jsonfile)
 
