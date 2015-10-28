@@ -23,9 +23,9 @@
 				var data = snapshot.val();
 				var list = data[0].pricelist;
 				list.forEach(function (d) {
-						d["value"] = d.price;
-						return d;
-					});
+					d["value"] = d.price;
+					return d;
+				});
 				console.log(list);
 
 				var packData = { children: list};
@@ -35,7 +35,7 @@
 					/*.sort(function(a,b) { b.value - a.value; })*/;
 
 				var nodes = packLayout.nodes(packData)
-					.filter(function(it) { return it.parent; });
+					.filter(function(d) { return d.parent; });
 
 				var dataBind = svgSection
 					.selectAll("g")
