@@ -42,6 +42,7 @@
 					var node = d3.layout.pack()
 						.padding(2)
 						.size([1200,900])
+						.sort(function(a,b) { b.value - a.value; })
 						.nodes({ children: list })
 						.filter(function(it) { 
 							return (it.parent); 
@@ -89,34 +90,29 @@
 
 				var textInGroup = groupSections.append("text")
 					.text(function (d) {
-						return (d.value[0] > 50 ? d.item : "");
+						return d.item;//(d.value[0] > 50 ? d.item : "");
 					})
 					.attr("x", -20)
 					.attr("y", 5);
 
 				var len = timedNode[0].x.length;
-				for(var i = 0; i < len; i++){
-					groupSections
+				var i = 0;
+				setInterval(function () {
+				    groupSections
 						.transition()
 						.attr("transform", function (d) {
 							return "translate(" + d.x[i] + ", " + d.y[i] + ")";
 						})
-						.duration(10000)
-						.delay(100);
+						.duration(500)
 					circleInGroup
 						.transition()
 						.attr("r", function (d) {
 							return d.r[i];
 						})
-						.duration(10000)
-						.delay(100);
-					textInGroup
-						.transition()
-						.text(function (d) {
-							return (d.value[0] > 50 ? d.item : "");
-						})
-				}
-
+						.duration(500)
+					if(i < len-1) i++;
+					console.log(len - i);
+				}, 600);
 				
 			});
 
@@ -126,7 +122,7 @@
 </head>
 
 <body>
-
+date <span id="date"></span>
 </body>
 
 </html>

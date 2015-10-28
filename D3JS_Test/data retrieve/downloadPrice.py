@@ -23,7 +23,7 @@ def loadAllContent (yy, mm, dd) :
 import time
 from datetime import timedelta, date
 
-start_date = date(2015, 9, 1)
+start_date = date(2010, 1, 1)
 end_date = date.today() - timedelta(days=1)
 
 d = start_date
@@ -45,6 +45,8 @@ while d <= end_date:
 	if jsonfile[-2] is ',':
 		jsonfile = jsonfile[:-2]
 	jsonfile += '\n]},\n'
+
+	print d.strftime("%Y-%m-%d")
 
 	d += delta
 
