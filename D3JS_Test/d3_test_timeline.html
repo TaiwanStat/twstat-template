@@ -9,20 +9,27 @@
 	<script>
 
 		var len = 0;
-		var index = [];
+		var indice = [];
 		var mapIndex_Itemname = []; 
 		var mapIndex_DatePrice = []; 
 
-		function getPriceDiff(index, time){
-			return Math.sin(((index * index % 20) / 2 + 1) * time / 60) * (((index * index + 1)* time) % 60);
+		Date.prototype.yyyymmdd = function() {
+			var yyyy = this.getFullYear().toString();
+			var mm = (this.getMonth()+1).toString();
+			var dd  = this.getDate().toString();
+			return yyyy + "-" + (mm[1]?mm:"0"+mm[0]) + "-" + (dd[1]?dd:"0"+dd[0]);
+		};
+
+		function getPrice(index, time){
+			return mapIndex_DatePrice[index][time]["price"];
 		}
 
 		var cenX = 200;
-		var cenY = 300;
-		var dX = 6;
-		var dY = 3;
-		var dzY = -15;
-		var sclX = 10;
+		var cenY = 400;
+		var dX = 8;
+		var dY = 4;
+		var dzY = -40;
+		var sclX = 13;
 
 		function XrG(index, time){
 			return index * sclX + time * dX + cenX;
@@ -46,25 +53,11 @@
 
 		$().ready(function (){
 
-			var color = d3.scale.category20();
-			var time = 0;
-
 			var svgSection = d3
 				.select(".datavis")
 				.append("svg")
 				.attr("width", 1200)
 				.attr("height", 900);
-
-			svgSection
-				.append("line")
-				.attr("x1", function (d) { return XG(-1, 0) + XrG(-1, 0); })
-				.attr("y1", function (d) { return YG(-1, 0) + YrG(0, 0); })
-				.attr("x2", function (d) { return XG(22, 0) + XrG(22, 0); })
-				.attr("y2", function (d) { return YG(22, 0) + YrG(0, 0); })
-				.style("stroke-width", 2)
-				.style("stroke", function(d) {
-					return color(21, 0);
-				});
 
 			var firebaseRef = new Firebase("https://ikdde-team6.firebaseio.com/");
 
@@ -72,25 +65,34 @@
 
 				var data = snapshot.val();
 
-				console.log(Object.keys(data));
-
-				for(var cate in Object.keys(data)){
-					for(var vege in Object.keys(cate)){
-						console.log("" + cate + ", " + vege);
-						index.push[len];
+				for(var cate in data){
+					for(var vege in data[cate]){
+						indice.push(len);
 						len++;
+						mapIndex_DatePrice.push(data[cate][vege]);
 						mapIndex_Itemname.push(vege);
-						mapIndex_DatePrice.push([]);
 					}
 				}
 
-				console.log(mapIndex_Itemname);
+				len = len - 1;
+
 				console.log(mapIndex_DatePrice);
 
-/*
+				var color = d3.scale.category20();
+				svgSection
+				.append("line")
+				.attr("x1", function (d) { return XG(-1, 0) + XrG(-1, 0); })
+				.attr("y1", function (d) { return YG(-1, 0) + YrG(0, 0); })
+				.attr("x2", function (d) { return XG(len+2, 0) + XrG(len+2, 0); })
+				.attr("y2", function (d) { return YG(len+2, 0) + YrG(0, 0); })
+				.style("stroke-width", 2)
+				.style("stroke", function(d) {
+					return color(len, 0);
+				});
+
 				var groupLines = svgSection
 					.selectAll("g")
-					.data(index)
+					.data(indice)
 					.enter() 
 					.append("g");
 
@@ -104,14 +106,15 @@
 
 				var groupIndicators = svgSection
 					.selectAll(".h")
-					.data(index)
+					.data(indice)
 					.enter() 
 					.append("g")
 					.attr("class", "h");
 
 				groupIndicators
 					.attr("transform", function (d) {
-						return "translate(" + XG(20-d, time) + ", " + YG(20-d, time) + ")";
+						console.log(d);
+						return "translate(" + XG(len-d, 0) + ", " + YG(len-d, 0) + ")";
 					});
 
 				var indicatorLine = groupIndicators
@@ -121,17 +124,50 @@
 					})
 					.style("stroke-width", 5);
 
+				var itemName = groupIndicators
+					.append("text")
+					.attr("x", function (d) { return XrG(len-d, 0) + dX; })
+					.attr("y", function (d) { return YrG(0, 0) + dY; })
+					.text(function (d){ return mapIndex_Itemname[d]; });
+					
+
+				var to = new Date(2015, 9, 27);
+				var dat = new Date(2015, 0, 2);
+				var count = 0;
 
 				setInterval(function () {
 
-					time++;
+					var yesterday = new Date(dat.toString()); yesterday.setDate(yesterday.getDate() - 1);
+					var yesterdaystr = yesterday.yyyymmdd();
+					var datestr = dat.yyyymmdd();
+
 
 					groupLines
 						.append("line")
-						.attr("x1", function (d) { return XrG(20-d, time - 1); })
-						.attr("y1", function (d) { return YrG(getPriceDiff(20-d, time-1), time-1); })
-						.attr("x2", function (d) { return XrG(20-d, time); })
-						.attr("y2", function (d) { return YrG(getPriceDiff(20-d, time), time); })
+						.attr("x1", function (d) { return XrG(len-d, count - 1); })
+						.attr("y1", function (d) { return YrG(mapIndex_DatePrice[len-d][yesterdaystr]["price"], count-1); })
+						.attr("x2", function (d) { return XrG(len-d, count); })
+						.attr("y2", function (d) { return YrG(mapIndex_DatePrice[len-d][datestr]["price"], count); })
+						.style("stroke", function(d) {
+								return color(d, 0);
+						});
+
+					groupLines
+						.append("line")
+						.attr("x1", function (d) { return XrG(len-d, count - 1); })
+						.attr("y1", function (d) { return YrG(0, count-1); })
+						.attr("x2", function (d) { return XrG(len-d, count); })
+						.attr("y2", function (d) { return YrG(0, count); })
+						.style("stroke", function(d) {
+								return color(d, 0);
+						});
+
+					groupLines
+						.append("line")
+						.attr("x1", function (d) { return XrG(len-d, count); })
+						.attr("y1", function (d) { return YrG(0, count); })
+						.attr("x2", function (d) { return XrG(len-d, count); })
+						.attr("y2", function (d) { return YrG(mapIndex_DatePrice[len-d][datestr]["price"], count); })
 						.style("stroke", function(d) {
 								return color(d, 0);
 						});
@@ -139,24 +175,23 @@
 					groupLines
 						.transition()
 						.attr("transform", function (d) {
-							return "translate(" + XG(20-d, time) + ", " + YG(20-d, time) + ")";
+							return "translate(" + XG(len-d, count) + ", " + YG(len-d, count) + ")";
 						})
-						;//.duration(200);
+						.duration(800);
 
 					indicatorLine
-						//.transition()
-						.attr("x1", function (d) { return XrG(20-d, 0) + dX/2; })
+						.transition()
+						.attr("x1", function (d) { return XrG(len-d, 0) + dX/2; })
 						.attr("y1", function (d) { return YrG(0, 0); })
-						.attr("x2", function (d) { return XrG(20-d, 0) + dX/2; })
-						.attr("y2", function (d) { return YrG(getPriceDiff((20-d), time), 0); })
-						;//.duration(200);
+						.attr("x2", function (d) { return XrG(len-d, 0) + dX/2; })
+						.attr("y2", function (d) { return YrG(mapIndex_DatePrice[len-d][datestr]["price"], 0); })
+						.duration(800);
 
+					if (dat < to) dat.setDate(dat.getDate() + 1);
+					$("#date").html(datestr);
+					count++;
 
-					$("#date").html(time);
-
-				}, 200);
-
-*/
+				}, 800);
 
 			});
 
