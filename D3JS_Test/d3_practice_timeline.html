@@ -9,16 +9,41 @@
 	<script>
 
 		function getPriceDiff(index, time){
-			return Math.sin(((index * index % 20) / 2 + 1) * time / 20) * 50;
+			return Math.sin(((index * index % 20) / 2 + 1) * time / 20) * (((index * index + 1)* time) % 60);
 		}
 
-		var cenX = 20;
+		var cenX = 200;
 		var cenY = 200;
-		var dX = 2;
-		var dY = 1;
-		var sclX = 25;
+		var dX = 6;
+		var dY = 3;
+		var dzY = -15;
+		var sclX = 10;
+
+		function XrG(index, time){
+			return index * sclX + time * dX + cenX;
+		}
+
+		function YrG(val, time){
+			return time * dY + cenY - val;
+		}
+
+		function XG(index, time){
+			return index * sclX - time * dX + cenX;
+		}
+
+		function YG(index, time){
+			return (- time * dY + cenY) + initShiftY(index);
+		}
+
+		function initShiftY(index){
+			return dzY * index;
+		}
 
 		$().ready(function (){
+
+			var color = d3.scale.category20();
+			var index = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
+			var time = 0;
 
 			var svgSection = d3
 				.select(".datavis")
@@ -26,39 +51,45 @@
 				.attr("width", 1200)
 				.attr("height", 900);
 
-			var color = d3.scale.category20();
+			svgSection
+				.append("line")
+				.attr("x1", function (d) { return XG(-1, 0) + XrG(-1, 0); })
+				.attr("y1", function (d) { return YG(-1, 0) + YrG(0, 0); })
+				.attr("x2", function (d) { return XG(22, 0) + XrG(22, 0); })
+				.attr("y2", function (d) { return YG(22, 0) + YrG(0, 0); })
+				.style("stroke-width", 2)
+				.style("stroke", function(d) {
+					return color(21, 0);
+				});
 
-			var index = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
-
-			var time = 0;
-
-			var groupSections = svgSection
+			var groupLines = svgSection
 				.selectAll("g")
 				.data(index)
 				.enter() 
-				.append("g")
-				.attr("transform", function (d) {
-					return "translate(" + ((20-d) * sclX - time * dX + cenX) + ", " + (50 - time * dY + cenY) + ")";
-				});
+				.append("g");
 
-			var linesegInGroup = groupSections
+			var linesegInGroup = groupLines
 				.append("line")
-				.attr("x1", function (d) { return ((20-d) * sclX + (time-1) * dX + cenX); })
-				.attr("y1", function (d) { return (50 + (time-1) * dY + cenY - getPriceDiff((20-d), time-1)); })
-				.attr("x2", function (d) { return ((20-d) * sclX + time * dX + cenX); })
-				.attr("y2", function (d) { return (50 + time * dY + cenY - getPriceDiff((20-d), time)); })
 				.style("stroke", function(d) {
 					return color(d, 0);
 				})
 				.style("stroke-width", 2)
-				.style("stroke-opacity", 0.2);
+				.style("stroke-opacity", 0.9);
 
-			var indicatorLine = groupSections
+			var groupIndicators = svgSection
+				.selectAll(".h")
+				.data(index)
+				.enter() 
+				.append("g")
+				.attr("class", "h");
+
+			groupIndicators
+				.attr("transform", function (d) {
+					return "translate(" + XG(20-d, time) + ", " + YG(20-d, time) + ")";
+				});
+
+			var indicatorLine = groupIndicators
 				.append("line")
-				.attr("x1", function (d) { return ((20-d) * sclX + time * dX + cenX); })
-				.attr("y1", function (d) { return (50 + time * dY + cenY); })
-				.attr("x2", function (d) { return ((20-d) * sclX + time * dX + cenX); })
-				.attr("y2", function (d) { return (50 + time * dY + cenY - getPriceDiff((20-d), time)); })
 				.style("stroke", function(d) {
 					return color(d, 0);
 				})
@@ -69,36 +100,37 @@
 
 				time++;
 
-				groupSections
+				groupLines
 					.append("line")
-					.attr("x1", function (d) { return ((20-d) * sclX + (time-1) * dX + cenX); })
-					.attr("y1", function (d) { return (50 + (time-1) * dY + cenY - getPriceDiff((20-d), time-1)); })
-					.attr("x2", function (d) { return ((20-d) * sclX + time * dX + cenX); })
-					.attr("y2", function (d) { return (50 + time * dY + cenY - getPriceDiff((20-d), time)); })
+					.attr("x1", function (d) { return XrG(20-d, time - 1); })
+					.attr("y1", function (d) { return YrG(getPriceDiff(20-d, time-1), time-1); })
+					.attr("x2", function (d) { return XrG(20-d, time); })
+					.attr("y2", function (d) { return YrG(getPriceDiff(20-d, time), time); })
 					.style("stroke", function(d) {
 							return color(d, 0);
 					})
 					.style("stroke-width", 2)
 					.style("stroke-opacity", 0.4);
 
-				indicatorLine
-					.transition()
-					.attr("x1", function (d) { return ((20-d) * sclX + time * dX + cenX); })
-					.attr("y1", function (d) { return (50 + time * dY + cenY); })
-					.attr("x2", function (d) { return ((20-d) * sclX + time * dX + cenX); })
-					.attr("y2", function (d) { return (50 + time * dY + cenY - getPriceDiff((20-d), time)); })
-					.duration(200);
-
-				groupSections
+				groupLines
 					.transition()
 					.attr("transform", function (d) {
-						return "translate(" + ((20-d) * sclX - time * dX + cenX) + ", " + (50 - time * dY + cenY) + ")";
+						return "translate(" + XG(20-d, time) + ", " + YG(20-d, time) + ")";
 					})
-					.duration(200);
-				
+					.duration(400);
+
+				indicatorLine
+					.transition()
+					.attr("x1", function (d) { return XrG(20-d, 0) + dX/2; })
+					.attr("y1", function (d) { return YrG(0, 0); })
+					.attr("x2", function (d) { return XrG(20-d, 0) + dX/2; })
+					.attr("y2", function (d) { return YrG(getPriceDiff((20-d), time), 0); })
+					.duration(400);
+
+
 				$("#date").html(time);
 
-			}, 200);
+			}, 400);
 
 		});
 
