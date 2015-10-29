@@ -9,11 +9,11 @@
 	<script>
 
 		function getPriceDiff(index, time){
-			return Math.sin(((index * index % 20) / 2 + 1) * time / 20) * (((index * index + 1)* time) % 60);
+			return Math.sin(((index * index % 20) / 2 + 1) * time / 60) * (((index * index + 1)* time) % 60);
 		}
 
 		var cenX = 200;
-		var cenY = 200;
+		var cenY = 300;
 		var dX = 6;
 		var dY = 3;
 		var dzY = -15;
@@ -108,29 +108,27 @@
 					.attr("y2", function (d) { return YrG(getPriceDiff(20-d, time), time); })
 					.style("stroke", function(d) {
 							return color(d, 0);
-					})
-					.style("stroke-width", 2)
-					.style("stroke-opacity", 0.4);
+					});
 
 				groupLines
 					.transition()
 					.attr("transform", function (d) {
 						return "translate(" + XG(20-d, time) + ", " + YG(20-d, time) + ")";
 					})
-					.duration(400);
+					;//.duration(200);
 
 				indicatorLine
-					.transition()
+					//.transition()
 					.attr("x1", function (d) { return XrG(20-d, 0) + dX/2; })
 					.attr("y1", function (d) { return YrG(0, 0); })
 					.attr("x2", function (d) { return XrG(20-d, 0) + dX/2; })
 					.attr("y2", function (d) { return YrG(getPriceDiff((20-d), time), 0); })
-					.duration(400);
+					;//.duration(200);
 
 
 				$("#date").html(time);
 
-			}, 400);
+			}, 200);
 
 		});
 
