@@ -1,0 +1,184 @@
+<!--web module Reference from: http://bl.ocks.org/mbostock/3883245 -->
+<!--web module Reference from: http://bl.ocks.org/mbostock/3884955#index.html -->
+<html>
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+	<!--script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script-->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+	<script src="https://cdn.firebase.com/js/client/2.3.1/firebase.js"></script>
+</head>
+<style>
+
+body {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  display: none;
+}
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+</style>
+<body>
+</body>
+<script>
+
+//begin--line chart feature setting
+
+var margin = {top: 20, right: 20, bottom: 30, left: 50},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+// reserve for expressing
+//     label of each line
+var reserv_w = 30;
+
+var x = d3.time.scale()
+    .range([0, width - reserv_w]);
+
+var y = d3.scale.linear()
+    .range([height, 0]);
+
+var color = d3.scale.category10();
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+	.ticks(5,"$")
+    .orient("left");
+
+var line = d3.svg.line()
+    .x(function(d) { return x(d.date); })
+    .y(function(d) { return y(d.price); });
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+//end--line chart feature setting
+
+
+// connect to firebase db
+var firebaseRef = new Firebase("https://ikdde-team6.firebaseio.com/vegetable_data/");
+
+// path of data
+//var query = ["葉菜類/小白菜","葉菜類/包心白菜","葉菜類/青江菜","葉菜類/香菜","葉菜類/莧菜"];
+//var query = ["葉菜類/小白菜","葉菜類/包心白菜","葉菜類/青江菜","葉菜類/莧菜"];
+var query = ["葉菜類/小白菜","葉菜類/包心白菜","葉菜類/莧菜"];
+//var query = ["葉菜類/小白菜","葉菜類/包心白菜"];
+
+// store data from firebase and drawing charts
+firebaseRef.on("value", function(snapshot) {
+
+	var data = [];
+
+	// get each data by their path
+	query.forEach( function(item) {
+
+		// if path is exist, store data
+		if ( snapshot.hasChild(item) ) {
+
+			data.push( {
+				name: item.split("/")[1],
+				value: snapshot.child(item).val()
+			});
+
+		}
+	});
+
+	// reconstruct(rebuild) date
+	data.forEach( function(v) {
+		v.value = d3.values(v.value);
+		v.value.forEach( function(e) {
+			e.date = new Date(e.date.year,e.date.month,e.date.day);
+		});
+	});
+
+	// set color domain by vegetable name
+	//     vegetable name --mapping--> specific color
+	color.domain(data.map(function(v) { return v.name}));
+
+
+	// set x domain by range from min of date to max of date
+	//     x invoked in xAxis
+	x.domain([
+		d3.min(data, function(v) { return d3.min(v.value, function(d) { return d.date});}),
+		d3.max(data, function(v) { return d3.max(v.value, function(d) { return d.date});})
+	]);
+
+
+	// set y domain by range from min of date to max of date
+	//     y invoked in yAxis
+	y.domain([
+		d3.min(data, function(v) { return d3.min(v.value, function(d) { return d.price});}),
+		d3.max(data, function(v) { return d3.max(v.value, function(d) { return d.price});})
+	]);
+
+
+	// append x axis by feature xAxis
+	svg.append("g")
+		.attr("class","x axis")
+		.attr("transform","translate(0," + height + ")")
+		.call(xAxis);
+	
+
+	// append y axis by feature yAxis
+	svg.append("g")
+		.attr("class","y axis")
+		.call(yAxis)
+
+	// append y axis label
+	.append("text")
+
+		// from horizental to vertical
+		.attr("transform","rotate(-90)")
+
+		// the distant to y axis
+		.attr("y",6)
+
+		.attr("dy", ".71em")
+		.style("text-anchor", "end")
+		.text("Price/Weight ($/kg)");
+
+
+	// add all g
+	var vg = svg.selectAll(".city")
+				.data(data)
+				.enter()
+			.append("g")
+				.attr("class","city");
+
+	// add path by feature "line" under each ".city"
+	vg.append("path")
+		.attr("class","line")
+		.attr("d", function(v) { return line(v.value)})
+		.style("stroke", function(v) { return color(v.name)});
+
+	// append label for each line
+	vg.append("text")
+		.datum(function(d) { return {_name: d.name, _value: d.value[d.value.length - 1]}; })
+		.attr("transform", function(d) { return "translate(" + x(d._value.date) + "," + y(d._value.price) + ")"; })
+		.attr("x", 3)
+		.attr("dy", ".35em")
+		.text(function(d) { return d._name; });
+
+});
+</script>
+</html>
