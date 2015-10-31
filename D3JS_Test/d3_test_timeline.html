@@ -67,10 +67,12 @@
 
 				for(var cate in data){
 					for(var vege in data[cate]){
-						indice.push(len);
+						//if(len != 2){
+							indice.push(len);
+							mapIndex_DatePrice.push(data[cate][vege]);
+							mapIndex_Itemname.push(vege);
+						//}
 						len++;
-						mapIndex_DatePrice.push(data[cate][vege]);
-						mapIndex_Itemname.push(vege);
 					}
 				}
 
@@ -113,7 +115,6 @@
 
 				groupIndicators
 					.attr("transform", function (d) {
-						console.log(d);
 						return "translate(" + XG(len-d, 0) + ", " + YG(len-d, 0) + ")";
 					});
 
@@ -132,15 +133,19 @@
 					
 
 				var to = new Date(2015, 9, 27);
-				var dat = new Date(2015, 0, 2);
+				var dat = new Date(2015, 0, 1);
 				var count = 0;
+				var dur = 300;
 
 				setInterval(function () {
+
+					if (dat < to) dat.setDate(dat.getDate() + 1);
+					$("#date").html(datestr);
+					count++;
 
 					var yesterday = new Date(dat.toString()); yesterday.setDate(yesterday.getDate() - 1);
 					var yesterdaystr = yesterday.yyyymmdd();
 					var datestr = dat.yyyymmdd();
-
 
 					groupLines
 						.append("line")
@@ -177,7 +182,7 @@
 						.attr("transform", function (d) {
 							return "translate(" + XG(len-d, count) + ", " + YG(len-d, count) + ")";
 						})
-						.duration(800);
+						.duration(dur);
 
 					indicatorLine
 						.transition()
@@ -185,13 +190,9 @@
 						.attr("y1", function (d) { return YrG(0, 0); })
 						.attr("x2", function (d) { return XrG(len-d, 0) + dX/2; })
 						.attr("y2", function (d) { return YrG(mapIndex_DatePrice[len-d][datestr]["price"], 0); })
-						.duration(800);
+						.duration(dur);
 
-					if (dat < to) dat.setDate(dat.getDate() + 1);
-					$("#date").html(datestr);
-					count++;
-
-				}, 800);
+				}, dur);
 
 			});
 
