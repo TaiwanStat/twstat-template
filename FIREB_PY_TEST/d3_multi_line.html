@@ -80,9 +80,9 @@ var svg = d3.select("body").append("svg")
 var firebaseRef = new Firebase("https://ikdde-team6.firebaseio.com/vegetable_data/");
 
 // path of data
-//var query = ["葉菜類/小白菜","葉菜類/包心白菜","葉菜類/青江菜","葉菜類/香菜","葉菜類/莧菜"];
+var query = ["葉菜類/小白菜","葉菜類/包心白菜","葉菜類/青江菜","葉菜類/香菜","葉菜類/莧菜"];
 //var query = ["葉菜類/小白菜","葉菜類/包心白菜","葉菜類/青江菜","葉菜類/莧菜"];
-var query = ["葉菜類/小白菜","葉菜類/包心白菜","葉菜類/莧菜"];
+//var query = ["葉菜類/小白菜","葉菜類/包心白菜","葉菜類/莧菜"];
 //var query = ["葉菜類/小白菜","葉菜類/包心白菜"];
 
 // store data from firebase and drawing charts
@@ -191,6 +191,7 @@ firebaseRef.on("value", function(snapshot) {
 
 	// add label for control line display
 	// Reference from http://bl.ocks.org/d3noob/e99a762017060ce81c76
+	/*
 	svg.append("g")
 		.selectAll(".choose")
 		.data(data)
@@ -200,36 +201,60 @@ firebaseRef.on("value", function(snapshot) {
 		.attr("x", function(v) { return (label_W/2)+v.id*label_W; })
 		.attr("y", function(v) { return height+(margin.bottom/2)+5; })
 		.style("fill", function(v) { return color(v.name);})
-		.on("click", function(v) {
-			var duration_time = 800;
-
-			v.opacity ^= 1;
-			d3.select("#tag_"+v.name)
-				.transition()
-				.duration(duration_time)
-				.style("opacity", v.opacity);
-
-			y.domain([
-				d3.min(data.filter(function(v) { return v.opacity;}), function(v) { return d3.min(v.value, function(d) { return d.price});}),
-				d3.max(data.filter(function(v) { return v.opacity;}), function(v) { return d3.max(v.value, function(d) { return d.price});})
-			]);
-
-			d3.select(".y.axis")
-				.transition()
-				.duration(duration_time)
-				.call(yAxis);
-
-			data.forEach( function(v) {
-				if (v.opacity) {
-					d3.select("#tag_"+v.name+".line")
-						.transition()
-						.duration(duration_time)
-						.attr("d", function(v) { return line(v.value); });
-				}
-			});
-		})
+		.on("click", function (v) { click(v); } )
 		.text(function(v) { return v.name;});
 
+	*/
+
+	d3.select("body")
+	.append("div")
+		.selectAll(".vginput")
+		.data(data)
+	.enter()
+	.append("label")
+		.text(function(v) { return " "+v.name; })
+	.append("input")
+		.attr("type","checkbox")
+		.attr("checked",true)
+		.property("position", "absolute")
+		.property("left", function(v) { return v.id*10+"px"; })
+		//.property("textContent", function(v) { return v.name;})
+		.on("change", function(v) {
+			this.checked ^ true;
+			click(v);
+		})
+	;
+
+	// for toggle event
+	function click(v) {
+		var duration_time = 800;
+
+		v.opacity ^= 1;
+		d3.select("#tag_"+v.name)
+			.transition()
+			.duration(duration_time)
+			.style("opacity", v.opacity);
+
+		y.domain([
+			d3.min(data.filter(function(v) { return v.opacity;}), function(v) { return d3.min(v.value, function(d) { return d.price});}),
+			d3.max(data.filter(function(v) { return v.opacity;}), function(v) { return d3.max(v.value, function(d) { return d.price});})
+		]);
+
+		d3.select(".y.axis")
+			.transition()
+			.duration(duration_time)
+			.call(yAxis);
+
+		data.forEach( function(v) {
+			if (v.opacity) {
+				d3.select("#tag_"+v.name+".line")
+					.transition()
+					.duration(duration_time)
+					.attr("d", function(v) { return line(v.value); });
+				}
+			});
+	}
 });
+
 </script>
 </html>
