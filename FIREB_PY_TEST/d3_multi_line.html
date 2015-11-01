@@ -90,14 +90,16 @@ firebaseRef.on("value", function(snapshot) {
 	var data = [];
 
 	// get each data by their path
-	query.forEach( function(item) {
+	query.forEach( function(item, index) {
 
 		// if path is exist, store data
 		if ( snapshot.hasChild(item) ) {
 
 			data.push( {
 				name: item.split("/")[1],
-				value: snapshot.child(item).val()
+				value: snapshot.child(item).val(),
+				id: +index,
+				opacity: +1
 			});
 
 		}
@@ -127,22 +129,22 @@ firebaseRef.on("value", function(snapshot) {
 	// set y domain by range from min of date to max of date
 	//     y invoked in yAxis
 	y.domain([
-		d3.min(data, function(v) { return d3.min(v.value, function(d) { return d.price});}),
-		d3.max(data, function(v) { return d3.max(v.value, function(d) { return d.price});})
+		d3.min(data.filter(function(v) { return v.opacity;}), function(v) { return d3.min(v.value, function(d) { return d.price});}),
+		d3.max(data.filter(function(v) { return v.opacity;}), function(v) { return d3.max(v.value, function(d) { return d.price});})
 	]);
 
 
 	// append x axis by feature xAxis
-	svg.append("g")
-		.attr("class","x axis")
-		.attr("transform","translate(0," + height + ")")
-		.call(xAxis);
+	var gxAxis = svg.append("g")
+					.attr("class","x axis")
+					.attr("transform","translate(0," + height + ")")
+					.call(xAxis);
 	
 
 	// append y axis by feature yAxis
-	svg.append("g")
-		.attr("class","y axis")
-		.call(yAxis)
+	var gyAxis = svg.append("g")
+					.attr("class","y axis")
+					.call(yAxis)
 
 	// append y axis label
 	.append("text")
@@ -163,13 +165,16 @@ firebaseRef.on("value", function(snapshot) {
 				.data(data)
 				.enter()
 			.append("g")
-				.attr("class","city");
+				.attr("class","city")
+				.attr("id", function(v) { return 'tag_'+v.name; });
 
 	// add path by feature "line" under each ".city"
 	vg.append("path")
 		.attr("class","line")
-		.attr("d", function(v) { return line(v.value)})
-		.style("stroke", function(v) { return color(v.name)});
+		.attr("id", function(v) { return "tag_"+v.name; })
+		.attr("d", function(v) { return line(v.value); })
+		.style("stroke", function(v) { return color(v.name); })
+		.style("opacity", function(v) { return v.opacity; });
 
 	// append label for each line
 	vg.append("text")
@@ -178,6 +183,50 @@ firebaseRef.on("value", function(snapshot) {
 		.attr("x", 3)
 		.attr("dy", ".35em")
 		.text(function(d) { return d._name; });
+
+	var label_W = width/data.length; 
+
+	//console.log(data);
+
+	
+	svg.append("g")
+		.selectAll(".choose")
+		.data(data)
+		.enter()
+	.append("text")
+		.attr("class","choose")
+		.attr("x", function(v) { return (label_W/2)+v.id*label_W; })
+		.attr("y", function(v) { return height+(margin.bottom/2)+5; })
+		.style("fill", function(v) { return color(v.name);})
+		.on("click", function(v) {
+			var duration_time = 800;
+
+			v.opacity ^= 1;
+			d3.select("#tag_"+v.name)
+				.transition()
+				.duration(duration_time)
+				.style("opacity", v.opacity);
+
+			y.domain([
+				d3.min(data.filter(function(v) { return v.opacity;}), function(v) { return d3.min(v.value, function(d) { return d.price});}),
+				d3.max(data.filter(function(v) { return v.opacity;}), function(v) { return d3.max(v.value, function(d) { return d.price});})
+			]);
+
+			d3.select(".y.axis")
+				.transition()
+				.duration(duration_time)
+				.call(yAxis);
+
+			data.forEach( function(v) {
+				if (v.opacity) {
+					d3.select("#tag_"+v.name+".line")
+						.transition()
+						.duration(duration_time)
+						.attr("d", function(v) { return line(v.value); });
+				}
+			});
+		})
+		.text(function(v) { return v.name;});
 
 });
 </script>
