@@ -1,5 +1,6 @@
 <!--web module Reference from: http://bl.ocks.org/mbostock/3883245 -->
 <!--web module Reference from: http://bl.ocks.org/mbostock/3884955#index.html -->
+<!--show/hide line Reference from: http://bl.ocks.org/d3noob/e99a762017060ce81c76 -->
 <html>
 <!DOCTYPE html>
 <meta charset="utf-8">
@@ -188,7 +189,8 @@ firebaseRef.on("value", function(snapshot) {
 
 	//console.log(data);
 
-	
+	// add label for control line display
+	// Reference from http://bl.ocks.org/d3noob/e99a762017060ce81c76
 	svg.append("g")
 		.selectAll(".choose")
 		.data(data)
