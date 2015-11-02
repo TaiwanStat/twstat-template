@@ -53,7 +53,7 @@ var x = d3.time.scale()
 var y = d3.scale.linear()
     .range([height, 0]);
 
-var color = d3.scale.category10();
+var color = d3.scale.category20();
 
 var xAxis = d3.svg.axis()
     .scale(x)
@@ -90,20 +90,19 @@ firebaseRef.on("value", function(snapshot) {
 
 	var data = [];
 
-	// get each data by their path
-	query.forEach( function(item, index) {
+	var name = d3.keys(snapshot.val()).filter(function(name) { return name != 'default'});
 
-		// if path is exist, store data
-		if ( snapshot.hasChild(item) ) {
+	console.log(name);
 
+	snapshot.forEach( function(child) {
+		child.forEach( function(grandChild) {
 			data.push( {
-				name: item.split("/")[1],
-				value: snapshot.child(item).val(),
-				id: +index,
+				cate: child.key(),
+				name: grandChild.key(),
+				value: grandChild.val(),
 				opacity: +1
 			});
-
-		}
+		});
 	});
 
 	// reconstruct(rebuild) date
@@ -183,7 +182,13 @@ firebaseRef.on("value", function(snapshot) {
 		.attr("transform", function(d) { return "translate(" + x(d._value.date) + "," + y(d._value.price) + ")"; })
 		.attr("x", 3)
 		.attr("dy", ".35em")
-		.text(function(d) { return d._name; });
+		.text(function(d) { return d._name; })
+
+		// can be modiy by css
+		.style("font-size","20px")
+		.style("font-weight","bold")
+		.style("stroke", "#000")
+		.style("fill", function(v) { return color(v._name); });
 
 	var label_W = width/data.length; 
 
@@ -212,7 +217,8 @@ firebaseRef.on("value", function(snapshot) {
 		.data(data)
 	.enter()
 	.append("label")
-		.text(function(v) { return " "+v.name; })
+		.style("color", function(v) { return color(v.name); })
+		.text(function(v) { return " |" + v.name; })
 	.append("input")
 		.attr("type","checkbox")
 		.attr("checked",true)
