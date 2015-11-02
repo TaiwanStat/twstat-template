@@ -37,6 +37,8 @@
 	$().ready(function() {
 
 
+		var dura = 500;
+
 		var width = 600,
 			height = 600,
 			radius = (Math.min(width, height) - 100) / 2;
@@ -72,13 +74,15 @@
 				var data = snapshot.val();
 				var root = {name: "農產品", children:[]}
 
+				var sz = 1;
 				for(var cate in data){
 					if(cate != "default"){
 						var a = {name: cate, children:[]};
 						root.children.push(a);
 						console.log(cate);
 						for(var vege in data[cate]){
-							var b = {name: vege, size: 1};
+							var b = {name: vege, size: sz};
+							sz++;
 							a.children.push(b);
 						}
 					}
@@ -111,7 +115,7 @@
 					path
 							.data(partition.value(value).nodes)
 						.transition()
-							.duration(1000)
+							.duration(dura)
 							.attrTween("d", arcTweenData);
 				});
 
@@ -120,10 +124,10 @@
 				function click(d) {
 					node = d;
 					path.transition()
-						.duration(1000)
+						.duration(dura)
 						.attrTween("d", arcTweenZoom(d));
 					name.transition()
-						.duration(1000)
+						.duration(dura)
 						.attrTween("x", textTweenZoomX(d))
 						.attrTween("y", textTweenZoomY(d))
 						.attrTween("opacity", textTweenZoomVisible(d));
@@ -187,11 +191,7 @@
 							yd = d3.interpolate(y.domain(), [d.y, 1]),
 							yr = d3.interpolate(y.range(), [d.y ? 20 : 0, radius]);
 					return function(d, i) {
-						console.log(i);
-						return i
-								? function(t) { return 0; }
-								: function(t) { return 1; };
-						//return function(t) { x.domain(xd(t)); y.domain(yd(t)).range(yr(t)); return x(d.dx); };
+						return function(t) { console.log(d); x.domain(xd(t)); y.domain(yd(t)).range(yr(t)); if(x(d.x) >=0 && x(d.x) < 6.28) return 1; else return 0; };
 					};
 				}
 
