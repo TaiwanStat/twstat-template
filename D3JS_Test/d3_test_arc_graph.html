@@ -37,8 +37,8 @@
 	$().ready(function() {
 
 
-		var width = 400,
-			height = 400,
+		var width = 600,
+			height = 600,
 			radius = (Math.min(width, height) - 100) / 2;
 
 		var x = d3.scale.linear()
@@ -70,7 +70,7 @@
 			firebaseRef.child("vegetable_data").on("value", function(snapshot) {
 
 				var data = snapshot.val();
-				var root = {name: "vegetable", children:[]}
+				var root = {name: "農產品", children:[]}
 
 				for(var cate in data){
 					if(cate != "default"){
@@ -98,8 +98,9 @@
 				var name = svg.datum(root).selectAll("text")
 						.data(partition.nodes)
 					.enter().append("text")
-						.attr("x", function(d){return Math.cos(x(d.x)) * y(d.y);})
-						.attr("y", function(d){return Math.sin(x(d.x)) * y(d.y);})
+						.attr("x", function(d){return Math.cos(x(d.x + d.dx/2) - Math.PI/2) * y(d.y + d.dy/2);})
+						.attr("y", function(d){return Math.sin(x(d.x + d.dx/2) - Math.PI/2) * y(d.y + d.dy/2);})
+						.attr("text-anchor", "middle")
 						.text(function(d) { return d.name; });
 
 				d3.selectAll("input").on("change", function change() {
@@ -121,6 +122,11 @@
 					path.transition()
 						.duration(1000)
 						.attrTween("d", arcTweenZoom(d));
+					name.transition()
+						.duration(1000)
+						.attrTween("x", textTweenZoomX(d))
+						.attrTween("y", textTweenZoomY(d))
+						.attrTween("opacity", textTweenZoomVisible(d));
 				}
 
 				function stash(d) {
@@ -155,6 +161,37 @@
 						return i
 								? function(t) { return arc(d); }
 								: function(t) { x.domain(xd(t)); y.domain(yd(t)).range(yr(t)); return arc(d); };
+					};
+				}
+
+				function textTweenZoomX(d) {
+					var xd = d3.interpolate(x.domain(), [d.x, d.x + d.dx]),
+							yd = d3.interpolate(y.domain(), [d.y, 1]),
+							yr = d3.interpolate(y.range(), [d.y ? 20 : 0, radius]);
+					return function(d, i) {
+						return function(t) { x.domain(xd(t)); y.domain(yd(t)).range(yr(t)); return Math.cos(x(d.x + d.dx/2) - Math.PI/2) * y(d.y + d.dy/2); };
+					};
+				}
+
+				function textTweenZoomY(d) {
+					var xd = d3.interpolate(x.domain(), [d.x, d.x + d.dx]),
+							yd = d3.interpolate(y.domain(), [d.y, 1]),
+							yr = d3.interpolate(y.range(), [d.y ? 20 : 0, radius]);
+					return function(d, i) {
+						return function(t) { x.domain(xd(t)); y.domain(yd(t)).range(yr(t)); return Math.sin(x(d.x + d.dx/2) - Math.PI/2) * y(d.y + d.dy/2); };
+					};
+				}
+
+				function textTweenZoomVisible(d) {
+					var xd = d3.interpolate(x.domain(), [d.x, d.x + d.dx]),
+							yd = d3.interpolate(y.domain(), [d.y, 1]),
+							yr = d3.interpolate(y.range(), [d.y ? 20 : 0, radius]);
+					return function(d, i) {
+						console.log(i);
+						return i
+								? function(t) { return 0; }
+								: function(t) { return 1; };
+						//return function(t) { x.domain(xd(t)); y.domain(yd(t)).range(yr(t)); return x(d.dx); };
 					};
 				}
 
