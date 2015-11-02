@@ -178,17 +178,19 @@ firebaseRef.on("value", function(snapshot) {
 
 	// append label for each line
 	vg.append("text")
-		.datum(function(d) { return {_name: d.name, _value: d.value[d.value.length - 1]}; })
-		.attr("transform", function(d) { return "translate(" + x(d._value.date) + "," + y(d._value.price) + ")"; })
+		.datum(function(d) { return {name: d.name, value: d.value[d.value.length - 1]}; })
+		.attr("class","vglabel")
+		.attr("id", function(v) { return "tag_"+v.name; })
+		.attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.price) + ")"; })
 		.attr("x", 3)
 		.attr("dy", ".35em")
-		.text(function(d) { return d._name; })
+		.text(function(d) { return d.name; })
 
 		// can be modiy by css
 		.style("font-size","20px")
 		.style("font-weight","bold")
 		.style("stroke", "#000")
-		.style("fill", function(v) { return color(v._name); });
+		.style("fill", function(v) { return color(v.name); });
 
 	var label_W = width/data.length; 
 
@@ -236,10 +238,6 @@ firebaseRef.on("value", function(snapshot) {
 		var duration_time = 800;
 
 		v.opacity ^= 1;
-		d3.select("#tag_"+v.name)
-			.transition()
-			.duration(duration_time)
-			.style("opacity", v.opacity);
 
 		y.domain([
 			d3.min(data.filter(function(v) { return v.opacity;}), function(v) { return d3.min(v.value, function(d) { return d.price});}),
@@ -252,13 +250,22 @@ firebaseRef.on("value", function(snapshot) {
 			.call(yAxis);
 
 		data.forEach( function(v) {
-			if (v.opacity) {
-				d3.select("#tag_"+v.name+".line")
+				d3.select(".line#tag_"+v.name)
 					.transition()
 					.duration(duration_time)
 					.attr("d", function(v) { return line(v.value); });
-				}
-			});
+
+				d3.select(".city#tag_"+v.name)
+					.transition()
+					.duration(duration_time)
+					.style("opacity", function(v) { return v.opacity; });
+
+				d3.select(".vglabel#tag_"+v.name)
+					.transition()
+					.duration(duration_time)
+					.attr("transform", function(v) { ;return "translate(" + x(v.value.date) + "," + y(v.value.price) + ")"; });
+
+		});
 	}
 });
 
