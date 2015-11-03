@@ -32,6 +32,10 @@ body {
   stroke-width: 1.5px;
 }
 
+.tick line {
+	opacity: 0.2;
+}
+
 </style>
 <body>
 </body>
@@ -57,15 +61,17 @@ var color = d3.scale.category20();
 
 var xAxis = d3.svg.axis()
     .scale(x)
-    .orient("bottom");
+    .orient("bottom")
+	.tickSize(-height,0);
 
 var yAxis = d3.svg.axis()
     .scale(y)
 	.ticks(5,"$")
-    .orient("left");
+    .orient("left")
+	.tickSize(-width,0);
 
 var line = d3.svg.line()
-    .x(function(d) { return x(d.date); })
+    .x(function(d) { return x(d.Date); })
     .y(function(d) { return y(d.price); });
 
 var svg = d3.select("body").append("svg")
@@ -79,17 +85,12 @@ var svg = d3.select("body").append("svg")
 // connect to firebase db
 var firebaseRef = new Firebase("https://ikdde-team6.firebaseio.com/vegetable_data/");
 
-// path of data
-var query = ["葉菜類/小白菜","葉菜類/包心白菜","葉菜類/青江菜","葉菜類/香菜","葉菜類/莧菜"];
-//var query = ["葉菜類/小白菜","葉菜類/包心白菜","葉菜類/青江菜","葉菜類/莧菜"];
-//var query = ["葉菜類/小白菜","葉菜類/包心白菜","葉菜類/莧菜"];
-//var query = ["葉菜類/小白菜","葉菜類/包心白菜"];
-
 // store data from firebase and drawing charts
 firebaseRef.on("value", function(snapshot) {
 
 	var data = [];
 
+	// get all vegetable name
 	var name = d3.keys(snapshot.val()).filter(function(name) { return name != 'default'});
 
 	console.log(name);
@@ -100,7 +101,7 @@ firebaseRef.on("value", function(snapshot) {
 				cate: child.key(),
 				name: grandChild.key(),
 				value: grandChild.val(),
-				opacity: +1
+				opacity: +0
 			});
 		});
 	});
@@ -109,9 +110,13 @@ firebaseRef.on("value", function(snapshot) {
 	data.forEach( function(v) {
 		v.value = d3.values(v.value);
 		v.value.forEach( function(e) {
-			e.date = new Date(e.date.year,e.date.month,e.date.day);
+			// creat_new element
+			e.Date = new Date(e.date.year,e.date.month,e.date.day);
+				console.log(e.price);
 		});
 	});
+
+	console.log(data);
 
 	// set color domain by vegetable name
 	//     vegetable name --mapping--> specific color
@@ -121,18 +126,24 @@ firebaseRef.on("value", function(snapshot) {
 	// set x domain by range from min of date to max of date
 	//     x invoked in xAxis
 	x.domain([
-		d3.min(data, function(v) { return d3.min(v.value, function(d) { return d.date});}),
-		d3.max(data, function(v) { return d3.max(v.value, function(d) { return d.date});})
+		d3.min(data, function(v) { return d3.min(v.value, function(d) { return d.Date});}),
+		d3.max(data, function(v) { return d3.max(v.value, function(d) { return d.Date});})
 	]);
 
+
+	// find max y, if y_max is NaN(no line display), set as default 50
+	var y_max = d3.max(
+			data.filter( function(v) { return v.opacity===1;}),
+			function(v) { return d3.max(v.value, function(d) { return d.price; }); }
+		);
+	y_max = isNaN(y_max)? +50: y_max;
 
 	// set y domain by range from min of date to max of date
 	//     y invoked in yAxis
 	y.domain([
-		d3.min(data.filter(function(v) { return v.opacity;}), function(v) { return d3.min(v.value, function(d) { return d.price});}),
-		d3.max(data.filter(function(v) { return v.opacity;}), function(v) { return d3.max(v.value, function(d) { return d.price});})
+		0,
+		y_max
 	]);
-
 
 	// append x axis by feature xAxis
 	var gxAxis = svg.append("g")
@@ -166,7 +177,8 @@ firebaseRef.on("value", function(snapshot) {
 				.enter()
 			.append("g")
 				.attr("class","city")
-				.attr("id", function(v) { return 'tag_'+v.name; });
+				.attr("id", function(v) { return 'tag_'+v.name; })
+				.style("opacity", function(v) { return v.opacity; });
 
 	// add path by feature "line" under each ".city"
 	vg.append("path")
@@ -174,14 +186,13 @@ firebaseRef.on("value", function(snapshot) {
 		.attr("id", function(v) { return "tag_"+v.name; })
 		.attr("d", function(v) { return line(v.value); })
 		.style("stroke", function(v) { return color(v.name); })
-		.style("opacity", function(v) { return v.opacity; });
 
 	// append label for each line
 	vg.append("text")
 		.datum(function(d) { return {name: d.name, value: d.value[d.value.length - 1]}; })
 		.attr("class","vglabel")
 		.attr("id", function(v) { return "tag_"+v.name; })
-		.attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.price) + ")"; })
+		.attr("transform", function(d) { return "translate(" + x(d.value.Date) + "," + y(d.value.price) + ")"; })
 		.attr("x", 3)
 		.attr("dy", ".35em")
 		.text(function(d) { return d.name; })
@@ -223,10 +234,8 @@ firebaseRef.on("value", function(snapshot) {
 		.text(function(v) { return " |" + v.name; })
 	.append("input")
 		.attr("type","checkbox")
-		.attr("checked",true)
 		.property("position", "absolute")
 		.property("left", function(v) { return v.id*10+"px"; })
-		//.property("textContent", function(v) { return v.name;})
 		.on("change", function(v) {
 			this.checked ^ true;
 			click(v);
@@ -239,9 +248,11 @@ firebaseRef.on("value", function(snapshot) {
 
 		v.opacity ^= 1;
 
+		var y_max = d3.max(data.filter( function(v) { return v.opacity===1; }), function(v) {return d3.max(v.value, function(d) { return d.price; }); });
+		y_max = isNaN(y_max)?+50:y_max;
 		y.domain([
-			d3.min(data.filter(function(v) { return v.opacity;}), function(v) { return d3.min(v.value, function(d) { return d.price});}),
-			d3.max(data.filter(function(v) { return v.opacity;}), function(v) { return d3.max(v.value, function(d) { return d.price});})
+			0,
+			y_max
 		]);
 
 		d3.select(".y.axis")
@@ -263,7 +274,7 @@ firebaseRef.on("value", function(snapshot) {
 				d3.select(".vglabel#tag_"+v.name)
 					.transition()
 					.duration(duration_time)
-					.attr("transform", function(v) { ;return "translate(" + x(v.value.date) + "," + y(v.value.price) + ")"; });
+					.attr("transform", function(v) { ;return "translate(" + x(v.value.Date) + "," + y(v.value.price) + ")"; });
 
 		});
 	}
