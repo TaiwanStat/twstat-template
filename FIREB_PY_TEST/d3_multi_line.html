@@ -81,7 +81,8 @@ var line = d3.svg.line()
 
 var svg = d3.select("body").append("svg")
     .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
+    //.attr("height", height + margin.top + margin.bottom)
+    .attr("height", 700 + margin.top + margin.bottom)
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -127,7 +128,7 @@ firebaseRef.on("value", function(snapshot) {
 		});
 	});
 
-	console.log(data);
+	//console.log(data);
 
 	// set color domain by vegetable name
 	//     vegetable name --mapping--> specific color
@@ -192,7 +193,7 @@ firebaseRef.on("value", function(snapshot) {
 				.style("opacity", function(v) { return v.opacity; });
 
 	// add path by feature "line" under each ".city"
-	vg.append("path")
+	var graph = vg.append("path")
 		.attr("class","line")
 		.attr("id", function(v) { return "tag_"+v.name; })
 		.attr("d", function(v) { return line(v.value); })
@@ -289,6 +290,68 @@ firebaseRef.on("value", function(snapshot) {
 
 		});
 	}
+
+///// brush
+
+var height2 = 50;
+
+var x2 = d3.time.scale()
+    .range([0, width]);
+
+x2.domain([
+	d3.min(data, function(v) { return d3.min(v.value, function(d) { return d.Date});}),
+	d3.max(data, function(v) { return d3.max(v.value, function(d) { return d.Date});})
+]);
+    var y2 = d3.scale.linear().range([height2, 0]);
+
+var xAxis2 = d3.svg.axis().scale(x2).orient("bottom");
+
+var brush = d3.svg.brush()
+    .x(x2)
+    .on("brush", brushed);
+
+var area2 = d3.svg.area()
+    .interpolate("monotone")
+    .x(function(d) { return x2(d.Date); })
+    .y0(height2)
+    .y1(function(d) { return y2(d.price); });
+
+svg.append("defs").append("clipPath")
+    .attr("id", "clip")
+  .append("rect")
+    .attr("width", width)
+    .attr("height", height);
+
+var context = svg.append("g")
+    .attr("class", "context")
+    .attr("transform", "translate(" + margin.left + "," + 550 + ")");
+
+  context.append("path")
+      .data(data)
+      .attr("class", "area")
+      .attr("d", area2);
+
+  context.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height2 + ")")
+      .call(xAxis2);
+
+  context.append("g")
+      .attr("class", "x brush")
+      .call(brush)
+    .selectAll("rect")
+      .attr("y", -6)
+      .attr("height", height2 + 7);
+
+////////////////
+
+	function brushed() {
+		x.domain(brush.empty() ? x2.domain() : brush.extent());
+		graph
+			.attr("d", function(v) { return line(v.value); });
+		vg.select(".x.axis").call(xAxis);
+	}
+
 });
 
 </script>
