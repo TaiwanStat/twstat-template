@@ -33,7 +33,12 @@ body {
 }
 
 .tick line {
-	opacity: 0.2;
+	fill: none;
+	stroke: #fff;
+}
+
+rect.main_rect{
+	fill: #ddd;
 }
 
 </style>
@@ -49,10 +54,9 @@ var margin = {top: 20, right: 20, bottom: 30, left: 50},
 
 // reserve for expressing
 //     label of each line
-var reserv_w = 30;
 
 var x = d3.time.scale()
-    .range([0, width - reserv_w]);
+    .range([0, width]);
 
 var y = d3.scale.linear()
     .range([height, 0]);
@@ -71,6 +75,7 @@ var yAxis = d3.svg.axis()
 	.tickSize(-width,0);
 
 var line = d3.svg.line()
+	//.interpolate("cardinal")
     .x(function(d) { return x(d.Date); })
     .y(function(d) { return y(d.price); });
 
@@ -79,6 +84,11 @@ var svg = d3.select("body").append("svg")
     .attr("height", height + margin.top + margin.bottom)
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+	svg.append("rect")
+		.attr("class","main_rect")
+		.attr("width", width)
+		.attr("height", height);
 //end--line chart feature setting
 
 
@@ -109,6 +119,7 @@ firebaseRef.on("value", function(snapshot) {
 	// reconstruct(rebuild) date
 	data.forEach( function(v) {
 		v.value = d3.values(v.value);
+		//v.value = v.value.filter(function(e) { return e.date.month===2; });
 		v.value.forEach( function(e) {
 			// creat_new element
 			e.Date = new Date(e.date.year,e.date.month,e.date.day);
@@ -136,7 +147,7 @@ firebaseRef.on("value", function(snapshot) {
 			data.filter( function(v) { return v.opacity===1;}),
 			function(v) { return d3.max(v.value, function(d) { return d.price; }); }
 		);
-	y_max = isNaN(y_max)? +50: y_max;
+	y_max = isNaN(y_max)? +50: y_max+20;
 
 	// set y domain by range from min of date to max of date
 	//     y invoked in yAxis
@@ -249,7 +260,7 @@ firebaseRef.on("value", function(snapshot) {
 		v.opacity ^= 1;
 
 		var y_max = d3.max(data.filter( function(v) { return v.opacity===1; }), function(v) {return d3.max(v.value, function(d) { return d.price; }); });
-		y_max = isNaN(y_max)?+50:y_max;
+		y_max = isNaN(y_max)?+50:y_max+20;
 		y.domain([
 			0,
 			y_max
