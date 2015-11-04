@@ -257,7 +257,18 @@
 				}];
 				dataSet1.dataProvider = chartData1;
 				dataSet1.categoryField = "date";
-
+				
+				var e0 = {
+					date: new Date(2015, 9, 12),
+					type: "sign",
+					backgroundColor: "#85CDE6",
+					graph: graph1,
+					text: "S",
+					description: "This is description of an event"
+				};
+				dataSet1.stockEvents = [e0] ;
+				
+				
 				var dataSet2 = new AmCharts.DataSet();
 				dataSet2.title = "ninefive";
 				dataSet2.fieldMappings = [{
@@ -340,7 +351,7 @@
 				// PANELS ///////////////////////////////////////////
 				// first stock panel
 				var stockPanel1 = new AmCharts.StockPanel();
-				stockPanel1.showCategoryAxis = false;
+				//stockPanel1.showCategoryAxis = false;
 				stockPanel1.title = "Value";
 				stockPanel1.percentHeight = 70;
 
@@ -366,6 +377,8 @@
 				stockPanel1.stockLegend = stockLegend1;
 
 				
+				
+				/*
 				// second stock panel
 				var stockPanel2 = new AmCharts.StockPanel();
 				stockPanel2.title = "Volume";
@@ -380,9 +393,9 @@
 				var stockLegend2 = new AmCharts.StockLegend();
 				stockLegend2.periodValueTextRegular = "[[value.close]]";
 				stockPanel2.stockLegend = stockLegend2;
-				
+				*/
 				// set panels to the chart
-				chart.panels = [stockPanel1, stockPanel2];
+				chart.panels = [stockPanel1/*, stockPanel2*/];
 
 
 				// OTHER SETTINGS ////////////////////////////////////
@@ -393,11 +406,13 @@
 				// CURSOR
 				var cursorSettings = new AmCharts.ChartCursorSettings();
 				cursorSettings.valueBalloonsEnabled = true;
+				/*
 				cursorSettings.fullWidth = true;
 				cursorSettings.cursorAlpha = 0.1;
 				cursorSettings.valueLineBalloonEnabled = true ;
 				cursorSettings.valueLineEnabled = true ;
 				cursorSettings.valueLineAlpha = 0.5 ;
+				*/
 				chart.chartCursorSettings = cursorSettings;
 
 
@@ -469,6 +484,18 @@
 					});
 				});
 				*/
+				
+				
+				var e0 = {
+					date: new Date(2015, 9, 12),
+					type: "sign",
+					backgroundColor: "#85CDE6",
+					graph: graph1,
+					text: "S",
+					description: "This is description of an event"
+				};
+				dataSet1.stockEvents = [e0] ;
+				
 				
 				allRef.once("value", function(snap) {
 					console.log("initial data loaded!", Object.keys(snap.val()).length === allCount);
