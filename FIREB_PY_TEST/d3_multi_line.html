@@ -252,13 +252,44 @@ firebaseRef.on("value", function(snapshot) {
 
 	*/
 
-	focus.append("line")
-		.attr("class","x")
-		.style("stroke", "blue")
-		.style("stroke-dasharray", "3.3")
-		.style("opacity", 0.5)
-		.attr("y1", -height)
-		.attr("y2", 0);
+	focus.selectAll("x")
+			.data(data)
+			.enter()
+		.append("line")
+			.attr("class","x")
+			.attr("id", function(v) { return "tag_" + v.name; })
+			.style("display","none")
+			.style("stroke", "blue")
+			.style("stroke-dasharray", "3.3")
+			.style("opacity", 0.5)
+			.attr("y1", -height)
+			.attr("y2", 0);
+
+	focus.selectAll("y")
+			.data(data)
+			.enter()
+		.append("line")
+			.attr("class","y")
+			.attr("id", function(v) { return "tag_"+v.name; })
+			.style("display","none")
+			.style("stroke", "blue")
+			.style("stroke-dasharray", "3.3")
+			.style("opacity", 0.5)
+			.attr("x1", 0)
+			.attr("x2", width);
+
+	focus.selectAll("dot")
+			.data(data)
+			.enter()
+		.append("circle")
+			.attr("class", "dot")
+			.attr("id", function(v) { return "tag_"+v.name; })
+			.style("display","none")
+			.style("opacity", 0.5)
+			.style("fill", "none")
+			.style("stroke", "blue")
+			.attr("r", 4);
+
 
 	svg.append("rect")
 		.attr("width", width)
@@ -272,16 +303,35 @@ firebaseRef.on("value", function(snapshot) {
 	var bisectDate = d3.bisector(function(v) { return v.Date; }).left;
 
 	function mousemove () {
+
+		var x0 = x.invert(d3.mouse(this)[0]);
+
+		data.forEach( function(v) {
+	
+			var	i = bisectDate(v.value, x0, 1);
+			var	d0 = v.value[i - 1];
+			var	d1 = v.value[i];
+			var	d = x0 - d0.Date > d1.Date - x0 ? d1 : d0;
+
+			focus.select("#tag_" + v.name + ".x")
+				.attr("transform", "translate(" + x(d.Date) + ","
+												+ y(0) + ")");
+			focus.select("#tag_" + v.name + ".y")
+				.attr("transform", "translate(" + 0 + ","
+											+ y(d.price) + ")");
+
+			focus.select("#tag_" + v.name + ".dot")
+				.attr("transform", "translate(" + x(d.Date) + ","
+												+ y(d.price) + ")");
+		});
+		/*
 		var x0 = x.invert(d3.mouse(this)[0]),
 			i = bisectDate(data[0].value, x0, 1),
 			d0 = data[0].value[i - 1],
 			d1 = data[0].value[i],
 			d = x0 - d0.Date > d1.Date - x0 ? d1 : d0;
 
-		focus.select(".x")
-			.attr("transform", "translate(" + x(d.Date) + ","
-											+ y(0) + ")");
-
+		*/
 	}
 
 	// check box
@@ -335,7 +385,16 @@ firebaseRef.on("value", function(snapshot) {
 				d3.select(".vglabel#tag_"+v.name)
 					.transition()
 					.duration(duration_time)
-					.attr("transform", function(v) { ;return "translate(" + x(v.value.Date) + "," + y(v.value.price) + ")"; });
+					.attr("transform", function(v) { return "translate(" + x(v.value.Date) + "," + y(v.value.price) + ")"; });
+
+				d3.select(".x#tag_"+v.name)
+					.style("display", function(v) { return v.opacity===1 ?null:"none";});
+
+				d3.select(".y#tag_"+v.name)
+					.style("display", function(v) { return v.opacity===1 ?null:"none" ;});
+
+				d3.select(".dot#tag_"+v.name)
+					.style("display", function(v) { return v.opacity===1 ?null:"none"; });
 
 		});
 	}
