@@ -79,17 +79,24 @@ var line = d3.svg.line()
     .x(function(d) { return x(d.Date); })
     .y(function(d) { return y(d.price); });
 
-var svg = d3.select("body").append("svg")
-    .attr("width", width + margin.left + margin.right)
-    //.attr("height", height + margin.top + margin.bottom)
-    .attr("height", 700 + margin.top + margin.bottom)
-  .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+// basic form
+var svg = d3.select("body")
+	.append("svg")
+    	.attr("width", width + margin.left + margin.right)
+    	//.attr("height", height + margin.top + margin.bottom)
+    	.attr("height", 700 + margin.top + margin.bottom)
+	.append("g")
+    	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-	svg.append("rect")
+var bg = svg.append("g")
+		.append("rect")
 		.attr("class","main_rect")
 		.attr("width", width)
 		.attr("height", height);
+
+var focus = svg.append("g")
+		.style("display", "none");
+
 //end--line chart feature setting
 
 
@@ -122,9 +129,7 @@ firebaseRef.on("value", function(snapshot) {
 		v.value = d3.values(v.value);
 		//v.value = v.value.filter(function(e) { return e.date.month===2; });
 		v.value.forEach( function(e) {
-			// creat_new element
-			e.Date = new Date(e.date.year,e.date.month,e.date.day);
-				console.log(e.price);
+			e.Date = new Date(e.date.year,e.date.month-1,e.date.day);
 		});
 	});
 
@@ -147,41 +152,31 @@ firebaseRef.on("value", function(snapshot) {
 	var y_max = d3.max(
 			data.filter( function(v) { return v.opacity===1;}),
 			function(v) { return d3.max(v.value, function(d) { return d.price; }); }
-		);
+	);
+
 	y_max = isNaN(y_max)? +50: y_max+20;
 
 	// set y domain by range from min of date to max of date
 	//     y invoked in yAxis
-	y.domain([
-		0,
-		y_max
-	]);
+	y.domain([0,y_max]);
 
 	// append x axis by feature xAxis
 	var gxAxis = svg.append("g")
-					.attr("class","x axis")
-					.attr("transform","translate(0," + height + ")")
-					.call(xAxis);
+			.attr("class","x axis")
+			.attr("transform","translate(0," + height + ")")
+			.call(xAxis);
 	
 
 	// append y axis by feature yAxis
 	var gyAxis = svg.append("g")
-					.attr("class","y axis")
-					.call(yAxis)
-
-	// append y axis label
-	.append("text")
-
-		// from horizental to vertical
-		.attr("transform","rotate(-90)")
-
-		// the distant to y axis
-		.attr("y",6)
-
-		.attr("dy", ".71em")
-		.style("text-anchor", "end")
-		.text("Price/Weight ($/kg)");
-
+			.attr("class","y axis")
+			.call(yAxis)
+		.append("text")
+			.attr("transform","rotate(-90)")
+			.attr("y",6)
+			.attr("dy", ".71em")
+			.style("text-anchor", "end")
+			.text("Price/Weight ($/kg)");
 
 	// add all g
 	var vg = svg.selectAll(".city")
@@ -197,7 +192,28 @@ firebaseRef.on("value", function(snapshot) {
 		.attr("class","line")
 		.attr("id", function(v) { return "tag_"+v.name; })
 		.attr("d", function(v) { return line(v.value); })
-		.style("stroke", function(v) { return color(v.name); })
+		.style("stroke", function(v) { return color(v.name); });
+
+	// append circle
+	/*
+	var cir = vg.selectAll(".dot")
+				.data(function(d) { return d.value; })
+			.enter()
+				.append("circle")
+				.attr("class","dot")
+				.attr("r", 5)
+				.attr("cx", function(d) { return x(d.Date); })
+				.attr("cy", function(d) { return y(d.price); })
+				.style("opacity",1)
+				.on("mouseover", function(d) {
+					var dot = d3.select(this);
+					dot.style("opacity", .9);
+				})
+				.on("mouseout", function(d) {
+					var dot = d3.select(this);
+					dot.style("opacity", 0);
+				});
+	*/
 
 	// append label for each line
 	vg.append("text")
@@ -236,6 +252,39 @@ firebaseRef.on("value", function(snapshot) {
 
 	*/
 
+	focus.append("line")
+		.attr("class","x")
+		.style("stroke", "blue")
+		.style("stroke-dasharray", "3.3")
+		.style("opacity", 0.5)
+		.attr("y1", -height)
+		.attr("y2", 0);
+
+	svg.append("rect")
+		.attr("width", width)
+		.attr("height", height)
+		.style("fill", "none")
+		.style("pointer-events", "all")
+		.on("mouseover", function() { focus.style("display", null); })
+		.on("mouseout", function() { focus.style("display", "none"); })
+		.on("mousemove", mousemove);
+
+	var bisectDate = d3.bisector(function(v) { return v.Date; }).left;
+
+	function mousemove () {
+		var x0 = x.invert(d3.mouse(this)[0]),
+			i = bisectDate(data[0].value, x0, 1),
+			d0 = data[0].value[i - 1],
+			d1 = data[0].value[i],
+			d = x0 - d0.Date > d1.Date - x0 ? d1 : d0;
+
+		focus.select(".x")
+			.attr("transform", "translate(" + x(d.Date) + ","
+											+ y(0) + ")");
+
+	}
+
+	// check box
 	d3.select("body")
 	.append("div")
 		.selectAll(".vginput")
@@ -349,7 +398,8 @@ var context = svg.append("g")
 		x.domain(brush.empty() ? x2.domain() : brush.extent());
 		graph
 			.attr("d", function(v) { return line(v.value); });
-		vg.select(".x.axis").call(xAxis);
+		//vg.select(".x.axis").call(xAxis);
+		d3.select(".x.axis").call(xAxis);
 	}
 
 });
