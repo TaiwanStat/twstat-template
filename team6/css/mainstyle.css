@@ -17,15 +17,20 @@ body {
     margin: 10px;
     border: 1px solid #bbbbbb;
 }
-.keyiv {
-    line-height: 150%;
-    font-family: "Courier New";
-}
 .sunburstChart {
 	display: inline-block;
-	width: 30%;
+	width: 40%;
 }
 .quickSummerize {
 	display: inline-block;
-	width: 65%;
+	width: 55%;
+}
+.multilineChart {
+    display: inline-block;
+    width: 100%;
+}
+.headTitle {
+    margin-left: 20px; 
+    font-family: 'Source Sans Pro', sans-serif; 
+    font-weight: 100;
 }

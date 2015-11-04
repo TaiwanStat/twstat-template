@@ -22,7 +22,7 @@ function drawSunburst (domobj, _width) {
 			.attr("transform", "translate(" + width / 2 + "," + (height / 2 + 10) + ")");
 
 	var partition = d3.layout.partition()
-			.sort(null)
+			.sort(function(d, e) { return d.size > e.size; })
 			.value(function(d) { return 1; });
 
 	var arc = d3.svg.arc()
@@ -43,7 +43,6 @@ function drawSunburst (domobj, _width) {
 			if(cate != "default"){
 				var a = {name: cate, children:[]};
 				root.children.push(a);
-				console.log(cate);
 				for(var vege in data[cate]){
 					var b = {name: vege, size: sz};
 					sz++;
@@ -60,7 +59,8 @@ function drawSunburst (domobj, _width) {
 				.attr("d", arc)
 				.style("fill", function(d) { return color((d.children ? d : d.parent).name); })
 				.on("click", click)
-				.each(stash);
+				.each(stash)
+				.on("click", click);
 
 		var i = 0;
 		var name = svg.datum(root).selectAll("text")
@@ -70,19 +70,8 @@ function drawSunburst (domobj, _width) {
 				.attr("y", function(d){return Math.sin(x(d.x + d.dx/2) - Math.PI/2) * y(d.y + d.dy/2);})
 				.attr("text-anchor", "middle")
 				.style("font-size", "8pt")
-				.text(function(d) { return d.name; });
-
-		d3.selectAll("input").on("change", function change() {
-			var value = this.value === "count"
-					? function() { return 1; }
-					: function(d) { return d.size; };
-
-			path
-					.data(partition.value(value).nodes)
-				.transition()
-					.duration(dura)
-					.attrTween("d", arcTweenData);
-		});
+				.text(function(d) { return d.name; })
+				.on("click", click);
 
 		d3.select(self.frameElement).style("height", height + "px");
 
@@ -138,7 +127,11 @@ function drawSunburst (domobj, _width) {
 					yd = d3.interpolate(y.domain(), [d.y, 1]),
 					yr = d3.interpolate(y.range(), [d.y ? 20 : 0, radius]);
 			return function(d, i) {
-				return function(t) { x.domain(xd(t)); y.domain(yd(t)).range(yr(t)); return Math.cos(x(d.x + d.dx/2) - Math.PI/2) * y(d.y + d.dy/2); };
+				return function(t) {
+					x.domain(xd(t));
+					y.domain(yd(t)).range(yr(t));
+					return Math.cos(x(d.x + d.dx/2) - Math.PI/2) * y(d.y + d.dy/2);
+				};
 			};
 		}
 
@@ -147,16 +140,29 @@ function drawSunburst (domobj, _width) {
 					yd = d3.interpolate(y.domain(), [d.y, 1]),
 					yr = d3.interpolate(y.range(), [d.y ? 20 : 0, radius]);
 			return function(d, i) {
-				return function(t) { x.domain(xd(t)); y.domain(yd(t)).range(yr(t)); return Math.sin(x(d.x + d.dx/2) - Math.PI/2) * y(d.y + d.dy/2); };
+				return function(t) { 
+					x.domain(xd(t)); 
+					y.domain(yd(t)).range(yr(t)); 
+					return Math.sin(x(d.x + d.dx/2) - Math.PI/2) * y(d.y + d.dy/2); 
+				};
 			};
 		}
 
 		function textTweenZoomVisible(d) {
+			var isClickInnerCircle = d.depth == 0; 
 			var xd = d3.interpolate(x.domain(), [d.x, d.x + d.dx]),
 					yd = d3.interpolate(y.domain(), [d.y, 1]),
 					yr = d3.interpolate(y.range(), [d.y ? 20 : 0, radius]);
 			return function(d, i) {
-				return function(t) { console.log(d); x.domain(xd(t)); y.domain(yd(t)).range(yr(t)); if(x(d.x+d.dx) >=0 && x(d.x+d.dx) <= 2*Math.PI) return 1; else return 0; };
+				return function(t) { 
+					x.domain(xd(t)); y.domain(yd(t)).range(yr(t));
+					var isShownCircle = x(d.x) >=0 && x(d.x) < 2*Math.PI;
+					var isThisOuterCircle = false;//d.depth == 2;
+					if(!(isThisOuterCircle && isClickInnerCircle) && isShownCircle)
+						return 1; 
+					else 
+						return 0; 
+				};
 			};
 		}
 
