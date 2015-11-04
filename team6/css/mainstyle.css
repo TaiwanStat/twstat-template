@@ -27,7 +27,12 @@ body {
 }
 .multilineChart {
     display: inline-block;
-    width: 100%;
+    width: 90%;
+}
+.multilineChartSelector {
+    display: inline-block;
+    width: 90%;
+    padding: 10px;
 }
 .headTitle {
     margin-left: 20px; 

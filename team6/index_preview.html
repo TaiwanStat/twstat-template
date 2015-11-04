@@ -19,7 +19,7 @@
 
     	$().ready(function (){
     		drawSunburst(d3.select(".sunburstChart"), $(".sunburstChart").width());
-            drawMultilineChart(d3.select(".multilineChart"));
+            drawMultilineChart(d3.select(".multilineChart"), d3.select(".multilineChartSelector"), $(".multilineChart").width());
     	});
 
     </script>
@@ -35,7 +35,7 @@
 
         <!-- /////////////////////////////////////////////////// -->
     	<div class="seperateline"></div>
-            <h1 class="headTitle"> 今日售價 Today Price </h1>
+        <h1 class="headTitle"> 今日售價 Today Price </h1>
         
         <div class="sunburstChart"></div>
         
@@ -45,8 +45,9 @@
 
         <!-- /////////////////////////////////////////////////// -->
         <div class="seperateline"></div>
-
-        <div class="multilineChart"></div>
+        <h1 class="headTitle"> 批價總攬 </h1>
+        <div class="multilineChart" style="margin-top: 20px;"></div>
+        <div class="multilineChartSelector"></div>
 
     </div>
 
