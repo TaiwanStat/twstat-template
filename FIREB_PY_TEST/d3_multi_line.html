@@ -41,6 +41,19 @@ rect.main_rect{
 	fill: #ddd;
 }
 
+div.tooltip{
+	position: absolute;
+	text-align: center;
+	width: 60px;
+	height: 28px;
+	padding: 2px;
+	font: 12px sans-serif;
+	background: white;
+	border: 1px;
+	border-radius: 8px;
+	pointer-events: none;
+}
+
 </style>
 <body>
 </body>
@@ -290,13 +303,27 @@ firebaseRef.on("value", function(snapshot) {
 			.style("stroke", function(v) { return color(v.name); })
 			.attr("r", 4);
 
+
+	var tooltip = d3.select("body")
+		.append("div")
+			.attr("class","tooltip")
+			.style("opacity",1)
+			.style("display","none");
+
+
 	svg.append("rect")
 		.attr("width", width)
 		.attr("height", height)
 		.style("fill", "none")
 		.style("pointer-events", "all")
-		.on("mouseover", function() { focus.style("display", null); })
-		.on("mouseout", function() { focus.style("display", "none"); })
+		.on("mouseover", function() {
+			focus.style("display", null);
+			tooltip.style("display",null);
+		})
+		.on("mouseout", function() { 
+			focus.style("display", "none");
+			tooltip.style("display","none");
+		})
 		.on("mousemove", mousemove);
 
 	var bisectDate = d3.bisector(function(v) { return v.Date; }).left;
@@ -321,32 +348,45 @@ firebaseRef.on("value", function(snapshot) {
 
 	function mousemove () {
 
+		var max = [];
 		var x0 = x.invert(d3.mouse(this)[0]);
 
 		data.forEach( function(v) {
-	
-			var	i = bisectDate(v.value, x0, 1);
-			var	d0 = v.value[i - 1];
-			var	d1 = v.value[i];
-			var	d = x0 - d0.Date > d1.Date - x0 ? d1 : d0;
+			if (v.opacity===1) {
+				var	i = bisectDate(v.value, x0, 1);
+				var	d0 = v.value[i - 1];
+				var	d1 = v.value[i];
+				var	d = x0 - d0.Date > d1.Date - x0 ? d1 : d0;
 
-			focus.select("#tag_" + v.name + ".x")
-				.attr("transform", "translate(" + x(d.Date) + ","
-												+ y(0) + ")");
-			focus.select("#tag_" + v.name + ".y")
-				.attr("transform", "translate(" + 0 + ","
-											+ y(d.price) + ")");
+				max.push({
+					name: v.name,
+					price: d.price,
+					Date: d.Date
+				});
 
-			focus.select("#tag_" + v.name + ".dot")
-				.attr("transform", "translate(" + x(d.Date) + ","
-												+ y(d.price) + ")");
+				focus.select("#tag_" + v.name + ".x")
+					.attr("transform", "translate(" + x(d.Date) + ","
+													+ y(0) + ")");
+				focus.select("#tag_" + v.name + ".y")
+					.attr("transform", "translate(" + 0 + ","
+													+ y(d.price) + ")");
+				focus.select("#tag_" + v.name + ".dot")
+					.attr("transform", "translate(" + x(d.Date) + ","
+													+ y(d.price) + ")");
+			}
 		});
+	
+		var _max = max.length!==0?d3.max(max, function(v) { return v.price; }):0;
+
+		tooltip
+			.style("left",d3.event.pageX+"px")
+			.style("top",y(_max)+"px");
 	}
+
 
 	// for toggle event
 	function click(v) {
 		var duration_time = 800;
-
 		v.opacity ^= 1;
 
 		var y_max = d3.max(
@@ -355,11 +395,7 @@ firebaseRef.on("value", function(snapshot) {
 		);
 
 		y_max = isNaN(y_max)?+50:y_max+20;
-
-		y.domain([
-			0,
-			y_max
-		]);
+		y.domain([0,y_max]);
 
 		d3.select(".y.axis")
 			.transition()
@@ -377,10 +413,12 @@ firebaseRef.on("value", function(snapshot) {
 				.duration(duration_time)
 				.style("opacity", function(v) { return v.opacity; });
 
+			/* wrong
 			d3.select(".vglabel#tag_"+v.name)
 				.transition()
 				.duration(duration_time)
 				.attr("transform", function(v) { return "translate(" + x(v.value.Date) + "," + y(v.value.price) + ")"; });
+			*/
 
 			d3.select(".x#tag_"+v.name)
 				.style("display", function(v) { return v.opacity===1 ?null:"none";});
