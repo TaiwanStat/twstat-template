@@ -9,46 +9,17 @@
 	<script src="https://cdn.firebase.com/js/client/2.3.1/firebase.js"></script>
 	<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700' rel='stylesheet' type='text/css'>
 
+    <link href='css/mainstyle.css' rel='stylesheet' type='text/css'>
+    <link href='css/multiline.css' rel='stylesheet' type='text/css'>
+
 	<script src="js/sunburst.js"></script>
-
-    <style>
-        body {
-            background-image: url("bg1.bmp");
-        }
-        .mainpart {
-            margin: 10px auto;
-            padding: 20px;
-            background-color: #FFFFFF;
-            width: 80%;
-            border: 1px solid #888888;
-
-            -webkit-box-shadow: inset 0px 0px 6px 2px rgba(0,0,0,0.18);
-            -moz-box-shadow: inset 0px 0px 6px 2px rgba(0,0,0,0.18);
-            box-shadow: inset 0px 0px 6px 2px rgba(0,0,0,0.18);
-
-        }
-        .seperateline {
-            margin: 10px;
-            border: 1px solid #bbbbbb;
-        }
-        .keyiv {
-            line-height: 150%;
-            font-family: "Courier New";
-        }
-        .sunburstChart {
-        	display: inline-block;
-        	width: 30%;
-        }
-        .quickSummerize {
-			display: inline-block;
-        	width: 65%;
-        }
-    </style>
+    <script src="js/multiline.js"></script>
 
     <script>
 
     	$().ready(function (){
     		drawSunburst(d3.select(".sunburstChart"), $(".sunburstChart").width());
+            drawMultilineChart(d3.select(".multilineChart"));
     	});
 
     </script>
@@ -60,16 +31,23 @@
 
     <div class="mainpart">
 
-    	<h1 style="font-family: "Source Sans Pro", sans-serif;"> 今日農產品售價一覽 </h1>
+    	<div style="margin-left: 20px;">
+            <h1 style="font-family: 'Source Sans Pro', sans-serif; font-weight: 100;"> 今日農產品售價一覽 Agriculture Price Index </h1>
+        </div>
 
+        <!-- /////////////////////////////////////////////////// -->
     	<div class="seperateline"></div>
 
-        <div class="sunburstChart">
-        </div>
+        <div class="sunburstChart"></div>
 
         <div class="quickSummerize">
 			<div style="margin-top: 45%;"></div>
         </div>
+
+        <!-- /////////////////////////////////////////////////// -->
+        <div class="seperateline"></div>
+
+        <div class="multilineChart"></div>
 
     </div>
 

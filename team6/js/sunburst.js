@@ -156,7 +156,7 @@ function drawSunburst (domobj, _width) {
 					yd = d3.interpolate(y.domain(), [d.y, 1]),
 					yr = d3.interpolate(y.range(), [d.y ? 20 : 0, radius]);
 			return function(d, i) {
-				return function(t) { console.log(d); x.domain(xd(t)); y.domain(yd(t)).range(yr(t)); if(x(d.x) >=0 && x(d.x) < 6.28) return 1; else return 0; };
+				return function(t) { console.log(d); x.domain(xd(t)); y.domain(yd(t)).range(yr(t)); if(x(d.x+d.dx) >=0 && x(d.x+d.dx) <= 2*Math.PI) return 1; else return 0; };
 			};
 		}
 
