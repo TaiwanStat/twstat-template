@@ -132,6 +132,12 @@ function drawMultilineChart(domobj){
 				.style("text-anchor", "end")
 				.text("Price/Weight ($/kg)");
 
+		svg.append("defs").append("clipPath")
+		    .attr("id", "clip")
+			.append("rect")
+	    	.attr("width", width)
+	    	.attr("height", height);
+
 		// add all g
 		var vg = svg.selectAll(".city")
 					.data(data)
@@ -139,6 +145,7 @@ function drawMultilineChart(domobj){
 				.append("g")
 					.attr("class","city")
 					.attr("id", function(v) { return 'tag_'+v.name; })
+					.attr("clip-path", "url(#clip)")
 					.style("opacity", function(v) { return v.opacity; });
 
 		// add path by feature "line" under each ".city"
@@ -377,12 +384,6 @@ function drawMultilineChart(domobj){
 	    .x(function(d) { return x2(d.Date); })
 	    .y0(height2)
 	    .y1(function(d) { return y2(d.price); });
-
-	svg.append("defs").append("clipPath")
-	    .attr("id", "clip")
-	  .append("rect")
-	    .attr("width", width)
-	    .attr("height", height);
 
 	var context = svg.append("g")
 	    .attr("class", "context")
