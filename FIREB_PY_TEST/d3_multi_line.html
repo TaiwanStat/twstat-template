@@ -67,6 +67,8 @@ div.tip{
 
 var dateParse = d3.time.format("%Y-%m-%d").parse;
 
+var dateParseD = d3.time.format("%Y-%m-%d");
+
 var margin = {top: 20, right: 20, bottom: 30, left: 50},
     width = 960 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
@@ -266,7 +268,7 @@ firebaseRef.on("value", function(snapshot) {
 		.append("rect")
 			.attr("clip-path", "url(#clip)")
 			.attr("class","bar")
-			.attr("x", function(ty) { return (x(ty.end_date)+x(ty.start_date))/2; })
+			.attr("x", function(ty) { return x(ty.start_date); })
 			.attr("width", function(ty) { return x(ty.end_date) - x(ty.start_date); })
 			.attr("y", 0)
 			.attr("height", height)
@@ -336,8 +338,19 @@ firebaseRef.on("value", function(snapshot) {
 			.style("display", "none")
 		.append("text")
 			.style("color", function(v) { return color(v.name); }) 
-
-
+	
+	tooltip
+		.selectAll("typhoon")
+			.data(tydata)
+			.enter()
+		.append("div")
+			.attr("class","typhoon")
+			.attr("id", function(v) { return "tag_"+v.name; })
+			.style("display","none")
+		.append("text")
+			.style("color", "black" )
+			.text(function(v){ return v.name+":"+v.rank; });
+			
 	svg.append("rect")
 		.attr("width", width)
 		.attr("height", height)
@@ -377,6 +390,7 @@ firebaseRef.on("value", function(snapshot) {
 
 		var max = [];
 		var x0 = x.invert(d3.mouse(this)[0]);
+		var _x = d3.mouse(this)[0];
 
 		data.forEach( function(v) {
 			if (v.opacity===1) {
@@ -406,6 +420,36 @@ firebaseRef.on("value", function(snapshot) {
 					.text(v.name +":"+d.price);
 			}
 		});
+		
+		var change_white = true;
+		tydata.forEach( function(ty) {
+			var ds1 = x(ty.start_date);
+			var ds2 = x(ty.end_date);
+
+			if (ds1<=_x && _x<=ds2) {
+				var _rank =	ty.rank <= 15 ? 0  :
+							ty.rank <= 25 ? 10 :
+							20;
+				_color = rankScale(_rank);
+
+				tooltip
+					.style("background", _color)
+				.select("#tag_"+ty.name+".typhoon")
+					.style("display", null);
+
+				change_white = false;
+			} else {
+				tooltip
+				.select("#tag_"+ty.name+".typhoon")
+					.style("display", "none");
+				console.log(ds1,_x,ds2);
+			}
+		});
+
+		if (change_white) {
+			tooltip
+				.style("background", "white");
+		}
 
 		var _max = max.length!==0?d3.max(max, function(v) { return v.price; }):0;
 
