@@ -273,6 +273,18 @@ function drawMultilineChart(domobj, domobjsel, _width){
 		.append("text")
 			.style("color", function(v) { return color(v.name); });
 
+		tooltip
+			.selectAll("typhoon")
+				.data(tydata)
+				.enter()
+			.append("div")
+				.attr("class","typhoon")
+				.attr("id", function(v) { return "tag_"+v.name; })
+				.style("display","none")
+			.append("text")
+				.style("color", "black" )
+				.text(function(v){ return v.name+":"+v.rank; });
+		
         svg.append("rect")
             .attr("width", width)
             .attr("height", height)
@@ -322,6 +334,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
 
             var max = [];
             var x0 = x.invert(d3.mouse(this)[0]);
+			var _x = d3.mouse(this)[0];
 
             data.forEach( function(v) {
                 if (v.opacity===1) {
@@ -353,6 +366,36 @@ function drawMultilineChart(domobj, domobjsel, _width){
                 }
             });
         
+			var change_white = true;
+			tydata.forEach( function(ty) {
+				var ds1 = x(ty.start_date);
+				var ds2 = x(ty.end_date);
+
+				if (ds1<=_x && _x<=ds2) {
+					var _rank =	ty.rank <= 15 ? 0  :
+								ty.rank <= 25 ? 10 :
+								20;
+					_color = rankScale(_rank);
+
+					tooltip
+						.style("background", _color)
+					.select("#tag_"+ty.name+".typhoon")
+						.style("display", null);
+
+					change_white = false;
+				} else {
+					tooltip
+					.select("#tag_"+ty.name+".typhoon")
+						.style("display", "none");
+					console.log(ds1,_x,ds2);
+				}
+			});
+
+			if (change_white) {
+			tooltip
+				.style("background", "white");
+			}
+
             var _max = max.length!==0?d3.max(max, function(v) { return v.price; }):0;
 
 			var _y_pad = max.length * 20;
