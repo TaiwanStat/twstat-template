@@ -1,0 +1,13 @@
+svg {
+  width: 50%;
+  height: 100%;
+  float: left;
+}
+
+#map path{
+  stroke: gray;
+}
+
+.site{
+  fill: rgb(222, 50, 38);
+}
