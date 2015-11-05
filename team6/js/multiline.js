@@ -359,7 +359,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
 		
             tooltip
                 .style("left",d3.event.pageX+"px")
-                .style("top",y(_max)-_y_pad+"px");
+                .style("top",650+y(_max)-_y_pad+"px");
         }
 
 
