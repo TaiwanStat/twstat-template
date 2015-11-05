@@ -25,6 +25,23 @@ rect.main_rect{
 	fill: #ddd;
 }
 
+div.tooltip{
+	position: absolute;
+	text-align: center;
+	width: 100px;
+	/*height: 28px;*/
+	padding: 2px;
+	font: 12px sans-serif;
+	background: white;
+	border: 1px;
+	border-radius: 8px;
+	pointer-events: none;
+}
+
+div.tip{
+	font: 15px sans-serif;
+}
+
 .area {
   fill: steelblue;
   clip-path: url(#clip);

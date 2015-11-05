@@ -221,7 +221,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
                 .style("display","none")
                 .style("stroke", "blue")
                 .style("stroke-dasharray", "3.3")
-                .style("opacity", 0.5)
+                .style("opacity", 1)
                 .attr("y1", -height)
                 .attr("y2", 0);
 
@@ -233,8 +233,8 @@ function drawMultilineChart(domobj, domobjsel, _width){
                 .attr("id", function(v) { return "tag_"+v.name; })
                 .style("display","none")
                 .style("stroke", function(v) { return color(v.name); })
-                //.style("stroke-dasharray", "3.3")
-                .style("opacity", 0.5)
+                .style("stroke-dasharray", "3.3")
+                .style("opacity", 1)
                 .attr("x1", 0)
                 .attr("x2", width);
 
@@ -257,6 +257,21 @@ function drawMultilineChart(domobj, domobjsel, _width){
                 .style("opacity",1)
                 .style("display","none");
 
+		tooltip
+			.append("div")
+			.append("text")
+				.text("價格");
+
+		tooltip
+			.selectAll("div")
+			.data(data)
+			.enter()
+		.append("div")
+			.attr("class","tip")
+			.attr("id", function(v) { return "tag_"+v.name; })
+			.style("display", "none")
+		.append("text")
+			.style("color", function(v) { return color(v.name); });
 
         svg.append("rect")
             .attr("width", width)
@@ -330,14 +345,21 @@ function drawMultilineChart(domobj, domobjsel, _width){
                     focus.select("#tag_" + v.name + ".dot")
                         .attr("transform", "translate(" + x(d.Date) + ","
                                                         + y(d.price) + ")");
+
+					tooltip
+						.select("div#tag_" + v.name + ".tip")
+						.select("text")
+						.text(v.name+":"+d.price);
                 }
             });
         
             var _max = max.length!==0?d3.max(max, function(v) { return v.price; }):0;
 
+			var _y_pad = max.length * 20;
+		
             tooltip
                 .style("left",d3.event.pageX+"px")
-                .style("top",y(_max)+"px");
+                .style("top",y(_max)-_y_pad+"px");
         }
 
 
@@ -385,6 +407,10 @@ function drawMultilineChart(domobj, domobjsel, _width){
 
                 d3.select(".dot#tag_"+v.name)
                     .style("display", function(v) { return v.opacity===1 ?null:"none"; });
+
+				d3.select(".tip#tag_"+v.name)
+                    .style("display", function(v) { return v.opacity===1 ?null:"none"; });
+
             });
         }
 
