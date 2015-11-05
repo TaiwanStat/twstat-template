@@ -13,7 +13,9 @@ module.exports = {
             lib_src + '/jquery/dist/jquery.js',
 	    lib_src + '/material-design-lite/material.js',
             lib_src + '/material-design-lite/material.css',
-            lib_src + '/d3/index.js'
+            lib_src + '/d3/index.js',
+            lib_src + '/leaflet/dist/leaflet.js',
+            lib_src + '/leaflet/dist/leaflet.css'
         ]
     },
     output: {
@@ -24,7 +26,8 @@ module.exports = {
     module: {
         loaders: [
             { test: /\.jsx$/, loader: 'jsx-loader?harmony!babel' },
-            { test: /\.css$/, loader: 'style-loader!css-loader' }
+            { test: /\.css$/, loader: 'style-loader!css-loader' },
+            { test: /\.png$/, loader: "url-loader?limit=100000" }
         ]
     },
 /*    externals: {
