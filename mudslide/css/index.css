@@ -1,13 +1,6 @@
-svg {
-  width: 50%;
-  height: 100%;
-  float: left;
-}
-
-#map path{
-  stroke: gray;
-}
-
-.site{
-  fill: rgb(222, 50, 38);
+#map path {
+  /*fill: rgba(0, 0, 0, 0.14);;
+  stroke: white;*/
+  fill: white;
+  stroke: black;
 }
