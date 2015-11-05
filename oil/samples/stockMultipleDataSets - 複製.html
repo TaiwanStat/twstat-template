@@ -16,7 +16,7 @@
 		
 		<script>
 			AmCharts.ready(function () {
-				generateChartData();
+				//generateChartData();
 				createStockChart();
 			});
 
@@ -31,60 +31,74 @@
 			var ref = new Firebase('https://radiant-fire-7063.firebaseio.com/');
 			var cpcRef = new Firebase('https://cpcoil.firebaseio.com/');
 			var internationalRef = new Firebase('https://internationaloil.firebaseio.com/');
-			var allRef = new Firebase('https://oildata.firebaseio.com/');
+			var allRef = new Firebase('https://oildata2.firebaseio.com/');
 			var count = 0;
 			var cpcCount = 0;
 			var internationalCount = 0;
 			var allCount = 0;
 			var data = [];
+			var newPost ;
 			var e0 ;
-
+			function compare(a,b) {
+				if (a.date< b.date)
+					return -1;
+				if (a.date> b.date)
+					return 1;
+				return 0;
+			}
+			
 			function generateChartData() {
 				var firstDate = new Date();
 				firstDate.setDate(firstDate.getDate() - 500);
 				firstDate.setHours(0, 0, 0, 0);
 				
 				
-				allRef.orderByChild("price/date").on("child_added", function(snap) {
-					allCount++;
-					var temp = snap.val();
-					if(temp.price.type==1){//international
-						chartData5.push({
-							date: new Date(temp.price.date),
-							value: temp.price.WTI,
-							volume: temp.price.WTI
-						});
-						chartData6.push({
-							date: new Date(temp.price.date),
-							value: temp.price.Brent,
-							volume: temp.price.Brent
-						});
-						chartData7.push({
-							date: new Date(temp.price.date),
-							value: temp.price.Dubai,
-							volume: temp.price.Dubai
-						});
-					}else{//domestic
-						chartData1.push({
-							date: new Date(temp.price.date),
-							value: temp.price.ninetwo,
-							volume: temp.price.ninetwo
-						});
-						chartData2.push({
-							date: new Date(temp.price.date),
-							value: temp.price.ninefive,
-							volume: temp.price.ninefive
-						});
-						chartData3.push({
-							date: new Date(temp.price.date),
-							value: temp.price.nineeight,
-							volume: temp.price.nineeight
-						});
-						chartData4.push({
-							date: new Date(temp.price.date),
-							value: temp.price.ultra,
-							volume: temp.price.ultra
-						});
+				allRef.once("value", function(snapshot) {
+				//console.log(snapshot.val());
+					newPost = snapshot.val();
+					data = $.map(newPost, function(value, index) {
+						return [value];
+					});
+					data.sort(compare);
+					for(i = 0 ; i < data.length ; i++ ){
+						if(data[i].type==1){
+							chartData5.push({
+								date: new Date(data[i].date),
+								value: data[i].WTI,
+								volume: data[i].WTI
+							});
+							chartData6.push({
+								date: new Date(data[i].date),
+								value: data[i].Brent,
+								volume: data[i].Brent
+							});
+							chartData7.push({
+								date: new Date(data[i].date),
+								value: data[i].Dubai,
+								volume: data[i].Dubai
+							});
+						}else{
+							chartData1.push({
+								date: new Date(data[i].date),
+								value: data[i].ninetwo,
+								volume: data[i].ninetwo
+							});
+							chartData2.push({
+								date: new Date(data[i].date),
+								value: data[i].ninefive,
+								volume: data[i].ninefive
+							});
+							chartData3.push({
+								date: new Date(data[i].date),
+								value: data[i].nineeight,
+								volume: data[i].nineeight
+							});
+							chartData4.push({
+								date: new Date(data[i].date),
+								value: data[i].ultra,
+								volume: data[i].ultra
+							});
+						}
 					}
 				});
 				
@@ -479,14 +493,90 @@
 				*/
 				
 				
+				allRef.once("value", function(snapshot) {
+				//console.log(snapshot.val());
+					newPost = snapshot.val();
+					data = $.map(newPost, function(value, index) {
+						return [value];
+					});
+					data.sort(compare);
+					dataSet1.stockEvents = [] ;
+					for(i = 0 ; i < data.length ; i++ ){
+						if(data[i].type==1){
+							chartData5.push({
+								date: new Date(data[i].date),
+								value: data[i].WTI,
+								volume: data[i].WTI
+							});
+							chartData6.push({
+								date: new Date(data[i].date),
+								value: data[i].Brent,
+								volume: data[i].Brent
+							});
+							chartData7.push({
+								date: new Date(data[i].date),
+								value: data[i].Dubai,
+								volume: data[i].Dubai
+							});
+						}else{
+							chartData1.push({
+								date: new Date(data[i].date),
+								value: data[i].ninetwo,
+								volume: data[i].ninetwo
+							});
+							chartData2.push({
+								date: new Date(data[i].date),
+								value: data[i].ninefive,
+								volume: data[i].ninefive
+							});
+							chartData3.push({
+								date: new Date(data[i].date),
+								value: data[i].nineeight,
+								volume: data[i].nineeight
+							});
+							chartData4.push({
+								date: new Date(data[i].date),
+								value: data[i].ultra,
+								volume: data[i].ultra
+							});
+						}
+					}
+					/*
+					e0 = {
+						date: new Date("2015-10-12"),
+						type: "sign",
+						backgroundColor: "#85CDE6",
+						graph: graph1,
+						text: "S",
+						description: "This is description of an event"
+					};
+					*/
+					dataSet1.stockEvents.push({
+						date: new Date("2015-10-12"),
+						type: "sign",
+						backgroundColor: "#85CDE6",
+						graph: graph1,
+						text: "S",
+						description: "This is description of an event"
+					});
+					dataSet1.stockEvents.push({
+						date: new Date("2015-10-19"),
+						type: "sign",
+						backgroundColor: "#85CDE6",
+						graph: graph1,
+						text: "S",
+						description: "This is description of an event"
+					});
+					//dataSet1.stockEvents = [e0] ;
+					chart.write('chartdiv');
+				});
 				
-				
-				
+				/*
 				allRef.once("value", function(snap) {
 					console.log("initial data loaded!", Object.keys(snap.val()).length === allCount);
 					//console.log(data);
-					e0 = {
-						date: new Date("2015-10-12"),
+					var e0 = {
+						date: new Date(2015, 9, 9),
 						type: "sign",
 						backgroundColor: "#85CDE6",
 						graph: graph1,
@@ -496,7 +586,7 @@
 					dataSet5.stockEvents = [e0] ;
 					chart.write('chartdiv');
 				});
-				
+				*/
 				
 				//chart.write('chartdiv');
 			}
