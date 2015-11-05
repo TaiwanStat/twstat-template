@@ -27,6 +27,7 @@
     "d3": "^3.5.6",
     "jquery": "^2.1.4",
     "leaflet": "^0.7.7",
+    "material-design-lite": "^1.0.6",
     "react": "^0.14.2",
     "react-dom": "^0.14.2",
     "webpack": "^1.12.2"
