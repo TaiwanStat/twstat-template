@@ -263,7 +263,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
 				.text("價格");
 
 		tooltip
-			.selectAll("div")
+			.selectAll("tip")
 			.data(data)
 			.enter()
 		.append("div")
