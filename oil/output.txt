@@ -1,0 +1,21 @@
+ref.push({
+	date:"2015-11-04",
+	WTI: 46.320,
+	Dubai: 47.110,
+	Brent: 49.750,
+	type: 1
+});
+ref.push({
+	date:"2015-11-05",
+	WTI: 45.200,
+	Dubai: 45.550,
+	Brent: 49.610,
+	type: 1
+});
+ref.push({
+	date:"2015-11-06",
+	WTI: 44.290,
+	Dubai: 44.920,
+	Brent: 48.470,
+	type: 1
+});

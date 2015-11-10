@@ -12,11 +12,8 @@
 		<script src="https://cdn.firebase.com/js/client/2.3.1/firebase.js"></script>
 		<script src="https://code.jquery.com/jquery-2.1.0.min.js"></script>
 		
-		
-		
 		<script>
 			AmCharts.ready(function () {
-				//generateChartData();
 				createStockChart();
 			});
 
@@ -28,17 +25,10 @@
 			var chartData6 = [];
 			var chartData7 = [];
 			
-			var ref = new Firebase('https://radiant-fire-7063.firebaseio.com/');
-			var cpcRef = new Firebase('https://cpcoil.firebaseio.com/');
-			var internationalRef = new Firebase('https://internationaloil.firebaseio.com/');
-			var allRef = new Firebase('https://oildata2.firebaseio.com/');
+			var ref = new Firebase('https://oildata2.firebaseio.com/');
 			var count = 0;
-			var cpcCount = 0;
-			var internationalCount = 0;
-			var allCount = 0;
 			var data = [];
 			var newPost ;
-			var e0 ;
 			function compare(a,b) {
 				if (a.date< b.date)
 					return -1;
@@ -47,194 +37,10 @@
 				return 0;
 			}
 			
-			function generateChartData() {
-				var firstDate = new Date();
-				firstDate.setDate(firstDate.getDate() - 500);
-				firstDate.setHours(0, 0, 0, 0);
-				
-				
-				allRef.once("value", function(snapshot) {
-				//console.log(snapshot.val());
-					newPost = snapshot.val();
-					data = $.map(newPost, function(value, index) {
-						return [value];
-					});
-					data.sort(compare);
-					for(i = 0 ; i < data.length ; i++ ){
-						if(data[i].type==1){
-							chartData5.push({
-								date: new Date(data[i].date),
-								value: data[i].WTI,
-								volume: data[i].WTI
-							});
-							chartData6.push({
-								date: new Date(data[i].date),
-								value: data[i].Brent,
-								volume: data[i].Brent
-							});
-							chartData7.push({
-								date: new Date(data[i].date),
-								value: data[i].Dubai,
-								volume: data[i].Dubai
-							});
-						}else{
-							chartData1.push({
-								date: new Date(data[i].date),
-								value: data[i].ninetwo,
-								volume: data[i].ninetwo
-							});
-							chartData2.push({
-								date: new Date(data[i].date),
-								value: data[i].ninefive,
-								volume: data[i].ninefive
-							});
-							chartData3.push({
-								date: new Date(data[i].date),
-								value: data[i].nineeight,
-								volume: data[i].nineeight
-							});
-							chartData4.push({
-								date: new Date(data[i].date),
-								value: data[i].ultra,
-								volume: data[i].ultra
-							});
-						}
-					}
-				});
-				
-				/*
-				cpcRef.orderByKey().on("child_added", function(snap) {
-					cpcCount++;
-					var temp = snap.val();
-					chartData1.push({
-						date: new Date(temp.price.date),
-						value: temp.price.ninetwo
-					});
-					chartData2.push({
-						date: new Date(temp.price.date),
-						value: temp.price.ninefive
-					});
-					chartData3.push({
-						date: new Date(temp.price.date),
-						value: temp.price.nineeight
-					});
-					chartData4.push({
-						date: new Date(temp.price.date),
-						value: temp.price.ultra
-					});
-				});
-				
-				internationalRef.orderByKey().on("child_added", function(snap) {
-					internationalCount++;
-					var temp = snap.val();
-					chartData5.push({
-						date: new Date(temp.price.date),
-						value: temp.price.WTI
-					});
-					chartData6.push({
-						date: new Date(temp.price.date),
-						value: temp.price.Brent
-					});
-					chartData7.push({
-						date: new Date(temp.price.date),
-						value: temp.price.Dubai
-					});
-					
-				});
-				*/
-				/*
-				ref.orderByChild("price/date").on("child_added", function(snap) {
-					count++;
-					console.log("added", snap.key());
-					console.log(snap.val());
-					var temp = snap.val() ;
-					console.log(temp.price.Brent);
-					data.push(snap.val());
-					
-					chartData1.push({
-						date: new Date(temp.price.date),
-						value: temp.price.ninetwo,
-						//volume: b1
-					});
-					chartData2.push({
-						date: new Date(temp.price.date),
-						value: temp.price.ninefive,
-						//volume: b1
-					});
-					chartData3.push({
-						date: new Date(temp.price.date),
-						value: temp.price.nineeight,
-						//volume: b1
-					});
-					chartData4.push({
-						date: new Date(temp.price.date),
-						value: temp.price.ultra,
-						//volume: b1
-					});
-					chartData5.push({
-						date: new Date(temp.price.date),
-						value: temp.price.WTI,
-						//volume: b1
-					});
-					chartData6.push({
-						date: new Date(temp.price.date),
-						value: temp.price.Brent,
-						//volume: b1
-					});
-					chartData7.push({
-						date: new Date(temp.price.date),
-						value: temp.price.Dubai,
-						//volume: b1
-					});
-					
-				});
-				*/
-				/*
-				for (var i = 0; i < 50; i++) {
-					var newDate = new Date(firstDate);
-					newDate.setDate(newDate.getDate() + i);
-
-					var a1 = Math.round(Math.random() * (40 + i)) + 100 + i;
-					var b1 = Math.round(Math.random() * (1000 + i)) + 500 + i * 2;
-
-					var a2 = Math.round(Math.random() * (100 + i)) + 200 + i;
-					var b2 = Math.round(Math.random() * (1000 + i)) + 600 + i * 2;
-
-					var a3 = Math.round(Math.random() * (100 + i)) + 200;
-					var b3 = Math.round(Math.random() * (1000 + i)) + 600 + i * 2;
-
-					var a4 = Math.round(Math.random() * (100 + i)) + 200 + i;
-					var b4 = Math.round(Math.random() * (100 + i)) + 600 + i;
-
-					chartData1.push({
-						date: newDate,
-						value: a1,
-						//volume: b1
-					});
-					chartData2.push({
-						date: newDate,
-						value: a2,
-						//volume: b2
-					});
-					chartData3.push({
-						date: newDate,
-						value: a3,
-						//volume: b3
-					});
-					chartData4.push({
-						date: newDate,
-						value: a4,
-						//volume: b4
-					});
-				}
-				*/
-			}
 
 			function createStockChart() {
 			
 				var chart = new AmCharts.AmStockChart();
-
-
 				chart.categoryAxesSettings = {maxSeries:0};
 
 				// DATASETS //////////////////////////////////////////
@@ -326,9 +132,6 @@
 				dataSet7.dataProvider = chartData7;
 				dataSet7.categoryField = "date";
 				
-				
-				
-				
 
 				// set data sets to the chart
 				chart.dataSets = [dataSet1, dataSet2, dataSet3, dataSet4, dataSet5, dataSet6, dataSet7];
@@ -418,17 +221,23 @@
 				chart.dataSetSelector = dataSetSelector;
 				
 				
-				
-				
-				
-				allRef.once("value", function(snapshot) {	//get data from firebase and generate chartDatas
-				//console.log(snapshot.val());
+				ref.once("value", function(snapshot) {	//get data from firebase and generate chartDatas
 					newPost = snapshot.val();
 					data = $.map(newPost, function(value, index) {
 						return [value];
 					});
 					data.sort(compare);
+					
+					// set stock events
 					dataSet1.stockEvents = [] ;
+					dataSet2.stockEvents = [] ;
+					dataSet3.stockEvents = [] ;
+					dataSet4.stockEvents = [] ;
+					dataSet5.stockEvents = [] ;
+					dataSet6.stockEvents = [] ;
+					dataSet7.stockEvents = [] ;
+					
+					// generate chartDatas
 					for(i = 0 ; i < data.length ; i++ ){
 						if(data[i].type==1){
 							chartData5.push({
@@ -446,7 +255,7 @@
 								value: data[i].Dubai,
 								volume: data[i].Dubai
 							});
-						}else{
+						}else if(data[i].type==0){
 							chartData1.push({
 								date: new Date(data[i].date),
 								value: data[i].ninetwo,
@@ -486,13 +295,9 @@
 						text: "S",
 						description: "This is description of an event"
 					});
-					//dataSet1.stockEvents = [e0] ;
+					
 					chart.write('chartdiv');
 				});
-				
-				
-				
-				//chart.write('chartdiv');
 			}
 		</script>
 	</head>
