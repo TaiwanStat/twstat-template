@@ -3,7 +3,6 @@ import datetime
 import requests
 from firebase import Firebase
 f = Firebase('https://oildata2.firebaseio.com/datas')
-file = open('output.txt', 'w')
 res = requests.get("http://new.cpc.com.tw/division/mb/oil-more1-1.aspx")
 source =  res.text
 tmp1 = source.split('<td width="9%">')
@@ -25,4 +24,3 @@ day = d3.split('</span>')
 newdate = datetime.datetime(int(year[0]), int(month[0]), int(day[0]))
 date = newdate.strftime("%Y-%m-%d")
 r = f.push({'date':date,'ninetwo':float(ninetwoP),'ninefive':float(ninefiveP),'nineeight':float(nineeightP),'ultra':float(ultraP),'type':0})
-file.close()
