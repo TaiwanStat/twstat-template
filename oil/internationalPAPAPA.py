@@ -1,10 +1,11 @@
 # coding=UTF-8
 import datetime
 import requests
-
+from firebase import Firebase
+f = Firebase('https://oildata2.firebaseio.com/datas')
 file = open('output.txt', 'w')
 now = datetime.datetime.now()
-d1 = datetime.datetime(2015, 10, 10)
+d1 = datetime.datetime(2015, 10, 12)
 while (now-d1).days > 1 :
 	dayOfWeek = d1.weekday()
 	if dayOfWeek > 4 :
@@ -13,7 +14,7 @@ while (now-d1).days > 1 :
 	query = {
     	'opt':'search',
     	'setform':'week',
-   	'S_year':d1.year,    
+		'S_year':d1.year,    
     	'S_month':d1.month,
     	'S_day':d1.day        # date
 	}
@@ -29,12 +30,13 @@ while (now-d1).days > 1 :
 	Brent = tmp3[3].split()[0]
 
 	date = d1.strftime("%Y-%m-%d")
-	file.write('ref.push({\nprice:{\n')
-	file.write('date:"'+date+'",\n')
-	file.write('WTI: '+ WTI+',\n')
-	file.write('Dubai: '+ Dubai+',\n')
-	file.write('Brent: '+ Brent+',\n')
-	file.write('type: 1\n}\n});\n')
+	#file.write('ref.push({\n')
+	#file.write('\tdate:"'+date+'",\n')
+	#file.write('\tWTI: '+ WTI+',\n')
+	#file.write('\tDubai: '+ Dubai+',\n')
+	#file.write('\tBrent: '+ Brent+',\n')
+	#file.write('\ttype: 1\n});\n')
+	r = f.push({'date':date,'WTI':float(WTI),'Dubai':float(Dubai),'Brent':float(Brent),'type':1})
 	d1=d1+datetime.timedelta(days=1)
 file.close()
 

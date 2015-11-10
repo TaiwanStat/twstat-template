@@ -37,6 +37,7 @@
 			var internationalCount = 0;
 			var allCount = 0;
 			var data = [];
+			var e0 ;
 
 			function generateChartData() {
 				var firstDate = new Date();
@@ -258,15 +259,7 @@
 				dataSet1.dataProvider = chartData1;
 				dataSet1.categoryField = "date";
 				
-				var e0 = {
-					date: new Date(2015, 9, 12),
-					type: "sign",
-					backgroundColor: "#85CDE6",
-					graph: graph1,
-					text: "S",
-					description: "This is description of an event"
-				};
-				dataSet1.stockEvents = [e0] ;
+				
 				
 				
 				var dataSet2 = new AmCharts.DataSet();
@@ -486,23 +479,24 @@
 				*/
 				
 				
-				var e0 = {
-					date: new Date(2015, 9, 12),
-					type: "sign",
-					backgroundColor: "#85CDE6",
-					graph: graph1,
-					text: "S",
-					description: "This is description of an event"
-				};
-				dataSet1.stockEvents = [e0] ;
+				
 				
 				
 				allRef.once("value", function(snap) {
 					console.log("initial data loaded!", Object.keys(snap.val()).length === allCount);
 					//console.log(data);
-					
+					e0 = {
+						date: new Date("2015-10-12"),
+						type: "sign",
+						backgroundColor: "#85CDE6",
+						graph: graph1,
+						text: "S",
+						description: "This is description of an event"
+					};
+					dataSet5.stockEvents = [e0] ;
 					chart.write('chartdiv');
 				});
+				
 				
 				//chart.write('chartdiv');
 			}
