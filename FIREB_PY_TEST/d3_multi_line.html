@@ -178,7 +178,8 @@ firebaseRef.on("value", function(snapshot) {
 
 	tydata = tydata.filter(function(ty) { return ty.start_date > new Date(2015,0,0); });
 
-	console.log(d3.extent(tydata, function(ty) {return ty.rank; }));
+	// check rank max and min
+	//console.log(d3.extent(tydata, function(ty) {return ty.rank; }));
 
 	// set color domain by vegetable name
 	//     vegetable name --mapping--> specific color
@@ -442,7 +443,6 @@ firebaseRef.on("value", function(snapshot) {
 				tooltip
 				.select("#tag_"+ty.name+".typhoon")
 					.style("display", "none");
-				console.log(ds1,_x,ds2);
 			}
 		});
 
