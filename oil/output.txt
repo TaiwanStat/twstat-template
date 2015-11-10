@@ -1,8 +1,0 @@
-ref.push({
-	date:"2015-11-09",
-	ninetwo: 26.3,
-	ninefive: 24.3,
-	nineeight: 22.8,
-	ultra: 20.6,
-	type: 0
-});
