@@ -346,6 +346,39 @@ function drawMultilineChart(domobj, domobjsel, _width){
 			return [start_date, yesterday];
 		}
 
+        function get30Day() {
+            var yesterday = new Date();
+            yesterday.setDate(yesterday.getDate()-1);
+            yesterday.setHours(0);
+            yesterday.setMinutes(0);
+            yesterday.setSeconds(0);
+
+            var thirtyday = new Date();
+            thirtyday.setDate(thirtyday.getDate()-31);
+            thirtyday.setHours(0);
+            thirtyday.setMinutes(0);
+            thirtyday.setSeconds(0);
+
+            return [thirtyday, yesterday];
+        }
+
+        function get10Day() {
+            var yesterday = new Date();
+            yesterday.setDate(yesterday.getDate()-1);
+            yesterday.setHours(0);
+            yesterday.setMinutes(0);
+            yesterday.setSeconds(0);
+
+            var tenday = new Date();
+            tenday.setDate(tenday.getDate()-11);
+            tenday.setHours(0);
+            tenday.setMinutes(0);
+            tenday.setSeconds(0);
+
+            return [tenday, yesterday];
+        }
+
+
         function mousemove () {
 
             var max = [];
@@ -498,6 +531,28 @@ function drawMultilineChart(domobj, domobjsel, _width){
     var brush = d3.svg.brush()
         .x(x2)
         .on("brush", brushed);
+
+    domobj.append("input")
+        .attr("type","button")
+        .attr("value","30 days")
+        .on("click", function(v) {
+            //brush.extent(getTimeDomain());
+            //brush();
+            d3.selectAll(".brush").call(brush.extent(get30Day()));
+            brushed();
+            console.log(brush.extent());
+        });
+
+    domobj.append("input")
+        .attr("type","button")
+        .attr("value","10 days")
+        .on("click", function(v) {
+            //brush.extent(getTimeDomain());
+            //brush();
+            d3.selectAll(".brush").call(brush.extent(get10Day()));
+            brushed();
+            console.log(brush.extent());
+        });
 
     var area2 = d3.svg.area()
         .interpolate("monotone")
