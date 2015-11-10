@@ -31,7 +31,7 @@ function drawSunburst (domobj, _width) {
 			.innerRadius(function(d) { return Math.max(0, y(d.y)); })
 			.outerRadius(function(d) { return Math.max(0, y(d.y + d.dy)-1.5); });
 
-	var firebaseRef = new Firebase("https://ikdde-team6.firebaseio.com/");
+	var firebaseRef = new Firebase("https://ikdde-team6.firebaseio.com/all_data/");
 
 	firebaseRef.child("vegetable_data").on("value", function(snapshot) {
 
