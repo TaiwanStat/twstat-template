@@ -141,6 +141,14 @@ firebaseRef.on("value", function(snapshot) {
 
 	var tydata = [];
 
+	// from min: 2015/1/1 to max: today
+	var yesterday = new Date();
+	yesterday.setDate(yesterday.getDate()-1);
+	yesterday.setSeconds(0);
+	yesterday.setMinutes(0);
+	yesterday.setHours(0);
+	var time_domain = [new Date(2015,0,1), yesterday];
+
 	// get all vegetable name
 	var name = d3.keys(vgsnap.val()).filter(function(name) { return name != 'default'});
 
@@ -188,11 +196,13 @@ firebaseRef.on("value", function(snapshot) {
 
 	// set x domain by range from min of date to max of date
 	//     x invoked in xAxis
+	/*
 	x.domain([
 		d3.min(data, function(v) { return d3.min(v.value, function(d) { return d.Date});}),
 		d3.max(data, function(v) { return d3.max(v.value, function(d) { return d.Date});})
 	]);
-
+	*/
+	x.domain(time_domain);
 
 	// find max y, if y_max is NaN(no line display), set as default 50
 	var y_max = d3.max(
@@ -395,8 +405,12 @@ firebaseRef.on("value", function(snapshot) {
 
 		data.forEach( function(v) {
 			if (v.opacity===1) {
-				var	i = bisectDate(v.value, x0, 1);
-				var	d0 = v.value[i - 1];
+				var i = bisectDate(v.value, x0, 1);
+
+				if (i >= v.value.length)
+					i = v.value.length - 1;
+
+				var d0 = v.value[i - 1];
 				var	d1 = v.value[i];
 				var	d = x0 - d0.Date > d1.Date - x0 ? d1 : d0;
 
@@ -518,10 +532,13 @@ var height2 = 50;
 var x2 = d3.time.scale()
     .range([0, width]);
 
+x2.domain(time_domain);
+/*
 x2.domain([
 	d3.min(data, function(v) { return d3.min(v.value, function(d) { return d.Date});}),
 	d3.max(data, function(v) { return d3.max(v.value, function(d) { return d.Date});})
 ]);
+*/
     var y2 = d3.scale.linear().range([height2, 0]);
 
 var xAxis2 = d3.svg.axis().scale(x2).orient("bottom");
