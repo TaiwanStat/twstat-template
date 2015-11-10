@@ -201,7 +201,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
             .append("rect")
                 .attr("clip-path", "url(#clip)")
                 .attr("class","bar")
-                .attr("x", function(ty) { return (x(ty.end_date)+x(ty.start_date))/2; })
+                .attr("x", function(ty) { return x(ty.start_date); })
                 .attr("width", function(ty) { return x(ty.end_date) - x(ty.start_date); })
                 .attr("y", 0)
                 .attr("height", height)
@@ -512,7 +512,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
                 .attr("d", function(v) { return line(v.value); });
 
             tybar
-                .attr("x", function(ty) { return (x(ty.end_date)+x(ty.start_date))/2; })
+                .attr("x", function(ty) { return x(ty.start_date); })
                 .attr("width", function(ty) { return x(ty.end_date) - x(ty.start_date); })
                 .attr("y", 0)
                 .attr("height", height);
