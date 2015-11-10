@@ -74,6 +74,8 @@ function drawMultilineChart(domobj, domobjsel, _width){
 
         var tydata = [];
 
+		var timeDomain = getTimeDomain();
+
         // get all vegetable name
         var name = d3.keys(vgsnap.val()).filter(function(name) { return name != 'default'});
 
@@ -120,11 +122,13 @@ function drawMultilineChart(domobj, domobjsel, _width){
 
         // set x domain by range from min of date to max of date
         //     x invoked in xAxis
+		/*
         x.domain([
             d3.min(data, function(v) { return d3.min(v.value, function(d) { return d.Date});}),
             d3.max(data, function(v) { return d3.max(v.value, function(d) { return d.Date});})
         ]);
-
+		*/
+		x.domain(timeDomain);
 
         // find max y, if y_max is NaN(no line display), set as default 50
         var y_max = d3.max(
@@ -330,6 +334,18 @@ function drawMultilineChart(domobj, domobjsel, _width){
             .append("label")
             .text(function(v) { return "" + v.name; });*/
 
+		function getTimeDomain() {
+			var start_date = new Date(2015,0,1);
+			var yesterday = new Date();
+
+			yesterday.setDate(yesterday.getDate()-1);
+			yesterday.setHours(0);
+			yesterday.setMinutes(0);
+			yesterday.setSeconds(0);
+
+			return [start_date, yesterday];
+		}
+
         function mousemove () {
 
             var max = [];
@@ -339,6 +355,9 @@ function drawMultilineChart(domobj, domobjsel, _width){
             data.forEach( function(v) {
                 if (v.opacity===1) {
                     var i = bisectDate(v.value, x0, 1);
+
+					i = (i>=v.value.length)?v.value.length-1:i;
+
                     var d0 = v.value[i - 1];
                     var d1 = v.value[i];
                     var d = x0 - d0.Date > d1.Date - x0 ? d1 : d0;
@@ -464,10 +483,13 @@ function drawMultilineChart(domobj, domobjsel, _width){
     var x2 = d3.time.scale()
         .range([0, width]);
 
+	/*
     x2.domain([
         d3.min(data, function(v) { return d3.min(v.value, function(d) { return d.Date});}),
         d3.max(data, function(v) { return d3.max(v.value, function(d) { return d.Date});})
     ]);
+	*/
+	x2.domain(timeDomain);
 
     var y2 = d3.scale.linear().range([height2, 0]);
 
