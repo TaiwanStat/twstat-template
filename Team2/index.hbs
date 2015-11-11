@@ -392,10 +392,11 @@
 					predictultra = temp[0].ultra;
 					
 					chart.write('chartdiv');
-					document.getElementById('pre92').innerHTML += predict92 ;
-					document.getElementById('pre95').innerHTML += predict95 ;
-					document.getElementById('pre98').innerHTML += predict98 ;
-					document.getElementById('preultra').innerHTML += predictultra ;
+					document.getElementById('pre92').innerHTML += predict92 + Rise_Fall(FloatSubtraction(predict92 , chartData1[chartData1.length-1].value));
+					document.getElementById('pre95').innerHTML += predict95 + Rise_Fall(FloatSubtraction(predict95 , chartData2[chartData2.length-1].value));
+					document.getElementById('pre98').innerHTML += predict98 + Rise_Fall(FloatSubtraction(predict98 , chartData3[chartData3.length-1].value));
+					document.getElementById('preultra').innerHTML += predictultra + Rise_Fall(FloatSubtraction(predictultra , chartData4[chartData4.length-1].value));
+ 					
 					
 					
 					document.getElementById('now92').innerHTML += chartData1[chartData1.length-1].value ;
