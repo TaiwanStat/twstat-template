@@ -388,7 +388,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
                     click(v);
                 });
 
-		var RainFallInput = d3.select("body")
+		var RainFallInput = domobjsel
 			.append("div")
 			.selectAll(".vginput")
 			.data(raindata)
@@ -404,6 +404,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
 				.append("input")
 				.attr("type","checkbox")
 				.property("position", "absolute")
+				.property("left", 0)
 				.on("change", function(r) {
 					this.checked ^ true;
 					rain_click(r);
