@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<body>
+<head>
+<script src="https://cdn.firebase.com/js/client/2.3.1/firebase.js"></script>
+</head>
+<script>
+	var myFirebaseRef = new Firebase("https://2013tous.firebaseio.com/");
+	
+	myFirebaseRef.child("0102").on("value", function(snapshot) {
+        snapshot.forEach(function(data){
+            data.forEach(function(data2){
+                if(data2.key() == "rate"){
+                    data2.forEach(function(child){
+                        document.write(child.val()+"<br>");              
+                    });
+                } 
+                else{
+                  document.write(data2.val()+"<br>");
+                }
+            });
+        });
+
+	});
+	
+function test(data){
+  
+}
+
+</script>
+
+</body>
+</html>

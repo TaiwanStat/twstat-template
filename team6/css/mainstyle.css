@@ -1,0 +1,43 @@
+body {
+    background-image: url("bg1.bmp");
+}
+.mainpart {
+    margin: 10px auto;
+    padding: 20px;
+    background-color: #FFFFFF;
+    width: 80%;
+    border: 1px solid #888888;
+
+    -webkit-box-shadow: inset 0px 0px 6px 2px rgba(0,0,0,0.18);
+    -moz-box-shadow: inset 0px 0px 6px 2px rgba(0,0,0,0.18);
+    box-shadow: inset 0px 0px 6px 2px rgba(0,0,0,0.18);
+
+}
+.seperateline {
+    margin: 10px;
+    border: 1px solid #bbbbbb;
+}
+.sunburstChart {
+	display: inline-block;
+	width: 40%;
+}
+.quickSummerize {
+	display: inline-block;
+	width: 55%;
+    font-family: 'Source Sans Pro', sans-serif; 
+    font-size: 18pt;
+}
+.multilineChart {
+    display: inline-block;
+    width: 90%;
+}
+.multilineChartSelector {
+    display: inline-block;
+    width: 90%;
+    padding: 10px;
+}
+.headTitle {
+    margin-left: 20px; 
+    font-family: 'Source Sans Pro', sans-serif; 
+    font-weight: 100;
+}

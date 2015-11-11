@@ -1,0 +1,512 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<meta charset="utf-8">
+<html>
+<head>
+    <title>"Team13" Exchange Visualization</title>
+    <style>
+	#Button{
+		  width: 80%;
+		  margin: auto;
+	}
+	.d3-tip {
+		line-height: 1;
+		font-weight: bold;
+		padding: 12px;
+		background: rgba(0, 0, 0, 0.8);
+		color: #fff;
+		border-radius: 2px;
+	}
+
+	.axis path, .axis line {
+		fill: none;
+		stroke: #000;
+		shape-rendering: crispEdges;
+	}
+	.datapoint:hover{
+		fill: steelblue;
+      }
+      .xlabel, .ylabel {
+       font-weight:bold;
+		font-size:20px;
+      }
+	  
+	.hot-container p { margin-top: 10px; }
+	a { text-decoration: none; margin: 0 10px; }
+
+	.hot-container {
+		min-height: 100px;
+		margin-top: 100px;
+		width: 30%;
+		text-align: center;
+	}
+
+	div.btn {
+		width: 120px;
+		display: inline-block;
+		color: #666;
+		background-color: #eee;
+		text-transform: uppercase;
+		letter-spacing: 2px;
+		font-size: 12px;
+		padding: 10px 30px;
+		border-radius: 5px;
+		-moz-border-radius: 5px;
+		-webkit-border-radius: 5px;
+		border: 1px solid rgba(0,0,0,0.3);
+		border-bottom-width: 3px;
+	}
+
+	div.btn:hover {
+		background-color: #e3e3e3;
+		border-color: rgba(0,0,0,0.5);
+	}
+	
+	div.btn:active {
+		background-color: #CCC;
+		border-color: rgba(0,0,0,0.9);
+	}
+
+	/* blue button */
+
+	div.btn.btn-blue {
+		background-color: #699DB6;
+		border-color: rgba(0,0,0,0.3);
+		text-shadow: 0 1px 0 rgba(0,0,0,0.5);
+		color: #FFF;
+	}
+
+	div.btn.btn-blue:hover {
+		background-color: #4F87A2;
+		border-color: rgba(0,0,0,0.5);
+	}
+	
+	div.btn.btn-blue:active {
+		background-color: #3C677B;
+		border-color: rgba(0,0,0,0.9);
+	}
+
+	/* red button */
+
+	div.btn.btn-red {
+		background-color: #E48681;
+		border-color: rgba(0,0,0,0.3);
+		text-shadow: 0 1px 0 rgba(0,0,0,0.5);
+		color: #FFF;
+	}
+
+	div.btn.btn-red:hover {
+		background-color: #DA4F49;
+		border-color: rgba(0,0,0,0.5);
+	}
+	
+	div.btn.btn-red:active {
+		background-color: #B32C24;
+		border-color: rgba(0,0,0,0.9);
+	}
+	
+	/* yellow button */
+
+	div.btn.btn-yellow {
+		background-color: #FFFF37;
+		border-color: rgba(0,0,0,0.3);
+		text-shadow: 0 1px 0 rgba(0,0,0,0.5);
+		color: #666;
+	}
+
+	div.btn.btn-yellow:hover {
+		background-color: #AE8F00;
+		border-color: rgba(0,0,0,0.5);
+	}
+	
+	div.btn.btn-yellow:active {
+		background-color: #FFD306;
+		border-color: rgba(0,0,0,0.9);
+	}
+    </style>
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+<script src="https://cdn.firebase.com/js/client/2.3.1/firebase.js"></script>
+
+<script type="text/javascript">
+  var strUrl = location.search;
+  console.log(strUrl);
+  var getPara, ParaVal;
+  var aryPara = [];
+
+  if (strUrl.indexOf("?") != -1) {
+    var getSearch = strUrl.split("?");
+    getPara = getSearch[1].split("&");
+    for (i = 0; i < getPara.length; i++) {
+      ParaVal = getPara[i].split("=");
+      aryPara.push(ParaVal[0]);
+      aryPara[ParaVal[0]] = ParaVal[1];
+    }
+    //alert(aryPara['dollar']);
+  }
+</script>
+
+</head>
+<body>
+<script>
+var dayInformation = []; //firebase的每筆年資料
+var in_time = [];
+var in_time_rateMax = [], in_time_rateMin = [];
+var domainX =[], rangeX =[], tickValX =[];
+
+var margin = {top: 30, right: 60, bottom: 100, left: 100}; //lineChart outer svg
+var width = 1300 - margin.left - margin.right; //座標圖寬
+var height = 550 - margin.top - margin.bottom;
+
+var scaleX_index = 9; //刻度畫幾個+1
+var line, tip;
+var x, y, xAxis, yAxis;
+var year = [], min_rate=[], max_rate=[];
+var length = 0;
+
+/*var test = {};
+var ref = new Firebase("https://gdpjp.firebaseio.com/"); //及時
+ref.once("value", function(snapshot) {
+			test = snapshot.val();
+			//console.log(test[0].GDPJPYBillion);
+		});*/
+
+		
+var country = aryPara['dollar'];
+var ref = new Firebase("https://rate-in-time.firebaseio.com/"); //及時
+ref.on("value", function(snapshot) {
+        snapshot.forEach(function(childsnapshot){
+				in_time[childsnapshot.key()] = [];
+				in_time[childsnapshot.key()] = childsnapshot.val();
+		});
+		in_time_rateMax[country] = 0;
+		in_time_rateMin[country] = 10000;
+		for(var i=0; i<in_time[country].length; i++){
+			in_time_rateMax[country] = Math.max(in_time_rateMax[country],in_time[country][i].rate.cash_rate_buying);
+			in_time_rateMin[country] = Math.min(in_time_rateMin[country],in_time[country][i].rate.cash_rate_buying);
+		}
+        draw(in_time[country],in_time_rateMin[country],in_time_rateMax[country],"in_time");
+      });
+
+var gdp = [];
+gdp['USD'] = {};
+var test_list = [];
+var ref = new Firebase("https://testus-gdp.firebaseio.com/"); //及時
+ref.on("value", function(snapshot) {
+		gdp['USD'] = snapshot.val();
+		test_list = gdp['USD']['2014']['quarters'].concat(gdp['USD']['2015']['quarters']);
+	});
+
+</script>
+<script type="text/javascript" src="USD.js"></script>
+<script>
+
+function draw(list,min,max,yscale_type) {
+	d3.select("#lineChart_wrap").remove();
+	
+	if(yscale_type.localeCompare("in_time")==0){
+		var x_format = d3.time.format("%H:%M");
+		var bottom_text_format = d3.time.format("%m/%d");
+		var tip_time_format = d3.time.format("%m/%d %H:%M");
+	}
+	else{
+	    var x_format = d3.time.format("%Y/%m");
+		var bottom_text_format = d3.time.format("%Y year");
+		var tip_time_format = d3.time.format("%Y/%m/%d");
+	}
+	
+	var number = list.length-1;
+	rangeX.length = 0 , domainX.length = 0 , tickValX.length = 0; 
+	/*for(var i=0; i<scaleX_index; i++){  //資料數
+		rangeX.push(width*i/scaleX_index);
+		rangeX.push(width*(i+1)/scaleX_index);
+		domainX.push(new Date(list[Math.round(i*number/(scaleX_index))].time));
+		domainX.push(new Date(list[Math.round((i+1)*number/(scaleX_index))].time));
+		tickValX.push(new Date(list[Math.round(number*i/(scaleX_index))].time));
+	}
+	tickValX.push(new Date(list[number].time));*/
+	
+	/*x = d3.time.scale()
+	  .range(rangeX)
+	  .domain(domainX);*/
+	domainX = [new Date(list[0].time),new Date(list[list.length-1].time)];
+	  
+	x = d3.time.scale()
+	  .range([0,width])
+	  .domain(domainX);
+
+    y = d3.scale.linear()
+	  .range([height, 0])
+	  .domain([min,max]);
+	  
+	xAxis = d3.svg.axis()
+		.scale(x)
+		//.tickValues(tickValX)
+		.ticks(10)
+		.tickFormat(x_format)
+		.orient("bottom");
+
+    yAxis = d3.svg.axis()
+	  .scale(y)
+	  .ticks(7)
+	  .orient("left");
+	  
+	var zoom = d3.behavior.zoom()
+	.translate([0, 0])
+	.scaleExtent([1, 3])
+	.scale(1)
+	.x(x)
+    .y(y)
+	.on("zoom", zoomed);
+	
+	function zoomed() {
+		d3.select(".x.axis").call(xAxis)
+							.selectAll("text")
+							.attr("y", 9)
+							.attr("x", 9)
+							.attr("dy", ".35em")
+							.attr("transform", "rotate(45)")
+							.style("text-anchor", "start");
+							d3.select(".y.axis").call(yAxis);
+		d3.select("path").attr('d',line(list));
+		d3.select('.path_constrain').selectAll('circle').remove();
+		d3.select('.path_constrain').selectAll(".dot")
+			  .data(list)
+			  .enter().append("circle")
+			  .attr('fill-opacity', 0.5)
+			  .attr('class', 'datapoint')
+			  .attr('cx', function(d) { return x(new Date(d.time)); })
+			  .attr('cy', function(d) { return y(d.rate.cash_rate_buying); })
+			  .attr('r', 6)
+			  .attr('fill', '#E48681')
+			  .on('mouseover', tip.show)
+			  .on('mouseout', tip.hide);
+	}	
+
+    // put the graph in the "miles" div
+    var svg = d3.select("#lineChart").append("svg")
+	  .attr("id","lineChart_wrap")
+	  .attr("width", width + margin.left + margin.right)
+	  .attr("height", height + margin.top + margin.bottom)
+	  .call(zoom);
+	  
+	var lineChart_container = svg.append("g")
+	  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	  
+	var path_constrain = lineChart_container.append('svg')
+	  .attr("class","path_constrain")
+	  .attr("width", width)
+	  .attr("height", height);
+	  //.attr("transform", "translate("+ margin.left +"," + margin.top + ")")
+	  
+    // function to draw the line
+    line = d3.svg.line()
+	.x(function(d) { return x(new Date(d.time)); } )
+	.y(function(d) { return y(d.rate.cash_rate_buying); } );
+	  
+	tip = d3.tip()
+		.attr('class', 'd3-tip')
+		.offset([120, 40])
+		.html(function(d) {
+			return "<strong>" + d.rate.cash_rate_buying +" dollars</strong><br>" +
+			tip_time_format(new Date(d.time)) + "<br>";
+		});
+	
+    lineChart_container.call(tip);
+
+    // add the x axis and x-label
+    lineChart_container.append("g")
+	  .attr("class", "x axis")
+	  .attr("transform", "translate(0," + height + ")")
+	  .call(xAxis)
+	  .selectAll("text")
+	  .attr("y", 9)
+	  .attr("x", 9)
+	  .attr("dy", ".35em")
+	  .attr("transform", "rotate(45)")
+	  .style("text-anchor", "start");
+	  
+    lineChart_container.append("text")  //大標題
+	  .attr("class", "xlabel")
+	  .attr("text-anchor", "middle")
+	  .attr("x", width / 2)
+	  .attr("y", height + margin.bottom -10)
+	  .text(bottom_text_format(new Date(list[0].time)));
+		
+    // add the y axis and y-label
+    lineChart_container.append("g")
+	  .attr("class", "y axis")
+	  .attr("transform", "translate(0,0)")
+	  .call(yAxis);
+	  
+    lineChart_container.append("text")  //大標題
+	  .attr("class", "ylabel")
+	  .attr("y", 0 - margin.left+10) // x and y switched due to rotation!!
+	  .attr("x", 0 - (height / 2))
+	  .attr("dy", "1em")
+	  .attr("transform", "rotate(-90)")
+	  .style("text-anchor", "middle")
+	  .text("NTD");
+
+    lineChart_container.append("text")
+	  .attr("class", "graphtitle")
+	  .attr("y", 5)
+	  .attr("x", width/2)
+	  .style("text-anchor", "middle")
+	  .text("Exchange Rate to "+country);
+
+    // draw the line and circle
+	  draw_line_and_tip(list);
+}
+
+function draw_line_and_tip(list){
+		
+
+		d3.select('.path_constrain').append("path")
+		  .attr("class", "line")
+		  .attr("stroke", "#E48681")
+		  .attr("stroke-width", 1.5)
+		  .attr("fill", "none")
+		  .attr("d", line(list));
+
+		d3.select('.path_constrain').selectAll(".dot")
+		  .data(list)
+		  .enter().append("circle")
+		  .attr('fill-opacity', 0.5)
+		  .attr('class', 'datapoint')
+		  //.attr('d', line(list))
+		  .attr('cx', function(d) { return x(new Date(d.time)); })
+		  .attr('cy', function(d) { return y(d.rate.cash_rate_buying); })
+		  .attr('r', 6)
+		  .attr('fill', '#E48681')
+		  .on('mouseover', tip.show)
+		  .on('mouseout', tip.hide);
+
+}
+	//moveX = d3.event.translate[0];
+	//moveY = d3.event.translate[1];
+	//console.log( moveX );
+	//moveScale = d3.event.scale;
+
+	//d3.select('.d3-tip').attr(d3.transform(d3.select('.d3-tip').attr("transform")))
+	//d3.select('#lineChart').select('.x.axis').selectAll('.tick').attr('transform', "translate("+(d3.transform(d3.select(this).attr('transform')).translate[0]+moveX)+",0)");
+	/*each(function() {
+      var translateObj = d3.transform(d3.select(this).attr('transform'));
+      var translateX = translateObj.translate[0];
+      var translateY = translateObj.translate[1];
+	  //console.log(translateX);
+	  d3.select(this).attr('transform', "translate("+(moveX+translateX)+",0)");
+	  });*/
+	  
+	  //---------------------------------------------------------------------
+	/*
+	var shift = Math.ceil(moveX*scaleX_index/width);
+	
+	rangeX = [];
+	domainX = [];
+	tickValX = [];
+	if(moveX < 0){
+		shift = 0-shift;
+		var first_range = shift*width/scaleX_index + moveX;
+		//console.log(first_range);
+		for(var i=0; i<scaleX_index+1; i++){
+			rangeX.push(width*i/scaleX_index + first_range);
+			rangeX.push(width*(i+1)/scaleX_index + first_range);
+			domainX.push(new Date(dayInformation[i+shift][0].time));
+			domainX.push(new Date(dayInformation[i+shift][dayInformation[i+shift].length-1].time));
+			tickValX.push(new Date(dayInformation[i+shift][0].time));
+		}
+	}
+	
+	
+	
+	var x = d3.time.scale()
+	  .range(rangeX)
+	  .domain(domainX);
+
+    var y = d3.scale.linear()
+	  .range([height-moveY, 0-moveY])
+	  .domain([27,32]);
+	
+    var xAxis = d3.svg.axis()
+	  .scale(x)
+	  .tickValues(tickValX)
+	  .tickFormat(in_time_format)
+	  .orient("bottom");
+
+    var yAxis = d3.svg.axis()
+	  .scale(y)
+	  .ticks(7)
+	  .orient("left");
+	  
+	d3.select('.x.axis').call(xAxis)
+	  .selectAll("text")
+	  .attr("y", 9)
+	  .attr("x", 9)
+	  .attr("dy", ".35em")
+	  .attr("transform", "rotate(45)")
+	  .style("text-anchor", "start");
+	  
+	d3.select('.y.axis').call(yAxis);*/
+
+//}
+
+function buttonToday(){
+	draw(in_time[country],in_time_rateMin[country],in_time_rateMax[country],'in_time');
+}
+
+function buttonYear(num){
+	draw(year[num],min_rate[num],max_rate[num],'year');
+	if(num==2)
+		d3.select(".xlabel").text("2014~2015");
+	//else if(num == 3)
+}
+
+function gdpdraw(){
+	var gdp_max=0,gdp_min=100000;
+	for(var i=0; i<test_list.length; i++){
+		gdp_max = Math.max(gdp_max, test_list[i][1]);
+		gdp_min = Math.min(gdp_min, test_list[i][1]);
+	}
+
+	var area = gdp_max-gdp_min;
+
+	for(var i=0; i<test_list.length; i++){
+		test_list[i][1] = (test_list[i][1]-gdp_min)/area;
+	}
+	console.log(test_list);
+
+	x = d3.time.scale()
+	  .range([0,width])
+	  .domain(domainX);
+
+    y = d3.scale.linear()
+	  .range([height, 0])
+	  .domain([0,1]);
+	  
+	line = d3.svg.line()
+	.x(function(d) { return x(new Date(d[0])); } )
+	.y(function(d) { return y(d[1]); } );
+	
+	d3.select('.path_constrain').append("path")
+		.attr("class", "line")
+		.attr("stroke", "#666")
+		.attr("stroke-width", 1.5)
+		.attr("fill", "none")
+		.attr("d", line(test_list));
+	
+
+}
+
+</script>
+<div id='Button'>
+<div id='Today' class="btn" onclick="buttonToday()" >Today</div>
+<div id='Whole  year' class="btn btn-red" onclick="buttonYear(1)">YTD</div>
+<div id='spot_rate_buying' class="btn btn-yellow" onclick="buttonYear(2)">Two year</div>
+<div id='spot_rate_buying' class="btn btn-blue" onclick="gdpdraw()">GDP</div>
+</div>
+
+<div id='lineChart' class='lineChart'></div>
+
+</body>
+</html>
