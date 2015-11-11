@@ -1,0 +1,56 @@
+<html>
+
+<head>
+
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+	<script src="https://cdn.firebase.com/js/client/2.3.1/firebase.js"></script>
+	<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700' rel='stylesheet' type='text/css'>
+
+    <link href='css/mainstyle.css' rel='stylesheet' type='text/css'>
+    <link href='css/multiline.css' rel='stylesheet' type='text/css'>
+
+	<script src="js/sunburst.js"></script>
+    <script src="js/multiline.js"></script>
+
+    <script>
+
+    	$().ready(function (){
+    		drawSunburst(d3.select(".sunburstChart"), d3.select(".quickSummerize"), $(".sunburstChart").width());
+            drawMultilineChart(d3.select(".multilineChart"), d3.select(".multilineChartSelector"), $(".multilineChart").width());
+    	});
+
+    </script>
+
+</head>
+
+
+<body>
+
+    <div class="mainpart">
+
+        <h1 class="headTitle"> 臺灣農產品售價一覽 Taiwan Agriculture Price Index </h1>
+
+        <!-- /////////////////////////////////////////////////// -->
+    	<div class="seperateline"></div>
+        <h1 class="headTitle"> 今日售價 Today Price </h1>
+        
+        <div class="sunburstChart"></div>
+        
+        <div class="quickSummerize">
+			<div style="margin-top: 45%;"></div>
+        </div>
+
+        <!-- /////////////////////////////////////////////////// -->
+        <div class="seperateline"></div>
+        <h1 class="headTitle"> 批價總覽 </h1>
+        <div class="multilineChart" style="margin-top: 20px;"></div>
+        <div class="multilineChartSelector"></div>
+
+    </div>
+
+</body>
+
+</html>
