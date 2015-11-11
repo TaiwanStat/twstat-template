@@ -1,17 +1,25 @@
 <!DOCTYPE html>
-<html>
-
 <head>
-	<script src="http://d3js.org/d3.v3.min.js"></script>
-	<script src="http://d3js.org/topojson.v1.min.js"></script>
-	<script src="datamap.js"></script>
-	<script src="https://cdn.firebase.com/js/client/2.3.1/firebase.js"></script>
-	<script src="firebase.js"></script>		
-</head>
+  {{> head}}
+  <!-- my js & css -->
 
+</head>
 <body>
+  {{> header}}
+
+  {{> start}}
+  <!-- my charts -->
 	<div id="map" style="width:1200px;height:600px"></div>
-	<script>
+
+  {{> end}}
+    <!-- my js & css -->
+    {{> footer}}
+
+	<script src="http://d3js.org/topojson.v1.min.js"></script>
+	<script src="./datamap.js"></script>
+	<script src="https://cdn.firebase.com/js/client/2.3.1/firebase.js"></script>
+	<script src="./firebase.js"></script>		
+ <script>
 		var ref = new Firebase("https://rate-in-time.firebaseio.com/");
 
 		var json = [];
@@ -169,6 +177,4 @@
 		
 		
 	</script>
-
 </body>
-</html>
