@@ -43,18 +43,18 @@ function drawMultilineChart(domobj, domobjsel, _width){
     var svg = domobj
         .append("svg")
             .attr("width", width + margin.left + margin.right + 90)
-            //.attr("height", height + margin.top + margin.bottom)
-            .attr("height", 550 + margin.top + margin.bottom)
-        .append("g")
+            .attr("height", 550 + margin.top + margin.bottom);
+	
+	var multi = svg.append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    var bg = svg.append("g")
+    var bg = multi.append("g")
             .append("rect")
             .attr("class","main_rect")
             .attr("width", width)
             .attr("height", height);
 
-    var focus = svg.append("g")
+    var focus = multi.append("g")
             .style("display", "none");
 
     //end--line chart feature setting
@@ -143,13 +143,13 @@ function drawMultilineChart(domobj, domobjsel, _width){
         y.domain([0,y_max]);
 
         // append x axis by feature xAxis
-        var gxAxis = svg.append("g")
+        var gxAxis = multi.append("g")
                 .attr("class","x axis")
                 .attr("transform","translate(0," + height + ")")
                 .call(xAxis);
         
         // append y axis by feature yAxis
-        var gyAxis = svg.append("g")
+        var gyAxis = multi.append("g")
                 .attr("class","y axis")
                 .call(yAxis)
             .append("text")
@@ -159,14 +159,14 @@ function drawMultilineChart(domobj, domobjsel, _width){
                 .style("text-anchor", "end")
                 .text("Price/Weight ($/kg)");
 
-        svg.append("defs").append("clipPath")
+        multi.append("defs").append("clipPath")
             .attr("id", "clip")
             .append("rect")
             .attr("width", width)
             .attr("height", height);
 
         // add all g
-        var vg = svg.selectAll(".city")
+        var vg = multi.selectAll(".city")
                     .data(data)
                     .enter()
                 .append("g")
@@ -199,7 +199,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
             .style("fill", function(v) { return color(v.name); });
 
         // typhoon
-        var tybar = svg.selectAll("bar")
+        var tybar = multi.selectAll("bar")
                 .data(tydata)
                 .enter()
             .append("rect")
@@ -216,6 +216,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
                         return rankScale( _rank); })
                 .style("opacity", 0.5);
 
+		// x dash line
         focus.selectAll("x")
                 .data(data)
                 .enter()
@@ -229,6 +230,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
                 .attr("y1", -height)
                 .attr("y2", 0);
 
+		// y dash line
         focus.selectAll("y")
                 .data(data)
                 .enter()
@@ -241,7 +243,8 @@ function drawMultilineChart(domobj, domobjsel, _width){
                 .style("opacity", 1)
                 .attr("x1", 0)
                 .attr("x2", width);
-
+		
+		// plot
         focus.selectAll("dot")
                 .data(data)
                 .enter()
@@ -289,7 +292,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
 				.style("color", "black" )
 				.text(function(v){ return v.name+":"+v.rank; });
 		
-        svg.append("rect")
+        multi.append("rect")
             .attr("width", width)
             .attr("height", height)
             .style("fill", "none")
@@ -303,8 +306,6 @@ function drawMultilineChart(domobj, domobjsel, _width){
                 tooltip.style("display","none");
             })
             .on("mousemove", mousemove);
-
-        var bisectDate = d3.bisector(function(v) { return v.Date; }).left;
 
         // check box
         var eachInputDiv = domobjsel
@@ -378,6 +379,8 @@ function drawMultilineChart(domobj, domobjsel, _width){
             return [tenday, yesterday];
         }
 
+
+        var bisectDate = d3.bisector(function(v) { return v.Date; }).left;
 
         function mousemove () {
 
