@@ -188,6 +188,7 @@ firebaseRef.once("value", function(snapshot) {
 		});
 		raindata.push({
 			name: child.key(),
+			opacity: +0,
 			value: tmpt
 		});
 	});
@@ -324,9 +325,11 @@ firebaseRef.once("value", function(snapshot) {
 		.enter()
 	.append("g")
 		.attr("class","rainfall")
-		.attr("clip-path", "url(#clip)")
 		.attr("id", function(r) { return 'tag_'+r.name; })
-		.style("opacity", 1);
+		.attr("clip-path", "url(#clip)")
+		.style("display", function(r) {
+			return (r.opacity===1)?null:'none';
+		});
 
 	var eachRainBar = rainfall.selectAll("rainbar")
 		.data(function(r) { return r.value; })
@@ -457,6 +460,28 @@ firebaseRef.once("value", function(snapshot) {
 				click(v);
 			});
 	
+	var RainFallInput = d3.select("body")
+		.append("div")
+		.selectAll(".vginput")
+		.data(raindata)
+		.enter()
+			.append("div")
+			.style("display", "inline-block")
+			.style("margin", 3);
+	
+	RainFallInput
+		.append("div")
+		.style("font-size",'15px')
+		.text( function(r) { return "" + r.name; })
+			.append("input")
+			.attr("type","checkbox")
+			.property("position", "absolute")
+			.on("change", function(r) {
+				this.checked ^ true;
+				rain_click(r);
+			});
+	
+
 
 	// function definition
 
@@ -604,6 +629,33 @@ firebaseRef.once("value", function(snapshot) {
 			d3.select(".tip#tag_"+v.name)
 				.style("display", function(v) { return v.opacity===1?null:"none"; });
 		});
+	}
+
+	function rain_click(r) {
+		var duration_time = 800;
+		r.opacity ^= 1;
+
+		var y_max = d3.max(
+			raindata.filter( function(e) { return e.opacity===1; }),
+			function(e) {return d3.max(e.value, function(d) { return d.rainfall; }); }
+		);
+
+		y_max = isNaN(y_max)?+50:y_max+20;
+		y3.domain([0,y_max]);
+
+		rainfall
+			.style("display", function(r) {
+				return (r.opacity===1)?null:'none';
+			});
+
+		eachRainBar
+			.transition()
+			.duration(duration_time)
+			.attr("x", function(r) { return x(r.date); })
+			.attr("width", x(getToday()) - x(getYesterday()) )
+			.attr("y", function(r) { return y3(r.rainfall); })
+			.attr("height", function(r) { return height - y3(r.rainfall); });
+			
 	}
 
 ///// brush
