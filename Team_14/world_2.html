@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<script src="http://d3js.org/d3.v3.min.js"></script>
+	<script src="http://d3js.org/topojson.v1.min.js"></script>
+	<script src="datamap.js"></script>
+	<script src="https://cdn.firebase.com/js/client/2.3.1/firebase.js"></script>
+	<script src="firebase.js"></script>		
+</head>
+
+<body>
+	<div id="map" style="width:1200px;height:600px"></div>
+	<script>
+		var ref = new Firebase("https://rate-in-time.firebaseio.com/");
+
+		var json = [];
+		var tmp = false;
+		ref.on("value", function(snapshot) {
+			snapshot.forEach(function(childsnapshot){
+				json[childsnapshot.key()] = [];
+				json[childsnapshot.key()] = childsnapshot.val();
+			});
+			console.log("data finish loading");
+			
+			//console.log(json);
+			if(tmp){
+				document.getElementById("map").remove();
+				var iDiv = document.createElement('div');
+				iDiv.id = 'map';
+				iDiv.style.width = "1200px";
+				iDiv.style.height = "600px";
+				document.body.appendChild(iDiv);
+			}
+
+	
+			var map = new Datamap({
+				element: document.getElementById("map"),
+				//projection: 'mercator',
+				geographyConfig: {
+				highlightBorderColor: '#bada55',
+					popupTemplate: function(geography, data) {
+						//console.log(geography);
+						var country = geography.properties.name;
+						if( country == "United States of America")
+							return boxing(country, json["USD"], "USD");
+						else if( country == "United Kingdom")
+							return boxing(country, json["GBP"], "GBP");
+						else if( country == "Australia")
+							return boxing(country, json["AUD"], "AUD");
+						else if( country == "China")
+							return boxing(country, json["CNY"], "CNY");
+						else if( country == "Japan")
+							return boxing(country, json["JPY"], "JPY");
+						else if( country == 'Canada')
+							return boxing(country, json['CAD'], "CAD");
+						else if( country == 'Germany' || country == 'France' || country == 'Italy' ||
+									country == 'Netherlands' || country == 'Belgium' || country == 'Luxembourg' || 
+									country == 'Ireland' || country == 'Greece' || country == 'Portugal' ||
+									country == 'Austria' || country == 'Finland' || country == 'Slovenia' ||
+									country == 'Cyprus' || country == 'Slovakia')
+							return boxing(country, json["EUR"], "EUR");
+						else
+							return '<div class="hoverinfo">' + country;
+						
+					},
+					highlightBorderWidth: 3
+				},
+				fills: {
+					defaultFill: "#F0FFFF",
+					USA: Choose_Color(json['USD']),
+					CAN: Choose_Color(json['CAD']),
+					GBR: Choose_Color(json['GBP']),
+					AUS: Choose_Color(json['AUD']),
+					JPN:	Choose_Color(json['JPY']),
+					CHN: Choose_Color(json['CNY']),
+					EU:	Choose_Color(json['EUR'])
+				},
+				data: {
+					USA: { fillKey: "USA"},
+					CAN: { fillKey: "CAN" },
+					GBR: { fillKey: "GBR" },
+					AUS: { fillKey: "AUS" },
+					JPN: { fillKey: "JPN" },
+					CHN: { fillKey: "CHN" },
+					DEU: { fillKey: "EU" },	FRA: { fillKey: "EU" },	ITA: { fillKey: "EU" },	NLD: { fillKey: "EU" },
+					BEL: { fillKey: "EU" },	LUX: { fillKey: "EU" },	IRL: { fillKey: "EU" },	GRC: { fillKey: "EU" },
+					PRT: { fillKey: "EU" },	AUT: { fillKey: "EU" },	FIN: { fillKey: "EU" },	SVN: { fillKey: "EU" },
+					CYP: { fillKey: "EU" },	SVK: { fillKey: "EU" }
+					
+					
+					
+				},
+				responsive : true
+			});
+
+			map.labels();
+			tmp = true;
+		});
+		
+
+		
+		function Choose_Color(arr){
+			var colorScale_green = d3.scale.linear()
+						.domain([-0.2, 0])
+						.range([d3.rgb(0,255,0),d3.rgb(0,100,0)]);
+			var colorScale_red = d3.scale.linear()
+						.domain([0, 0.2])
+						.range([d3.rgb(100,0,0),d3.rgb(255,0,0)]);
+						
+			max_obj = arr[arr.length-1]['rate'];
+			max2_obj = arr[0]['rate'];
+			
+			cash_buy = max_obj.cash_rate_buying;
+			cash_buy2 = max2_obj.cash_rate_buying;
+			
+			rate = (cash_buy-cash_buy2)/cash_buy2*100;
+			console.log(rate);
+			if(rate == 0)
+				return "yellow";
+			else if(rate < 0)
+				return colorScale_green(rate);
+			else if(rate > 0)
+				return colorScale_red(rate);
+			
+			/*
+			if(cash_buy > cash_buy2)
+			{
+				rate = cash_buy/cash_buy2;
+				var color = d3.rgb(rate*200, 0, 0);
+				//console.log(rate);
+				//return color;
+				
+				return colorScale(rate);
+			}
+			else if(cash_buy == cash_buy2)
+				return "yellow";
+			else if(cash_buy < cash_buy2)
+			{
+				var rate = cash_buy2/cash_buy;
+				var color = d3.rgb(0, rate*200, 0);
+				//console.log(rate);
+				//return color;
+				
+				return colorScale(rate);
+			}
+			else
+				return "blue";
+			*/
+		}
+		
+		function boxing(country, arr, dollar){
+			total = (arr[arr.length-1]['rate'].cash_rate_buying + arr[arr.length-1]['rate'].cash_rate_selling +
+					arr[arr.length-1]['rate'].spot_rate_buying + arr[arr.length-1]['rate'].spot_rate_selling) /4;
+			
+			total2 = (arr[0]['rate'].cash_rate_buying + arr[0]['rate'].cash_rate_selling +
+					arr[0]['rate'].spot_rate_buying + arr[0]['rate'].spot_rate_selling) / 4;
+			
+			change_rate = Math.round( (total-total2)/4*100000)/1000;
+			//change_rate = (total-total2)/total2;
+			return '<div class="hoverinfo">' + country + "<br>"
+				+ '$' + dollar + '<br>'
+				+ 'change rate: ' + change_rate + '%<br>'
+				+ 'Cash buy: ' + arr[arr.length-1]['rate'].cash_rate_buying + '<br>'
+				+ 'Cash sell: ' + arr[arr.length-1]['rate'].cash_rate_selling + '<br>'
+				+ 'Spot buy: ' + arr[arr.length-1]['rate'].spot_rate_buying + '<br>'
+				+ 'Spot sell: ' + arr[arr.length-1]['rate'].spot_rate_selling + '<br>';			
+		}
+		
+		
+		
+	</script>
+
+</body>
+</html>

@@ -1,0 +1,151 @@
+<html>
+<head>
+	<style type="text/css">
+	body {
+		display: block;
+		margin: 0px;
+		overflow: hidden;
+		padding: 0px;
+	}
+	</style>
+	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+	<script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>
+	<script type="text/javascript" src="http://underscorejs.org/underscore-min.js"></script>
+	<script src="https://cdn.firebase.com/js/client/2.3.1/firebase.js"></script>
+	<script src="firebase.js"></script>
+</head>
+<body>
+	<div id="container"></div>
+	<svg>
+	<!--
+	<radialGradient id="tip">
+		<stop offset="0" stop-color="white"/>
+		<stop offset="0.2" stop-color="pink"/>
+		<stop offset="1" stop-color="white"/>
+	</radialGradient>
+	-->
+	</svg>
+
+	<script type="text/javascript">
+
+		var height = window.innerHeight+250;
+		var width = window.innerWidth;
+		var svg = d3.select('#container').append('svg');
+
+		d3.json("world-countries.json", function(data) {
+			
+			var other_country = _.filter(data.features, function(value, key){
+				return value.properties.name != 'Antarctica' && 
+				value.properties.name != 'China' &&
+				value.properties.name != 'United States of America' &&
+				value.properties.name != 'Japan' &&
+				value.properties.name != 'Taiwan' ;
+			});		
+			
+			var features = _.filter(data.features, function(value, key) {
+				return value.properties.name == 'China' || 
+				value.properties.name == 'United States of America' ||
+				value.properties.name == 'Japan' ||
+				value.properties.name == 'Taiwan';
+			});
+
+			var projection = d3.geo.mercator();
+			var oldScala = projection.scale();
+			var oldTranslate = projection.translate();
+
+			xy = projection.scale(oldScala * (width / oldTranslate[0] / 2) * 1)
+			.translate([width / 2, height / 2]);
+			//.center([120,25]);
+			
+			var color = d3.scale.category20();
+		  
+			path = d3.geo.path().projection(xy);
+
+			
+			svg.attr('width', width).attr('height', height);
+		  	
+			/*
+			var myLocation = xy([121.3997, 31.0456]);
+			svg.append('circle').attr('r', 15)
+			.attr('fill', 'url(#tip)')
+			.attr('transform', 'translate(' + myLocation[0] + ', ' + myLocation[1] + ')');
+			*/
+
+			var ref = new Firebase("https://2015tous.firebaseio.com/");
+			
+			var json = [];
+			ref.on("value", function(snapshot) {
+				snapshot.forEach(function(childsnapshot){
+					json.push(childsnapshot.val());
+				});
+				
+				console.log("data finish loading");
+				
+				var tmp_color;
+				svg.selectAll('path').data(features).enter().append('svg:path')
+				.attr('d', path)
+				.on('mouseover', function(data) {
+					tmp_color = d3.rgb(d3.select(this).attr('fill'));
+					d3.select(this).attr('fill', 'yellow');
+				})
+				.on('mouseout', function(d, i) {
+					d3.select(this).attr("fill", tmp_color);
+				})
+				.on('click', function(d, i){
+					console.log(data);
+				})
+				
+				.attr('fill', function(d, i){
+					//console.log(d);
+					//console.log(i);
+					//console.log(d.properties.name);
+					if(d.properties.name == 'United States of America')
+						return Choose_Color('US', json);
+					else
+						return "blue";
+				})
+				.attr('stroke', 'black')
+				.attr('stroke-width', 1);	
+				
+				
+				svg.selectAll('path').data(other_country).enter().append('svg:path')
+				.attr('d', path)
+				/*
+				.on('mouseover', function(data) {
+				  d3.select(this).attr('fill', 'yellow');
+				})
+				.on('mouseout', function(d, i) {
+					//d3.select(this).attr('fill', color(i));
+					d3.select(this).attr("fill", "grey");
+				})
+				*/
+				.attr('fill', function(d, i){
+					//return color(i);
+					return "grey";
+				})
+				
+				.attr('stroke', 'black')
+				.attr('stroke-width', 1);		
+				
+			});
+			
+			function Choose_Color(country, data){
+
+				//console.log(data[data.length-1][data[data.length-1].length-1]);
+				//console.log(data[data.length-1][data[data.length-1].length-2]);
+				max_obj = data[data.length-1][data[data.length-1].length-1]['rate'];
+				max2_obj = data[data.length-1][data[data.length-1].length-2]['rate'];
+				
+				if(max_obj.cash_rate_buying > max2_obj.cash_rate_buying)
+					return "red";
+				else if(max_obj.cash_rate_buying == max2_obj.cash_rate_buying)
+					return "orange";
+				else
+					return "green";
+			}
+			
+		});
+	
+	</script>
+</body>
+</html>
