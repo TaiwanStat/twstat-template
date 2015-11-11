@@ -55,7 +55,15 @@ div.tooltip{
 }
 
 div.tip{
-	font: 15px sans-serif;
+	font: 12px sans-serif;
+}
+
+.typhoon{
+	font: 12px sans-serif;
+}
+
+.raintip{
+	font: 12px sans-serif;
 }
 
 </style>
@@ -330,15 +338,16 @@ firebaseRef.once("value", function(snapshot) {
 		.style("display", function(r) {
 			return (r.opacity===1)?null:'none';
 		});
-
+	
+	var rain_width = x(getToday()) - x(getYesterday());
 	var eachRainBar = rainfall.selectAll("rainbar")
 		.data(function(r) { return r.value; })
 		.enter()
 	.append("rect")
 		.attr("class","rainbar")
 		.attr("clip-path", "url(#clip)")
-		.attr("x", function(r) { return x(r.date); })
-		.attr("width", x(getToday()) - x(getYesterday()) )
+		.attr("x", function(r) { return x(r.date) - rain_width/2; })
+		.attr("width", rain_width )
 		.attr("y", function(r) { return y3(r.rainfall); })
 		.attr("height", function(r) { return height - y3(r.rainfall); })
 		.style("fill",'blue')
@@ -392,10 +401,6 @@ firebaseRef.once("value", function(snapshot) {
 			.attr("class","tooltip")
 			.style("opacity",0.8)
 			.style("display","none");
-	tooltip
-		.append("div")
-		.append("text")
-			.text("價格");
 
 	tooltip
 		.selectAll("tip")
@@ -418,8 +423,21 @@ firebaseRef.once("value", function(snapshot) {
 			.style("display","none")
 		.append("text")
 			.style("color", "black" )
-			.text(function(v){ return v.name+":"+v.rank; });
-	
+			.text(function(v){ return v.name+":"+v.rank+" rk"; });
+
+	var rain_tip = tooltip
+		.selectAll("raintip")
+			.data(raindata)
+			.enter()
+		.append("div")
+			.attr("class","raintip")
+			.attr("id", function(r) { return "tag_"+r.name; })
+			.style("display","none");
+
+	rain_tip
+		.append("text")
+			.style("color","blue");
+
 	// active plane
 	multi.append("rect")
 		.attr("width", width)
@@ -539,7 +557,7 @@ firebaseRef.once("value", function(snapshot) {
 
 				tooltip.select("div#tag_" + v.name + ".tip")
 						.select("text")
-					.text(v.name +":"+d.price);
+					.text(v.name +":"+d.price+" $/kg");
 			}
 		});
 
@@ -579,6 +597,27 @@ firebaseRef.once("value", function(snapshot) {
 		tooltip
 			.style("left",d3.event.pageX+10+"px")
 			.style("top",y(_max)-y_pad+"px");
+		
+
+		var _r = raindata[0];
+		var _bisectDate = d3.bisector(function(v) { return v.date; }).left;
+		var i = _bisectDate(_r.value, x0, 1);
+
+		if (i >= _r.value.length)
+			i = _r.value.length - 1;
+
+		var _d0 = _r.value[i - 1];
+		var	_d1 = _r.value[i];
+		var	_i = x0 - _d0.date > _d1.date - x0 ? i : i-1;
+		//console.log(_r);
+		rain_tip
+			.style("display", function(r) { return r.opacity===1?null:'none'; });
+
+		rain_tip.select("text")
+			.style("color","blue")
+			.text(function(r) { return r.name+":"+r.value[_i].rainfall+" mm"; });
+
+			
 	}
 
 	// for toggle event
@@ -726,8 +765,8 @@ var context = svg.append("g")
 		var _rain_width = x(getToday()) - x(getYesterday());
 
 		eachRainBar
-			.attr("x", function(r) { return x(r.date); })
-			.attr("width", x(getToday()) - x(getYesterday()) )
+			.attr("x", function(r) { return x(r.date)-_rain_width/2; })
+			.attr("width", _rain_width )
 			.attr("y", function(r) { return y3(r.rainfall); })
 			.attr("height", function(r) { return height - y3(r.rainfall); });
 		
