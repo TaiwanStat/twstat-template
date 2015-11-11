@@ -1,12 +1,12 @@
 {
   "data": {
     "page": [
-      {
-        "title": "title",
-        "url": "example",
+	   {
+        "title": "油價知多少",
+        "url": "Team2",
         "img": "images/assert/background.png",
         "description": "description",
-        "author": "Your Name"
+        "author": "詹博山、李岳庭、謝忠穎"
       },
       {
         "title": "Team_14-外匯",
@@ -15,7 +15,6 @@
         "description": "Team_14",
         "author": "Your Name"
       }
-
     ]
   },
   "layout": "./index.hbs",
