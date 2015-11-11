@@ -1,0 +1,74 @@
+<html>
+	<head>
+		<script src="http://d3js.org/d3.v3.min.js"></script>
+		<script src="https://cdn.firebase.com/js/client/2.3.1/firebase.js"></script>
+		<script src="http://d3js.org/topojson.v1.min.js"></script>
+		<script src="D3_DataVisual/datamap.js"></script>
+	</head>
+	
+	<body>
+<div id="map" style="width:2000px;height:600px"></div>
+
+
+<script>
+var
+        color_q0 = 'rgb(198,219,239)',
+        color_q1 = 'rgb(158,202,225)',
+        color_q2 = 'rgb(107,174,214)',
+        color_q3 = 'rgb(66,146,198)',
+        color_q4 = 'rgb(33,113,181)',
+        color_q5 = 'rgb(8,81,156)',
+        color_q6 = 'rgb(8,48,107)',
+        colorScale = [
+          color_q0,
+          color_q1,
+          color_q2,
+          color_q3,
+          color_q4,
+          color_q5,
+          color_q6
+        ] // array used to generate color scale
+
+      // input: 0 to 10 percent of GDP
+      // output: q0 through q8
+      var quantize = d3.scale.quantize()
+        .domain([0, 11.3])
+        .range(d3.range(10).map(function(i) { return "q" + i; }));
+
+      var jsonMilExp = {};
+
+      var map = new Datamap({
+          element: document.getElementById('map')
+        });
+		
+		map.bubbles([
+  {
+    name: 'Castle Bravo',
+    radius: 25,
+    yeild: 15000,
+    country: 'USA',
+    significance: 'First dry fusion fuel "staged" thermonuclear weapon; a serious nuclear fallout accident occurred',
+    fillKey: 'China',
+    date: '1954-03-01',
+    latitude: 11.415,
+    longitude: 165.1619
+  },{
+    name: 'Tsar Bomba',
+    radius: 70,
+    yeild: 50000,
+    country: 'USSR',
+    fillKey: 'RUS',
+    significance: 'Largest thermonuclear weapon ever tested—scaled down from its initial 100 Mt design by 50%',
+    date: '1961-10-31',
+    latitude: 73.482,
+    longitude: 54.5854
+  }
+]
+);
+</script>
+
+
+    </script>
+	
+  </body>
+</html>
