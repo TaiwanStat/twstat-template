@@ -92,8 +92,7 @@ function drawSunburst (domobj, itemobj, _width) {
 				itemobj.html("");
 				var dates = Object.keys(data[d.parent.name][d.name]);
 				var price = (data[d.parent.name][d.name][dates[dates.length - 1]].price);
-				itemobj.append("div")
-					.html("" + d.name + price + "NTD");
+				itemobj.html("" + d.name + ": " + price + " NTD");
 			}
 			console.log(d);
 		}

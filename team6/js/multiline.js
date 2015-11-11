@@ -529,13 +529,15 @@ function drawMultilineChart(domobj, domobjsel, _width){
 
     var y2 = d3.scale.linear().range([height2, 0]);
 
-    var xAxis2 = d3.svg.axis().scale(x2).orient("bottom");
+    var xAxis2 = d3.svg.axis()
+        .scale(x2)
+        .orient("bottom");
 
     var brush = d3.svg.brush()
         .x(x2)
         .on("brush", brushed);
 
-    domobj.append("input")
+    domobjsel.append("input")
         .attr("type","button")
         .attr("value","30 days")
         .on("click", function(v) {
@@ -546,7 +548,9 @@ function drawMultilineChart(domobj, domobjsel, _width){
             console.log(brush.extent());
         });
 
-    domobj.append("input")
+    //brush.extent(getTimeDomain());
+
+    domobjsel.append("input")
         .attr("type","button")
         .attr("value","10 days")
         .on("click", function(v) {
@@ -565,7 +569,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
 
     var context = svg.append("g")
         .attr("class", "context")
-        .attr("transform", "translate(" + 0 + "," + 500 + ")");
+        .attr("transform", "translate(" + 50 + "," + 500 + ")");
 
     context.append("path")
         .data(data)
@@ -582,7 +586,10 @@ function drawMultilineChart(domobj, domobjsel, _width){
         .call(brush)
     .selectAll("rect")
         .attr("y", -6)
-        .attr("height", height2 + 7);
+        .attr("height", height2 + 7)
+        .style("fill", "silver")
+        .style("fill-opacity", 0.5)
+        .style("visibility", "visible");
 
     ////////////////
 
