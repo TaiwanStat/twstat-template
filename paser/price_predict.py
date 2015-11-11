@@ -1,7 +1,8 @@
 # coding=UTF-8
 import datetime
 import requests
-#f = Firebase('https://oildata2.firebaseio.com/datas')
+from firebase import Firebase
+f = Firebase('https://oildata2.firebaseio.com/datas/predict')
 res = requests.get("http://www.taiwanoil.org/")
 source =  res.text
 
@@ -23,3 +24,6 @@ print "95 : " + nextweek_95
 print "92 : " + nextweek_92
 print "ultra : " + nextweek_ultra
  
+##r = f.push({'ninetwo':float(nextweek_92),'ninefive':float(nextweek_95),'nineeight':float(nextweek_98),'ultra':float(nextweek_ultra)})
+r = f.delete();
+r = f.push({'ninetwo':float(nextweek_92),'ninefive':float(nextweek_95),'nineeight':float(nextweek_98),'ultra':float(nextweek_ultra)})

@@ -21,6 +21,12 @@
 			var chartData6 = [];
 			var chartData7 = [];
 			
+			var predict92 = 0.0;
+			var predict95 = 0.0;
+			var predict98 = 0.0;
+			var predictultra = 0.0;
+			
+			
 			var ref = new Firebase('https://oildata2.firebaseio.com/datas');
 			var count = 0;
 			var data = [];
@@ -222,7 +228,7 @@
 					data = $.map(newPost, function(value, index) {
 						return [value];
 					});
-					data.sort(compare);
+					//data.sort(compare);
 					
 					// set stock events
 					dataSet1.stockEvents = [] ;
@@ -274,6 +280,13 @@
 							});
 						}
 					}
+					chartData1.sort(compare);
+					chartData2.sort(compare);
+					chartData3.sort(compare);
+					chartData4.sort(compare);
+					chartData5.sort(compare);
+					chartData6.sort(compare);
+					chartData7.sort(compare);
 					
 					dataSet1.stockEvents.push({
 						date: new Date("2015-10-12"),
@@ -292,6 +305,15 @@
 						description: "This is description of an event"
 					});
 					
+					temp = $.map(data[data.length-1], function(value, index) {
+						return [value];
+					});
+					
+					predict92 = temp[0].ninetwo;
+					predict95 = temp[0].ninefive;
+					predict98 = temp[0].nineeight;
+					predictultra = temp[0].ultra;
+					
 					chart.write('chartdiv');
 				});
 			}
@@ -302,6 +324,10 @@
 
   {{> start}}
     <!-- my charts -->
+	<li>資料來源：<a href="http://web3.moeaboe.gov.tw/oil102/oil1022010/A02/A0201/dayoil.asp">經濟部能源局</a>、<a href="http://new.cpc.com.tw/division/mb/oil-more4.aspx">中油</a></li>
+	<li>更新頻率：國際油價每日更新，中油油價每周更新</li>
+	<li>今日中油油價 </br>92: </li>
+	
 	<div id="chartdiv" style="width:100%; height:600px;"></div>
   {{> end}}
     <!-- my js & css -->

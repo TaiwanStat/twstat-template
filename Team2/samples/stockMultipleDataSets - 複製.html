@@ -226,7 +226,7 @@
 					data = $.map(newPost, function(value, index) {
 						return [value];
 					});
-					data.sort(compare);
+					//data.sort(compare);
 					
 					// set stock events
 					dataSet1.stockEvents = [] ;
@@ -278,7 +278,13 @@
 							});
 						}
 					}
-					
+					chartData1.sort(compare);
+					chartData2.sort(compare);
+					chartData3.sort(compare);
+					chartData4.sort(compare);
+					chartData5.sort(compare);
+					chartData6.sort(compare);
+					chartData7.sort(compare);
 					dataSet1.stockEvents.push({
 						date: new Date("2015-10-12"),
 						type: "sign",

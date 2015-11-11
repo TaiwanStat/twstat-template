@@ -6,9 +6,9 @@ f = Firebase('https://oildata2.firebaseio.com/datas')
 res = requests.get("http://new.cpc.com.tw/division/mb/oil-more1-1.aspx")
 source =  res.text
 tmp1 = source.split('<td width="9%">')
-ninetwo = tmp1[2].split('</td>')
+nineeight = tmp1[2].split('</td>')
 ninefive = tmp1[4].split('</td>')
-nineeight = tmp1[6].split('</td>')
+ninetwo = tmp1[6].split('</td>')
 ultra = tmp1[10].split('</td>')
 ninetwoP = ninetwo[0]
 ninefiveP = ninefive[0]
