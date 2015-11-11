@@ -1,0 +1,23 @@
+{
+  "data": {
+    "title": "good ckboy",
+    "page": [
+      	{
+        "title": "good ckboy",
+        "url": "oil",
+        "img": "images/assert/background.png",
+        "description": "description",
+        "author": "Your Name"
+      	},
+	{
+        "title": "good ckboy",
+        "url": "oil",
+        "img": "images/assert/background.png",
+        "description": "description",
+        "author": "Your Name"
+      	}
+    ]
+  },
+  "layout": "./index.hbs",
+  "filename": "index.html"
+}
