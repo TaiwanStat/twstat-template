@@ -15,6 +15,9 @@ function drawMultilineChart(domobj, domobjsel, _width){
     var y = d3.scale.linear()
         .range([height, 0]);
 
+	var y3 = d3.scale.linear()
+		.range([height, 0]);
+
     var color = d3.scale.category20();
 
     var mycolor = ["#FFFF00", "#FF8250","#FF0000"];
@@ -64,15 +67,20 @@ function drawMultilineChart(domobj, domobjsel, _width){
     var firebaseRef = new Firebase("https://ikdde-team6.firebaseio.com/all_data/");
 
     // store data from firebase and drawing charts
-    firebaseRef.on("value", function(snapshot) {
+	//   Read only once
+    firebaseRef.once("value", function(snapshot) {
 
         var vgsnap = snapshot.child("vegetable_data");
 
         var tysnap = snapshot.child("typhoon_data");
 
+		var rainsnap = snapshot.child("rainfall");
+
         var data = [];
 
         var tydata = [];
+
+		var raindata = [];
 
 		var timeDomain = getTimeDomain();
 
@@ -102,6 +110,22 @@ function drawMultilineChart(domobj, domobjsel, _width){
             });
         });
 
+		rainsnap.forEach( function(child) {
+			var tmpt = [];
+			child.forEach( function(grandChild) {
+				var r = grandChild.val();
+				tmpt.push({
+					date: new Date(r.year, r.month, r.day),
+					rainfall: r.rainfall
+				});
+			});
+			raindata.push({
+				name: child.key(),
+				opacity: +0,
+				value: tmpt
+			});
+		});
+
         // reconstruct(rebuild) date
         data.forEach( function(v) {
             v.value = d3.values(v.value);
@@ -113,8 +137,6 @@ function drawMultilineChart(domobj, domobjsel, _width){
 
         tydata = tydata.filter(function(ty) { return ty.start_date > new Date(2015,0,0); });
 
-        console.log(d3.extent(tydata, function(ty) {return ty.rank; }));
-
         // set color domain by vegetable name
         //     vegetable name --mapping--> specific color
         color.domain(data.map(function(v) { return v.name}));
@@ -122,12 +144,6 @@ function drawMultilineChart(domobj, domobjsel, _width){
 
         // set x domain by range from min of date to max of date
         //     x invoked in xAxis
-		/*
-        x.domain([
-            d3.min(data, function(v) { return d3.min(v.value, function(d) { return d.Date});}),
-            d3.max(data, function(v) { return d3.max(v.value, function(d) { return d.Date});})
-        ]);
-		*/
 		x.domain(timeDomain);
 
         // find max y, if y_max is NaN(no line display), set as default 50
@@ -137,10 +153,17 @@ function drawMultilineChart(domobj, domobjsel, _width){
         );
 
         y_max = isNaN(y_max)? +50: y_max+20;
-
         // set y domain by range from min of date to max of date
         //     y invoked in yAxis
         y.domain([0,y_max]);
+
+		y3.domain([	0,
+					d3.max(raindata,
+							function(r) {
+								return d3.max(r.value, function(e) { return e.rainfall; });
+							}
+					)+10
+		]);
 
         // append x axis by feature xAxis
         var gxAxis = multi.append("g")
@@ -215,6 +238,32 @@ function drawMultilineChart(domobj, domobjsel, _width){
                                     20;
                         return rankScale( _rank); })
                 .style("opacity", 0.5);
+		
+		var rainfall = multi.selectAll("rainfall")
+			.data(raindata)
+			.enter()
+		.append("g")
+			.attr("class","rainfall")
+			.attr("id", function(r) { return 'tag_'+r.name; })
+			.attr("clip-path", "url(#clip)")
+			.style("display", function(r) {
+				return (r.opacity===1)?null:'none';
+			});
+	
+		var rain_width = x(getToday()) - x(getYesterday());
+		var eachRainBar = rainfall.selectAll("rainbar")
+			.data(function(r) { return r.value; })
+			.enter()
+		.append("rect")
+			.attr("class","rainbar")
+			.attr("clip-path", "url(#clip)")
+			.attr("x", function(r) { return x(r.date) - rain_width/2; })
+			.attr("width", rain_width )
+			.attr("y", function(r) { return y3(r.rainfall); })
+			.attr("height", function(r) { return height - y3(r.rainfall); })
+			.style("fill",'blue')
+			.style("opacity", .2);
+
 
 		// x dash line
         focus.selectAll("x")
@@ -265,11 +314,6 @@ function drawMultilineChart(domobj, domobjsel, _width){
                 .style("display","none");
 
 		tooltip
-			.append("div")
-			.append("text")
-				.text("價格");
-
-		tooltip
 			.selectAll("tip")
 			.data(data)
 			.enter()
@@ -290,8 +334,22 @@ function drawMultilineChart(domobj, domobjsel, _width){
 				.style("display","none")
 			.append("text")
 				.style("color", "black" )
-				.text(function(v){ return v.name+":"+v.rank; });
-		
+				.text(function(v){ return v.name+":"+v.rank+" rk"; });
+
+		var rain_tip = tooltip
+			.selectAll("raintip")
+				.data(raindata)
+				.enter()
+			.append("div")
+				.attr("class","raintip")
+				.attr("id", function(r) { return "tag_"+r.name; })
+				.style("display","none");
+
+		rain_tip
+			.append("text")
+				.style("color","blue");
+
+		// active plane
         multi.append("rect")
             .attr("width", width)
             .attr("height", height)
@@ -317,7 +375,6 @@ function drawMultilineChart(domobj, domobjsel, _width){
                 .style("display", "inline-block")
                 .style("margin", 3);
         
-        
         eachInputDiv
             .append("div")
             .style("background-color", function(v) { return color(v.name); })
@@ -331,9 +388,47 @@ function drawMultilineChart(domobj, domobjsel, _width){
                     click(v);
                 });
 
+		var RainFallInput = d3.select("body")
+			.append("div")
+			.selectAll(".vginput")
+			.data(raindata)
+			.enter()
+				.append("div")
+				.style("display", "inline-block")
+				.style("margin", 3);
+	
+		RainFallInput
+			.append("div")
+			.style("font-size",'15px')
+			.text( function(r) { return "" + r.name; })
+				.append("input")
+				.attr("type","checkbox")
+				.property("position", "absolute")
+				.on("change", function(r) {
+					this.checked ^ true;
+					rain_click(r);
+				});
+	
         /*eachInputDiv
             .append("label")
             .text(function(v) { return "" + v.name; });*/
+
+		function getToday() {
+			var today = new Date();
+
+			today.setHours(0);
+			today.setMinutes(0);
+			today.setSeconds(0);
+
+			return today;
+		}
+	
+		function getYesterday() {
+			var yesterday = getToday();
+
+			yesterday.setDate( yesterday.getDate()-1 );
+			return yesterday;
+		}
 
 		function getTimeDomain() {
 			var start_date = new Date(2015,0,1);
@@ -379,7 +474,6 @@ function drawMultilineChart(domobj, domobjsel, _width){
             return [tenday, yesterday];
         }
 
-
         var bisectDate = d3.bisector(function(v) { return v.Date; }).left;
 
         function mousemove () {
@@ -417,7 +511,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
 					tooltip
 						.select("div#tag_" + v.name + ".tip")
 						.select("text")
-						.text(v.name+":"+d.price);
+						.text(v.name+":"+d.price+" $/kg");
                 }
             });
         
@@ -442,7 +536,6 @@ function drawMultilineChart(domobj, domobjsel, _width){
 					tooltip
 					.select("#tag_"+ty.name+".typhoon")
 						.style("display", "none");
-					console.log(ds1,_x,ds2);
 				}
 			});
 
@@ -453,11 +546,31 @@ function drawMultilineChart(domobj, domobjsel, _width){
 
             var _max = max.length!==0?d3.max(max, function(v) { return v.price; }):0;
 
-			var _y_pad = max.length * 20;
+			var y_pad = max.length * 20;
 		
             tooltip
                 .style("left",d3.event.pageX+"px")
-                .style("top",650+y(_max)-_y_pad+"px");
+                .style("top",650+y(_max)-y_pad+"px");
+
+
+			var _r = raindata[0];
+			var _bisectDate = d3.bisector(function(v) { return v.date; }).left;
+			var i = _bisectDate(_r.value, x0, 1);
+
+			if (i >= _r.value.length)
+				i = _r.value.length - 1;
+
+			var _d0 = _r.value[i - 1];
+			var	_d1 = _r.value[i];
+			var	_i = x0 - _d0.date > _d1.date - x0 ? i : i-1;
+		
+			rain_tip
+				.style("display", function(r) { return r.opacity===1?null:'none'; });
+
+			rain_tip.select("text")
+				.style("color","blue")
+				.text(function(r) { return r.name+":"+r.value[_i].rainfall+" mm"; });
+
         }
 
 
@@ -512,6 +625,35 @@ function drawMultilineChart(domobj, domobjsel, _width){
             });
         }
 
+		function rain_click(r) {
+			var duration_time = 800;
+			r.opacity ^= 1;
+
+			var y_max = d3.max(
+				raindata.filter( function(e) { return e.opacity===1; }),
+				function(e) {return d3.max(e.value, function(d) { return d.rainfall; }); }
+			);
+
+			y_max = isNaN(y_max)?+50:y_max+20;
+			y3.domain([0,y_max]);
+
+			rainfall
+				.style("display", function(r) {
+					return (r.opacity===1)?null:'none';
+				});
+			
+			var __rain_width = x(getToday()) - x(getYesterday());
+
+			eachRainBar
+				.transition()
+				.duration(duration_time)
+				.attr("x", function(r) { return x(r.date) - __rain_width/2; })
+				.attr("width", __rain_width )
+				.attr("y", function(r) { return y3(r.rainfall); })
+				.attr("height", function(r) { return height - y3(r.rainfall); });
+			
+		}
+
     ///// brush
 
     var height2 = 50;
@@ -519,12 +661,6 @@ function drawMultilineChart(domobj, domobjsel, _width){
     var x2 = d3.time.scale()
         .range([0, width]);
 
-	/*
-    x2.domain([
-        d3.min(data, function(v) { return d3.min(v.value, function(d) { return d.Date});}),
-        d3.max(data, function(v) { return d3.max(v.value, function(d) { return d.Date});})
-    ]);
-	*/
 	x2.domain(timeDomain);
 
     var y2 = d3.scale.linear().range([height2, 0]);
@@ -594,7 +730,9 @@ function drawMultilineChart(domobj, domobjsel, _width){
     ////////////////
 
         function brushed() {
+
             x.domain(brush.empty() ? x2.domain() : brush.extent());
+
             graph
                 .attr("d", function(v) { return line(v.value); });
 
@@ -604,6 +742,14 @@ function drawMultilineChart(domobj, domobjsel, _width){
                 .attr("y", 0)
                 .attr("height", height);
 
+			var _rain_width = x(getToday()) - x(getYesterday());
+
+			eachRainBar
+				.attr("x", function(r) { return x(r.date)-_rain_width/2; })
+				.attr("width", _rain_width )
+				.attr("y", function(r) { return y3(r.rainfall); })
+				.attr("height", function(r) { return height - y3(r.rainfall); });
+		
             vg.select(".x.axis").call(xAxis);
             d3.select(".x.axis").call(xAxis);
         }
