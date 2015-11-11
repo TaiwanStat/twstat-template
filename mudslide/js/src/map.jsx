@@ -1,35 +1,37 @@
 'use strict';
 
-import d3 from 'd3';
-import $ from 'jquery';
+import L from 'leaflet';
 import topojson from 'topojson';
 
-export default function(id, size, country, data) {
-  let width = size.width;
-  let height = size.height;
-  let radius = Math.min(width, height) / 2 - 10;
+export function init(map) {
+  L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
+    maxZoom: 17,
+    minZoom: 8,
+    attribution: "Imagery from <a href=\"http://giscience.uni-hd.de/\">GIScience Research Group @ University of Heidelberg</a> &mdash; Map data &copy; <a href=\"http://www.openstreetmap.org/copyright\">OpenStreetMap</a>",
+    id: "hsuting.o4lf8mg0",
+    accessToken: "pk.eyJ1IjoiaHN1dGluZyIsImEiOiJRajF4Y0hjIn0.9UDt8uw_fxEX791Styd-lA"
+  }).addTo(map);
+}
 
-  let features = topojson.feature(country, country.objects['layer1']).features;
-  let path = d3.geo.path().projection(
-    d3.geo.mercator().center([118.7, 24.5]).scale(4000)
-  );
+export function site(map, data) {
+  let icon = L.icon({
+    iconUrl: 'image/marker-icon.png',
+    shadowUrl: 'image/marker-shadow.png'
+  });
 
-  let svg = d3.select('#' + id)
-    .append('g')
-      .attr('id', 'map');
+  for(let i in data) {
+    if(data[i].Rainfall10min != "0" || data[i].Rainfall1hr != "0" || data[i].Rainfall3hr != "0"
+      || data[i].Rainfall6hr != "0" || data[i].Rainfall12hr != "0" || data[i].Rainfall24hr != "0") {
 
-  svg
-    .selectAll("path")
-      .data(features)
-    .enter().append("path")
-      .attr("d",path);
+      let html = "";
+      for(let key in data[i]) {
+        html = html + key + ": " + data[i][key] + "<br>";
+      }
 
-  svg
-    .append('circle')
-      .attr('r', radius)
-      .attr('cx', width / 2)
-      .attr('cy', height / 2)
-      .attr('fill', 'none')
-      .attr('stroke', 'white')
-      .attr('stroke-width', radius / 2);
+      L.marker([data[i].TWD67Lat, data[i].TWD67Lon], {icon: icon})
+        .addTo(map)
+        .bindPopup(html);
+ 
+    }
+  }
 }

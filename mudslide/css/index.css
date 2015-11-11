@@ -1,6 +1,4 @@
-#map path {
-  /*fill: rgba(0, 0, 0, 0.14);;
-  stroke: white;*/
-  fill: white;
-  stroke: black;
+#map {
+  width: 100vw;
+  height: 100vh;
 }

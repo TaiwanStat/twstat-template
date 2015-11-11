@@ -14,7 +14,9 @@ module.exports = {
 	    lib_src + '/material-design-lite/material.js',
             lib_src + '/material-design-lite/material.css',
             lib_src + '/d3/index.js',
-            lib_src + '/topojson/topojson.min.js'
+            lib_src + '/leaflet/dist/leaflet.js',
+            lib_src + '/leaflet/dist/leaflet.css',
+            lib_src + '/topojson/topojson.js'
         ]
     },
     output: {
@@ -24,9 +26,15 @@ module.exports = {
     },
     module: {
         loaders: [
-            { test: /\.jsx$/, loader: 'jsx-loader?harmony!babel' },
+            {
+                test: /\.jsx$/,
+                loader: 'babel',
+                query: {
+                  presets: ['es2015']
+                } 
+            },
             { test: /\.css$/, loader: 'style-loader!css-loader' },
-            { test: /\.png$/, loader: "url-loader?limit=100000" }
+            { test: /\.png$/, loader: 'url-loader?limit=100000' }
         ]
     },
 /*    externals: {
