@@ -1,5 +1,5 @@
 
-function drawSunburst (domobj, _width) {
+function drawSunburst (domobj, itemobj, _width) {
 
 	var dura = 500;
 
@@ -36,6 +36,7 @@ function drawSunburst (domobj, _width) {
 	firebaseRef.child("vegetable_data").on("value", function(snapshot) {
 
 		var data = snapshot.val();
+		console.log(data);
 		var root = {name: "農產品", children:[]}
 
 		var sz = 1;
@@ -85,6 +86,16 @@ function drawSunburst (domobj, _width) {
 				.attrTween("x", textTweenZoomX(d))
 				.attrTween("y", textTweenZoomY(d))
 				.attrTween("opacity", textTweenZoomVisible(d));
+			if(d.children){
+				itemobj.html("");
+			}else{
+				itemobj.html("");
+				var dates = Object.keys(data[d.parent.name][d.name]);
+				var price = (data[d.parent.name][d.name][dates[dates.length - 1]].price);
+				itemobj.append("div")
+					.html("" + d.name + price + "NTD");
+			}
+			console.log(d);
 		}
 
 		function stash(d) {
