@@ -8,15 +8,12 @@ module.exports = {
     entry: {
         'index': jsx_src + 'index.jsx',
         'common': [
-            lib_src + '/react/react.js',
-            lib_src + '/react-dom/index.js',
             lib_src + '/jquery/dist/jquery.js',
 	    lib_src + '/material-design-lite/material.js',
             lib_src + '/material-design-lite/material.css',
             lib_src + '/d3/index.js',
             lib_src + '/leaflet/dist/leaflet.js',
-            lib_src + '/leaflet/dist/leaflet.css',
-            lib_src + '/topojson/topojson.js'
+            lib_src + '/leaflet/dist/leaflet.css'
         ]
     },
     output: {
@@ -43,7 +40,7 @@ module.exports = {
     },
 */
     resolve: {
-        extensions: ['', '.js', '.jsx', '.css', '.min.css', '.min.js']
+        extensions: ['', '.js', '.jsx', '.css', '.min.css', '.min.js', '.json']
     },
     //plugins: [commonsPlugin, minifyPlugin]
     plugins: [

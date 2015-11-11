@@ -1,7 +1,6 @@
 'use strict';
 
 import L from 'leaflet';
-import topojson from 'topojson';
 
 export function init(map) {
   L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
@@ -34,4 +33,15 @@ export function site(map, data) {
  
     }
   }
+}
+
+export function line(map, data) {
+  L.geoJson(data, {
+    style: function(feature) {
+      return {
+        color: "red",
+        opacity: 1
+      }
+    }
+  }).addTo(map);
 }
