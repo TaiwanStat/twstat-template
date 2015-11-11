@@ -383,22 +383,28 @@ firebaseRef.on("value", function(snapshot) {
 		.on("mousemove", mousemove);
 
 	// check box
-	d3.select("body")
-	.append("div")
+	var eachInputDiv = d3.select("body")
+		.append("div")
 		.selectAll(".vginput")
 		.data(data)
-	.	enter()
-	.append("label")
-		.style("color", function(v) { return color(v.name); })
-		.text(function(v) { return " |" + v.name; })
-	.append("input")
-		.attr("type","checkbox")
-		.property("position", "absolute")
-		.property("left", function(v) { return v.id*10+"px"; })
-		.on("change", function(v) {
-			this.checked ^ true;
-			click(v);
-		});
+		.enter()
+			.append("div")
+			.style("display", "inline-block")
+			.style("margin", 3);
+
+	eachInputDiv
+		.append("div")
+		.style("background-color", function(v) { return color(v.name); })
+		.style("font-size",'15px')
+		.text(function(v) { return "" + v.name; })
+			.append("input")
+			.attr("type","checkbox")
+			.property("position", "absolute")
+			.property("left", function(v) { return v.id*10+"px"; })
+			.on("change", function(v) {
+				this.checked ^ true;
+				click(v);
+			});
 	
 
 	// function definition
