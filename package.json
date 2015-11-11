@@ -26,10 +26,10 @@
     "bower": "^1.6.5",
     "d3": "^3.5.6",
     "jquery": "^2.1.4",
-    "leaflet": "^0.7.7",
     "material-design-lite": "^1.0.6",
     "react": "^0.14.2",
     "react-dom": "^0.14.2",
+    "topojson": "^1.6.19",
     "webpack": "^1.12.2"
   },
   "devDependencies": {
@@ -38,7 +38,6 @@
     "css-loader": "^0.21.0",
     "file-loader": "^0.8.4",
     "jsx-loader": "^0.13.2",
-    "style-loader": "^0.13.0",
-    "url-loader": "^0.5.6"
+    "style-loader": "^0.13.0"
   }
 }

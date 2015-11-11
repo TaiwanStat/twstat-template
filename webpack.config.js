@@ -14,8 +14,7 @@ module.exports = {
 	    lib_src + '/material-design-lite/material.js',
             lib_src + '/material-design-lite/material.css',
             lib_src + '/d3/index.js',
-            lib_src + '/leaflet/dist/leaflet.js',
-            lib_src + '/leaflet/dist/leaflet.css'
+            lib_src + '/topojson/topojson.min.js'
         ]
     },
     output: {
