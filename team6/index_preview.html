@@ -18,7 +18,7 @@
     <script>
 
     	$().ready(function (){
-    		drawSunburst(d3.select(".sunburstChart"), $(".sunburstChart").width());
+    		drawSunburst(d3.select(".sunburstChart"), d3.select(".quickSummerize"), $(".sunburstChart").width());
             drawMultilineChart(d3.select(".multilineChart"), d3.select(".multilineChartSelector"), $(".multilineChart").width());
     	});
 
