@@ -82,6 +82,9 @@ var x = d3.time.scale()
 var y = d3.scale.linear()
     .range([height, 0]);
 
+var y3 = d3.scale.linear()
+	.range([height, 0]);
+
 var color = d3.scale.category20();
 
 var mycolor = ["#FFFF00", "#FF8250","#FF0000"];
@@ -131,15 +134,19 @@ var focus = multi.append("g")
 var firebaseRef = new Firebase("https://ikdde-team6.firebaseio.com/all_data/");
 
 // store data from firebase and drawing charts
-firebaseRef.on("value", function(snapshot) {
+firebaseRef.once("value", function(snapshot) {
 
 	var vgsnap = snapshot.child("vegetable_data");
 
 	var tysnap = snapshot.child("typhoon_data");
 
+	var rainsnap = snapshot.child("rainfall");
+
 	var data = [];
 
 	var tydata = [];
+
+	var raindata = [];
 
 	// from min: 2015/1/1 to max: today
 	var yesterday = new Date();
@@ -147,8 +154,11 @@ firebaseRef.on("value", function(snapshot) {
 	yesterday.setSeconds(0);
 	yesterday.setMinutes(0);
 	yesterday.setHours(0);
-	var time_domain = [new Date(2015,0,1), yesterday];
+	var time_domain = [new Date(2015,0,1), new Date(2015,10,9)];
+	//var time_domain = [new Date(2015,0,1), yesterday];
+	var time_diff = Math.floor( (time_domain[1] - time_domain[0]) / 86400000 );
 
+	//console.log(time_diff);
 	// get all vegetable name
 	var name = d3.keys(vgsnap.val()).filter(function(name) { return name != 'default'});
 
@@ -174,6 +184,23 @@ firebaseRef.on("value", function(snapshot) {
 			end_date: new Date(+ty.end_year, +ty.end_month-1, +ty.end_day)
 		});
 	});
+
+	rainsnap.forEach( function(child) {
+		var tmpt = [];
+		child.forEach( function(grandChild) {
+			var r = grandChild.val()
+			tmpt.push({
+				date: new Date(r.year, r.month, r.day),
+				rainfall: r.rainfall
+			});
+		});
+		raindata.push({
+			name: child.key(),
+			value: tmpt
+		});
+	});
+
+	//console.log(raindata);
 
 	// reconstruct(rebuild) date
 	data.forEach( function(v) {
@@ -211,10 +238,17 @@ firebaseRef.on("value", function(snapshot) {
 	);
 
 	y_max = isNaN(y_max)? +50: y_max+20;
-
 	// set y domain by range from min of date to max of date
 	//     y invoked in yAxis
 	y.domain([0,y_max]);
+	
+	y3.domain([ 0,
+				d3.max(raindata,
+						function(r) { 
+							return d3.max(r.value, function(e) { return e.rainfall; });
+						}
+				)+10
+	]);
 
 	// append x axis by feature xAxis
 	var gxAxis = multi.append("g")
@@ -274,21 +308,44 @@ firebaseRef.on("value", function(snapshot) {
 
 	// typhoon
 	var tybar = multi.selectAll("bar")
-			.data(tydata)
-			.enter()
-		.append("rect")
-			.attr("clip-path", "url(#clip)")
-			.attr("class","bar")
-			.attr("x", function(ty) { return x(ty.start_date); })
-			.attr("width", function(ty) { return x(ty.end_date) - x(ty.start_date); })
-			.attr("y", 0)
-			.attr("height", height)
-			.style("fill", function(ty) {
-					var _rank =	ty.rank <= 15 ? 0  :
-								ty.rank <= 25 ? 10 :
-								20;
-					return rankScale( _rank); })
-			.style("opacity", 0.5);
+		.data(tydata)
+		.enter()
+	.append("rect")
+		.attr("clip-path", "url(#clip)")
+		.attr("class","bar")
+		.attr("x", function(ty) { return x(ty.start_date); })
+		.attr("width", function(ty) { return x(ty.end_date) - x(ty.start_date); })
+		.attr("y", 0)
+		.attr("height", height)
+		.style("fill", function(ty) {
+			var _rank =	ty.rank <= 15 ? 0  :
+						ty.rank <= 25 ? 10 :
+									20;
+			return rankScale( _rank); })
+		// hide typhoon for debug
+		//.style("display","none")
+		.style("opacity", 0.5);
+
+
+	var rainfall = multi.selectAll("rainfall")
+		.data(raindata)
+		.enter()
+	.append("g")
+		.attr("class","rainfall")
+		.attr("id", function(r) { return 'tag_'+r.name; })
+		.style("opacity", 1);
+
+	var eachRainBar = rainfall.selectAll("rainbar")
+		.data(function(r) { return r.value; })
+		.enter()
+	.append("rect")
+		.attr("class","rainbar")
+		.attr("x", function(r) { return x(r.date)-Math.floor(width/time_diff); })
+		.attr("width", Math.floor(width/time_diff) )
+		.attr("y", function(r) { return y3(r.rainfall); })
+		.attr("height", function(r) { return height - y3(r.rainfall); })
+		.style("fill",'blue')
+		.style("opacity", .5);
 
 
 	// x dash line
@@ -547,6 +604,7 @@ var x2 = d3.time.scale()
     .range([0, width]);
 
 x2.domain(time_domain);
+
 /*
 x2.domain([
 	d3.min(data, function(v) { return d3.min(v.value, function(d) { return d.Date});}),
@@ -591,7 +649,12 @@ var context = svg.append("g")
 ////////////////
 
 	function brushed() {
+		var _time_diff; 
+
 		x.domain(brush.empty() ? x2.domain() : brush.extent());
+
+		//_time_diff = Math.floor((x.domain()[1]-x.domain()[0])/86400000);
+
 		graph
 			.attr("d", function(v) { return line(v.value); });
 
@@ -600,7 +663,13 @@ var context = svg.append("g")
 			.attr("width", function(ty) { return x(ty.end_date) - x(ty.start_date); })
 			.attr("y", 0)
 			.attr("height", height);
-
+		/*
+		eachRainBar
+			.attr("x", function(r) { return x(r.date)-Math.floor(width/_time_diff); })
+			.attr("width", Math.floor(width/_time_diff) )
+			.attr("y", function(r) { return y3(r.rainfall); })
+			.attr("height", function(r) { return height - y3(r.rainfall); });
+		*/
 		vg.select(".x.axis").call(xAxis);
 		d3.select(".x.axis").call(xAxis);
 	}
