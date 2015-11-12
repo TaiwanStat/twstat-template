@@ -551,7 +551,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
 		
             tooltip
                 .style("left",d3.event.pageX+"px")
-                .style("top",650+y(_max)-y_pad+"px");
+                .style("top",d3.event.pageY+"px");
 
 
 			var _r = raindata[0];
