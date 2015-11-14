@@ -1,5 +1,5 @@
-var jsx_src = './mudslide/js/src/';
-var jsx_dist = './mudslide/js/dist/';
+var jsx_src = './Team_10/js/src/';
+var jsx_dist = './Team_10/js/dist/';
 var lib_src = './node_modules';
 
 var webpack = require('webpack');
@@ -11,7 +11,7 @@ module.exports = {
             lib_src + '/jquery/dist/jquery.js',
 	    lib_src + '/material-design-lite/material.js',
             lib_src + '/material-design-lite/material.css',
-            lib_src + '/d3/index.js',
+            lib_src + '/d3/d3.js',
             lib_src + '/leaflet/dist/leaflet.js',
             lib_src + '/leaflet/dist/leaflet.css'
         ]
@@ -19,7 +19,7 @@ module.exports = {
     output: {
         filename: '[name].min.js',
         path: jsx_dist,
-        publicPath: '/mudslide/js/dist/'
+        publicPath: '/Team_10/js/dist/'
     },
     module: {
         loaders: [
