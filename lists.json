@@ -11,5 +11,6 @@
     ]
   },
   "layout": "./index.hbs",
-  "filename": "index.html"
+  "filename": "index.html",
+  "partials": "./include/partials.js"
 }
