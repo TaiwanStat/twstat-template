@@ -1,0 +1,21 @@
+#button {
+  position: fixed;
+  top: 50%;
+  right: 10px;
+  margin-top: -65px;
+  width: 65px;
+  z-index: 10;
+}
+
+#button .mdl-button{
+  margin: 5px;
+}
+
+#map {
+  width: 100vw;
+  height: 100vh;
+}
+
+.leaflet-popup-content {
+  width: 200px;
+}
