@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang='zh-TW'>
+<style>
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  margin: auto;
+  position: relative;
+  width: 960px;
+}
+
+text {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+form {
+  position: absolute;
+  left: 10%;
+  top: 90%;
+}
+</style>
+<head>
+{{> head}}
+<meta charset="utf-8">
+
+<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+<link rel="icon" type="image/png" href="/favicon.ico" />
+<meta property="og:title" content="用數據看台灣 - {{chart_description.title}}">
+<meta property="og:site_name" content="用數據看台灣 - {{chart_description.title}}">
+<meta property="og:description" content="{{chart_description.description}}">
+<title>用數據看台灣 - {{chart_description.title}}</title>
+<meta http-equiv="Content-Type" content="text/html"; charset="utf-8">
+<meta property="og:image" content="http://i.imgur.com/04AFcnA.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="300">
+<meta property="og:image:height" content="300">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="stylesheet" href="/bower_components/semantic/dist/semantic.min.css" type="text/css" media="all" />
+<link rel="stylesheet" href="/css/style.css" type="text/css" media="all" />
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.2/material.indigo-pink.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+</head>
+<body>
+{{>header}}
+<header class="mdl-layout__header">
+<div class="mdl-layout__header-row">
+  <span class="mdl-layout-title"><a href="http://real.taiwanstat.com/" style="color: #FFF"><img src="/images/assert/round-logo.png" id="round-logo"/>用數據看台灣</a></span>
+  <div class="mdl-layout-spacer"></div>
+  <nav class="mdl-navigation mdl-layout--large-screen-only">
+  <a class="mdl-navigation__link" href="http://real.taiwanstat.com/">台灣開放即時資料</a>
+  <a class="mdl-navigation__link" href="http://long.taiwanstat.com">台灣開放統計資料</a>
+  <a class="mdl-navigation__link" href="http://global.taiwanstat.com/r/">世界即時資訊</a>
+  <a class="mdl-navigation__link" href="http://global.taiwanstat.com/l/">世界統計資訊</a>
+  <a class="mdl-navigation__link" href="http://taiwanstat.com/opendata">開放資料分析部落格</a>
+  <a class="mdl-navigation__link" href="https://www.facebook.com/taiwanstat">Facebook 粉專</a>
+  </nav>
+  <div>
+    </header>
+    <div class="mdl-layout__drawer">
+      <span class="mdl-layout-title"><a href="http://real.taiwanstat.com/"><img src="/images/assert/round-logo.png" id="round-logo"/>用數據看台灣</a></span>
+      <nav class="mdl-navigation">
+      <a class="mdl-navigation__link" href="http://real.taiwanstat.com/">台灣開放即時資料</a>
+      <a class="mdl-navigation__link" href="http://long.taiwanstat.com">台灣開放統計資料</a>
+      <a class="mdl-navigation__link" href="http://global.taiwanstat.com/r/">世界即時資訊</a>
+      <a class="mdl-navigation__link" href="http://global.taiwanstat.com/l/">世界統計資訊</a>
+      <a class="mdl-navigation__link" href="http://taiwanstat.com/opendata">開放資料分析部落格</a>
+      <a class="mdl-navigation__link" href="https://www.facebook.com/taiwanstat">Facebook 粉專</a>
+      </nav>
+    </div>
+{{> start}}
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header" id="layout-header">
+  <main class="mdl-layout__content" id="main-content">
+  <h2 id="title">台灣與各國貿易關係</h2>
+    <div class="fb-plugin">
+    <div class="fb-like-box" data-href="https://www.facebook.com/taiwanstat?fref=ts" data-colorscheme="light" data-show-faces="false"></div>
+    <div class="fb-like" data-href="http://real.taiwanstat.com/{{chart_description.url}}" data-width="300px" data-layout="standard" data-action="like" data-show-faces="true" data-share="true"></div>
+  </div>
+  <div id="chart">
+  </div>
+<form>
+  <label><input type="radio" name="mode" value="grouped"> 分類</label>
+  <label><input type="radio" name="mode" value="stacked" checked> 累計</label>
+</form>
+{{> end}}
+
+{{> footer}}
+
+</body>
+</html>
+<script src="d3/d3.v3.min.js"></script>
+<script>
+
+var n = 13, // number of layers
+    m = 2; // number of samples per layer
+	
+	var margin = {top: 20, right: 50, bottom: 100, left: 75},
+    width = 940 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+	var svg = d3.select("#chart").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	
+	d3.csv("trade.csv", function (data){
+    
+    var headers = ["電機與設備及其零件","核子反應器及機械用具零件","塑膠及其製品","精密儀器及器具","礦物燃料與礦油及蒸餾產品","車輛及其零件與附件","有機化學產品","鋼鐵","鋼鐵製品","雜項化學產品","珠寶類","其他"];
+    
+    var layers = d3.layout.stack()(headers.map(function(priceRange) {
+        return data.map(function(d) {
+			
+          return {x: d.year, y: +d[priceRange]};
+		  
+        });
+    }));
+	console.log(layers);
+    var yGroupMax = d3.max(layers, function(layer) { return d3.max(layer, function(d) { return d.y; }); });
+    var yStackMax = d3.max(layers, function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); });
+	
+    var xScale = d3.scale.ordinal()
+        .domain(layers[0].map(function(d) { return d.x; }))
+        .rangeRoundBands([25, width], .08);
+
+    var y = d3.scale.linear()
+        .domain([0, yStackMax])
+        .range([height, 0]);
+	
+	var y2 = d3.scale.linear()
+        .domain([0, yGroupMax])
+        .range([height, 0]);
+	
+    var color = d3.scale.ordinal()
+        .domain(headers)
+        .range(["red","#FF726D","#FFCC6B", "#F4FF8A", "#3FFF57", "#12FFC8", "#66B7FF","#1A32FF","#AB63E8","#E773FF","#FF66BB","#FF1296"]);
+      
+    var xAxis = d3.svg.axis()
+        .scale(xScale)
+        .tickSize(0)
+        .tickPadding(6)
+        .orient("bottom");
+
+    var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left")
+        .tickFormat(d3.format(".2s"));
+
+    var layer = svg.selectAll(".layer")
+        .data(layers)
+        .enter().append("g")
+        .attr("class", "layer")
+        .style("fill", function(d, i) { return color(i); });
+
+    var rect = layer.selectAll("rect")
+        .data(function(d) { return d; })
+        .enter().append("rect")
+        .attr("x", function(d) { return xScale(d.x); })
+        .attr("y", height)
+        .attr("width", xScale.rangeBand())
+        .attr("height", 0);
+
+    rect.transition()
+        .delay(function(d, i) { return i * 10; })
+        .attr("y", function(d) { return y(d.y0 + d.y); })
+        .attr("height", function(d) { return y(d.y0) - y(d.y0 + d.y); });
+
+    //********** AXES ************
+    svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis)
+        .selectAll("text").style("text-anchor", "end")
+            .attr("dx", "-.8em")
+            .attr("dy", ".15em")
+            .attr("transform", function(d) {
+                  return "rotate(-45)" 
+                });
+    
+    svg.append("g")
+        .attr("class", "y axis")
+        .attr("transform", "translate(20,0)")
+        .call(yAxis)
+      .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr({"x": -150, "y": -70})
+        .attr("dy", ".75em")
+        .style("text-anchor", "end")
+        .text("單位:億美元");
+
+    var legend = svg.selectAll(".legend")
+        .data(headers)
+            .enter().append("g")
+            .attr("class", "legend")
+            .attr("transform", function(d, i) { return "translate(50," + i * 20 + ")"; });
+       
+        legend.append("rect")
+            .attr("x", width - 18)
+            .attr("width", 18)
+            .attr("height", 18)
+            .style("fill", color);
+    
+        legend.append("text")
+              .attr("x", width - 24)
+              .attr("y", 9)
+              .attr("dy", ".35em")
+              .style("text-anchor", "end")
+              .text(function(d) { return d;  });
+
+
+    d3.selectAll("input").on("change", change);
+
+    var timeout = setTimeout(function() {
+      d3.select("input[value=\"grouped\"]").property("checked", true).each(change);
+    }, 2000);
+
+    function change() {
+      clearTimeout(timeout);
+      if (this.value === "grouped") {
+	   
+	  transitionGrouped();
+	  var yAxis = d3.svg.axis()
+        .scale(y2)
+        .orient("left")
+        .tickFormat(d3.format(".2s"));
+		svg.selectAll("g .y.axis")
+            .call(yAxis)
+	  }
+      else {
+	  
+	  transitionStacked();
+	  
+	  	 var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left")
+        .tickFormat(d3.format(".2s"));
+		svg.selectAll("g .y.axis")
+            .call(yAxis)
+	  }
+    }
+
+    function transitionGrouped() {
+      y.domain([0, yGroupMax]);
+	
+      rect.transition()
+          .duration(500)
+          .delay(function(d, i) { return i * 10; })
+          .attr("x", function(d, i, j) { return xScale(d.x) + xScale.rangeBand() / n * j; })
+          .attr("width", xScale.rangeBand() / n)
+        .transition()
+          .attr("y", function(d) { return y(d.y); })
+          .attr("height", function(d) { return height - y(d.y); });
+
+      rect.on("mouseover", function() { tooltip.style("display", null); })
+        .on("mouseout", function() { tooltip.style("display", "none"); })
+        .on("mousemove", function(d) {
+          var xPosition = d3.mouse(this)[0] - 15;
+          var yPosition = d3.mouse(this)[1] - 25;
+          tooltip.attr("transform", "translate(" + xPosition + "," + yPosition + ")");
+          tooltip.select("text").text(d.y);
+        });
+		
+    };
+
+    function transitionStacked() {
+      y.domain([0, yStackMax]);
+
+      rect.transition()
+          .duration(500)
+          .delay(function(d, i) { return i * 10; })
+          .attr("y", function(d) { return y(d.y0 + d.y); })
+          .attr("height", function(d) { return y(d.y0) - y(d.y0 + d.y); })
+        .transition()
+          .attr("x", function(d) { return xScale(d.x); })
+          .attr("width", xScale.rangeBand());
+
+      rect.on("mouseover", function() { tooltip.style("display", null); })
+        .on("mouseout", function() { tooltip.style("display", "none"); })
+        .on("mousemove", function(d) {
+          var xPosition = d3.mouse(this)[0] - 15;
+          var yPosition = d3.mouse(this)[1] - 25;
+         // console.log(xPosition);
+          tooltip.attr("transform", "translate(" + xPosition + "," + yPosition + ")");
+          tooltip.select("text").text(Math.round(d.y0 + d.y));
+        });
+    };
+
+    var tooltip = svg.append("g")
+        .attr("class", "tooltip");
+        
+    tooltip.append("rect")
+        .attr("width", 30)
+        .attr("height", 20)
+        .attr("fill", "white")
+        .style("opacity", 0.5);
+     
+    tooltip.append("text")
+        .attr("x", 15)
+        .attr("dy", "1.2em")
+        .style("text-anchor", "middle")
+        .attr("font-size", "12px")
+        .attr("font-weight", "bold");
+});
+</script>
