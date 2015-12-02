@@ -7,8 +7,11 @@ var no_birth = d3.select('#container').append('svg')
 var s_death = d3.select('#container').append('svg');
 var no_death = d3.select('#container').append('svg') ;
 
+var map_hdi = svg.append("text").attr("class" , "map_hdi");
+var map_rank = svg.append("text").attr("class" , "map_rank") ;
+
 var margin = {top: 20, right: 20, bottom: 30, left: 40},
-    s_width = width - margin.left - margin.right,
+    s_width = width-200 - margin.left - margin.right,
     s_height = 250 - margin.top - margin.bottom;
 
 
@@ -59,9 +62,7 @@ d3.json("world-countries.json", function(data) {
         .key(function(d){return d.Country;})
         .entries(death); 
     
-    console.log(cDeath) ;
-    console.log(cBirth) ;
-
+    console.log(hdi2013) ;
 
     /* Antarctica will not shown on the map */
     var features = _.filter(data.features, function(value, key) {
@@ -94,6 +95,43 @@ d3.json("world-countries.json", function(data) {
 
         d3.select(this.parentNode.appendChild(this)).transition().duration(300)
           .style({'stroke-opacity':0.7,'stroke-width':'3px','stroke':'#000000'});
+
+        for (var i = 0 ; i < hdi2013.length ; i++)
+        {
+          if(hdi2013[i].Country == data.properties.name)
+          {
+            
+            map_hdi.text("HDI:  "+ hdi2013[i].HDI)
+                .style("font-size" , 19)
+                .style("font-family" , "fantasy")
+                .style("font-weight" , 900)
+                .attr("transform" , "translate("+30+" ,"+ (height-20)+")") 
+            map_rank.text("Rank: "+(hdi2013.length-1-i))
+                .style("font-size" , 19)
+                .style("font-family" , "fantasy")
+                .style("font-weight" , 900)
+                .attr("transform" , "translate("+180+" ,"+ (height-20)+")") 
+            if ((hdi2013.length-1-i) <= 10)
+              map_rank.style("fill" , "#CC0000")
+            else
+              map_rank.style("fill" , "black")
+          }
+          else if(data.properties.name == "Somaliland")
+            hdi_text() ;
+          else if(data.properties.name == "Western Sahara")
+            hdi_text() ;
+          else if(data.properties.name == "Ivory Coast")
+            hdi_text() ;
+          else if(data.properties.name == "Republic of the Congo")
+            hdi_text() ;
+          else if(data.properties.name == "Guinea Bissau")
+            hdi_text() ;
+          else if(data.properties.name == "Greenland")
+            hdi_text() ;
+          else if(data.properties.name == "Republic of Serbia")
+            hdi_text() ;
+
+        }
       
         $("#country").text(function(){
           return " Country : "+ data.properties.name ;
@@ -128,7 +166,7 @@ d3.json("world-countries.json", function(data) {
 
             s_birth.style("display" , "block")
              .append("text")
-              .attr("transform" , "translate("+(width -300) + ",20)")
+              .attr("transform" , "translate("+(width -300) + ",30)")
               .style("font-family", "fantasy")
               .style("font-weight",900)
               .style("font-size" , 25) 
@@ -142,7 +180,7 @@ d3.json("world-countries.json", function(data) {
 
             s_death.style("display" , "block")
              .append("text")
-              .attr("transform" , "translate("+(width - 300) + ",20)")
+              .attr("transform" , "translate("+(width - 300) + ",30)")
               .style("font-family", "fantasy")
               .style("font-weight",900)
               .style("font-size" , 25) 
@@ -182,16 +220,6 @@ d3.json("world-countries.json", function(data) {
 
         d3.select(this.parentNode.appendChild(this)).transition().duration(300)
           .style({'stroke-opacity':1,'stroke-width':'1px','stroke':'white'});
-            /*
-            $("#country").text(function(){
-              return "" ;
-            });
-            $("#birth").text(function(){
-              return "";
-            })
-            $("#death").text(function(){
-              return "";
-            })*/
 
       })
       .attr('fill', function(data){ 
@@ -207,6 +235,16 @@ d3.json("world-countries.json", function(data) {
       })
       .attr('stroke', 'rgba(255,255,255,1)')
       .attr('stroke-width', 1);
+
+      function hdi_text()
+      {
+        map_hdi.text("HDI: No Data")
+            .style("font-size" , 19)
+            .style("font-family" , "fantasy")
+            .attr("transform" , "translate("+30+" ,"+ (height-20)+")") 
+         map_rank.text("") 
+
+      }
 
 
       function show_bar(b_array , d_array){
@@ -282,7 +320,7 @@ d3.json("world-countries.json", function(data) {
 
         s_birth.append("g")
           .attr("class", "x axis")
-          .attr("transform", "translate(30," + (s_height+10) + ")")
+          .attr("transform", "translate(50," + (s_height+10) + ")")
           .call(xAxis) 
         .append("text")
           .text("Years")
@@ -290,7 +328,7 @@ d3.json("world-countries.json", function(data) {
 
         s_birth.append("g")
           .attr("class", "y axis")
-          .attr("transform", "translate(30,10)")
+          .attr("transform", "translate(50,10)")
           .call(yAxis)
         .append("text")
           .attr("transform", "rotate(-90)")
@@ -302,14 +340,14 @@ d3.json("world-countries.json", function(data) {
 
         s_birth.selectAll(".bar").data(tArray).enter().append("rect")
           .attr("class", "bar")
-          .attr("transform", "translate(30,10)")
+          .attr("transform", "translate(50,10)")
           .attr("x", function(d) { return x(d.year); })
-        .attr("width", (x.rangeBand()-3))
+        .attr("width", (x.rangeBand()-5))
           .attr("y", function(d) { return s_height; })
           .attr("height" ,0)
         .transition()
-          .duration(300)
-          .delay(function(d, i) { return i * 70; })
+          .duration(250)
+          .delay(function(d, i) { return i * 50; })
           .attr("y", function(d) { return y(d.num); })
           .attr({
             "height": function(d) { return s_height - y(d.num); }
@@ -361,15 +399,13 @@ d3.json("world-countries.json", function(data) {
         dArray[52 - h].num = d_array[0].y2012 ;  
         dArray[53 - h].num = d_array[0].y2013 ;
         //dArray[54 - h].num = d_array[0].y2014 ; 
-
-        console.log(dArray) ;
-        
+                
         x.domain(dArray.map(function(d) { return d.year; }));
         y.domain([0, 25]);//d3.max(dArray, function(d) { return d.num; })
 
         s_death.append("g")
           .attr("class", "x axis")
-          .attr("transform", "translate(30," + (s_height+10) + ")")
+          .attr("transform", "translate(50," + (s_height+10) + ")")
           .call(xAxis) 
         .append("text")
           .text("Years")
@@ -377,7 +413,7 @@ d3.json("world-countries.json", function(data) {
 
         s_death.append("g")
           .attr("class", "y axis")
-          .attr("transform", "translate(30,10)")
+          .attr("transform", "translate(50,10)")
           .call(yAxis)
         .append("text")
           .attr("transform", "rotate(-90)")
@@ -389,19 +425,20 @@ d3.json("world-countries.json", function(data) {
 
         s_death.selectAll(".bar").data(dArray).enter().append("rect")
           .attr("class", "bar")
-          .attr("transform", "translate(30,10)")
+          .attr("transform", "translate(50,10)")
           .attr("x", function(d) { return x(d.year); })
           .attr("width", (x.rangeBand()-3))
           .attr("y", function(d) { return s_height; })
           .attr("height" ,0)
         .transition()
-          .duration(300)
-          .delay(function(d, i) { return i * 70; })
+          .duration(250)
+          .delay(function(d, i) { return i * 50; })
           .attr("y", function(d) { return y(d.num); })
           .attr({
             "height": function(d) { return s_height - y(d.num); }
           });       
         }
+
       })
     })
     })

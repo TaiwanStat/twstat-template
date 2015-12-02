@@ -11,7 +11,7 @@
       font-weight:700;
       line-height:10px;
       word-spacing:5px; 
-      top:80%;
+      top:79%;
       left:28px;
       position: absolute;
       margin: 0px;
@@ -63,6 +63,9 @@
       padding-right:10px;
       line-height: 9px;
     }
+    .s_death{
+      float : right;
+    }
     .bar {
       fill: steelblue;
     }
@@ -80,4 +83,14 @@
     }
     .x.axis path {
       display: none;
+    }
+    .line_birth{
+      stroke: DodgerBlue;
+      stroke-width: 3;
+      fill: none;
+    }
+    .line_death{
+      stroke: red;
+      stroke-width: 2.5;
+      fill: none;
     }
