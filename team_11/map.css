@@ -1,0 +1,83 @@
+    body {
+      display: block;
+      margin: 0px;      
+      padding: 0px;
+    }
+    #chart{
+      width:40% ;
+      height:200px ;
+      font-size:19px;
+      font-family: fantasy;
+      font-weight:700;
+      line-height:10px;
+      word-spacing:5px; 
+      top:80%;
+      left:28px;
+      position: absolute;
+      margin: 0px;
+      padding: 0px;
+      
+    }
+    .ps
+    {
+      border-radius: 25px;
+      background:white;
+      z-index:10;
+      position: absolute;
+
+      font-family: fantasy;
+      width: 55%;
+      height:100px ;
+      opacity: 0.9;
+      top:80%;
+      right:40px;
+      margin: 0px;
+      padding:10px;
+    }
+    .svg_pic
+    {
+      display: block;
+      z-index: 30;
+      height: 50px;
+      width : 100%;
+
+    }
+    .icon
+    {
+      float:left;
+      width:20%;
+      height:30px;
+      font-size:15px;
+      font-weight:700 ;
+      text-align: center;
+    }
+    .title
+    {
+      float:bottom;
+      height:45px;
+      font-size:25px;
+      font-weight:900 ;
+      text-align: right;
+      margin:0px;
+      padding-top:25px;
+      padding-right:10px;
+      line-height: 9px;
+    }
+    .bar {
+      fill: steelblue;
+    }
+    .bar:hover {
+      fill: brown;
+    }
+    .axis {
+      font: 10px sans-serif;
+    }
+    .axis path,
+    .axis line {
+      fill: none;
+      stroke: #000;
+      shape-rendering: crispEdges;
+    }
+    .x.axis path {
+      display: none;
+    }

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style type="text/css">
+    @import "map.css";
+  </style>
+
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>
+  <script type="text/javascript" src="http://underscorejs.org/underscore-min.js"></script>
+</head>
+<body style = "background-color:#f8f8ff"> <!--#DCDCDC-->
+
+  <div id = "container"></div>
+  
+  <div id = "chart">
+    <p id = "country" style ="font-size:26px;font-weight:900; color:#CC0000; "></p>
+    <p id = "birth"></p>
+    <p id = "death"></p>
+  </div>
+
+  <div class = "ps">
+    <div class = "svg_pic" style = "left:10px">
+      <div class = "icon">
+        <svg class = "very_high_icon" width = "20" height = "20" stroke="black" stroke-width = "3px">
+          <rect width = "20" height = "20" style = "fill:rgb(29, 92, 114)"></rect>
+        </svg>
+        <div>Very high </div>
+      </div>
+
+      <div class = "icon">
+        <svg class = "high_icon" width = "20" height = "20" stroke="black" stroke-width = "3px">
+          <rect width = "20" height = "20" style = "fill:#79B2C6"></rect>
+        </svg>
+        <div>High </div>
+      </div>
+
+      <div class = "icon">
+        <svg class = "normal_icon" width = "20" height = "20" stroke="black" stroke-width = "3px">
+          <rect width = "20" height = "20" style = "fill:#D5EAEF"></rect>
+        </svg>
+        <div>Normal</div>
+      </div>
+
+      <div class = "icon">
+        <svg class = "low_icon" width = "20" height = "20" stroke="black" stroke-width = "3px">
+          <rect width = "20" height = "20" style = "fill:rgb(245, 253, 254)" ></rect>
+        </svg>
+        <div>Low </div>
+      </div>
+
+      <div class = "icon">
+        <svg class = "black_icon" width = "20" height = "20" stroke="black" stroke-width = "3px">
+          <rect width = "20" height = "20" style = "fill:black"></rect>
+        </svg>
+        <div>No data</div>
+      </div>
+
+    </div>
+    
+    <div class = "title" >
+      HDI(Human development Index) with Birth/Death
+      <p style = "padding-top:0px;font-size:12px ; font-weight:300 ;"> by ncku-netdb 106  [Data : 2014 years]</p>
+    </div>
+    <div class = "birth">
+
+
+  </div>
+
+  <script type="text/javascript" src="map.js"></script>
+
+</body>
+</html>
