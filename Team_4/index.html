@@ -1,15 +1,43 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang='zh-TW'>
     <head>
+		<meta charset="utf-8">
+		<title>NBA</title>
      <!-- my js & css -->
-     <link rel="stylesheet" type="text/css" href="./css/style.css">
+		<link rel="stylesheet" type="text/css" href="./css/style.css">
+		<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+		
     </head>
     <body>
     <!-- my charts -->
-    <div class="chart">
+		<div class="chart">
+		</div>
+	<!-- slider -->	
+		<p>
+			<label for="amount">TIME:</label>
+			<input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
+		</p>
+		 
+		<div id="slider-range-min" style="width: 40%;"></div>
 
-    </div>
     <!-- my js & css -->
-    <script type="text/javascript" src="./js/index.js"></script>
+		<script type="text/javascript" src="./js/index.js"></script>
+		<script src="//code.jquery.com/jquery-1.10.2.js"></script>
+		<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+		<script>
+			  $(function() {
+				$( "#slider-range-min" ).slider({
+				  range: "min",
+				  value: 2015,
+				  min: 1950,
+				  max: 2015,
+				  slide: function( event, ui ) {
+					$( "#amount" ).val( ui.value + " year" );
+				  }
+				});
+				$( "#amount" ).val( $( "#slider-range-min" ).slider( "value" ) + " year" );
+			  });
+		</script>
     </body>
 </html>
+
