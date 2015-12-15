@@ -555,19 +555,12 @@ function nodeMouseout(d){
 //讀取當年度新秀資料
 function readDraft(year) {
     //Load in NBA teams data
-        d3.csv("data/NBA-teams.csv", function(data) {
-            //Map the rank to radius[2, 20] 
-            Scale.domain([0, d3.max(data, function(d) { return d.winrate; })]);
-
-
-            //Map the winrate to fontsize[10, 20] 
-            var FontSize = d3.scale.linear()
-                .domain([15, 1])
-                .range([10, 20]);
+    d3.csv("data/NBA-teams.csv", function(teamData) {
+        d3.csv("data/draft_NBA_1996-2015.csv", function(draftData) {
 
             //Create nodes group
             var nodes = g.selectAll("nodes")
-                .data(data)
+                .data(teamData)
                 .enter()
                 .append("g")
                 .attr("class", "team")
@@ -576,6 +569,25 @@ function readDraft(year) {
                 .on("mouseover", nodeMouseover)
                 .on("mouseout", nodeMouseout);
 
+            for (var i = 0; i < draftData.length; i++) {
+                if(draftData[i].Year == year){
+                    for(var j = 0; j < teamData.length; j++){
+                        if(draftData[i].Tm == teamData[j].abb){
+                            //Map the rank to radius[2, 20] 
+                            Scale.domain([0, d3.max(draftData, function(d) { return (d.PTS*7); })]);
+
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+            
+
+            //Map the winrate to fontsize[10, 20] 
+            var FontSize = d3.scale.linear()
+                .domain([15, 1])
+                .range([10, 20]);
             
             //Circles for teams
             nodes.append("circle")
@@ -589,8 +601,6 @@ function readDraft(year) {
                         return "red";
                     };
                 })
-                .style("opacity", function(d){
-                    return Opacity(d.winrate);})
                 .style("cursor", "pointer")
                 .on("click", teamClick); //點node 呼叫teamclick
             
@@ -609,5 +619,5 @@ function readDraft(year) {
                 .text(function(d) {
                     return d.abb;});
         });
-
+    });
 }
