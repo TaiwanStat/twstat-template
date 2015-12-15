@@ -515,7 +515,8 @@ function nodeMouseover(d){
             return 1.5 * Scale(d.winrate);})
         .style("fill", "#000000")
         .text(function(d) {
-            return d.abb + " (" + d.winrate + "%)";});
+            return d.abb + " (" + d.winrate + "%)";
+        });
 
     //Append the logo of the team
     g.append("image")
@@ -530,60 +531,71 @@ function nodeMouseover(d){
 
 //Get back to original status
 function nodeMouseout(d){
-    d3.select(this).select("circle")
-        .transition()
-        .duration(200)
-        .attr("r", function(d) { 
-            return Scale(d.winrate); })
-        .style("opacity", function(d){
-            return Opacity(d.winrate);})
-        .style("stroke-width", "1px");
+    
 
-    d3.select(this).select("text")
-        .transition()
-        .duration(200)
-        .attr("dx", function(d){
-            return Scale(d.winrate);})
-        .style("fill", "#888888")
-        .text(function(d) {
-            return d.abb});
 
-    g.select("image")
-        .remove();
+    
 }
 
+var thisYearDraft = {};
 //讀取當年度新秀資料
 function readDraft(year) {
     //Load in NBA teams data
     d3.csv("data/NBA-teams.csv", function(teamData) {
+        //Create nodes group
+        var nodes = g.selectAll("circle")
+            .data(teamData)
+            .enter()
+            .append("g")
+            .attr("class", "team")
+            .attr("transform", function(d) {
+                return "translate(" + projection([d.lon, d.lat])[0] + "," + projection([d.lon, d.lat])[1] + ")";})
+            .on("mouseout", nodeMouseout);
+        
+
         d3.csv("data/draft_NBA_1996-2015.csv", function(draftData) {
-
-            //Create nodes group
-            var nodes = g.selectAll("nodes")
-                .data(teamData)
-                .enter()
-                .append("g")
-                .attr("class", "team")
-                .attr("transform", function(d) {
-                    return "translate(" + projection([d.lon, d.lat])[0] + "," + projection([d.lon, d.lat])[1] + ")";})
-                .on("mouseover", nodeMouseover)
-                .on("mouseout", nodeMouseout);
-
+            
+            thisYearDraft.year = {};
             for (var i = 0; i < draftData.length; i++) {
                 if(draftData[i].Year == year){
+                    
                     for(var j = 0; j < teamData.length; j++){
                         if(draftData[i].Tm == teamData[j].abb){
-                            //Map the rank to radius[2, 20] 
-                            Scale.domain([0, d3.max(draftData, function(d) { return (d.PTS*7); })]);
+                            thisYearDraft[draftData[i].Tm] = draftData[i].Player;
+                            console.log(i);
+                            console.log(draftData[i].Player);
+                            console.log(draftData[i].Tm);
 
-                            break;
+                            //Text for temm abbreviation
+                            nodes.on("mouseover", function(d){
+                                console.log(year);
+                                console.log(d.abb);
+                                d3.select(this).select("text")
+                                    .transition()
+                                    .duration(200)
+                                    .attr("dx", function(d){
+                                        return Scale(d.winrate);})
+                                    .style("fill", "#888888")
+                                    .text(function(d) {
+                                        return thisYearDraft[d.abb]});
+
+                                d3.select(this).select("circle")
+                                    .transition()
+                                    .duration(200)
+                                    .attr("r", function(d) { 
+                                        return Scale(d.winrate); })
+                                    .style("opacity", function(d){
+                                        return Opacity(d.winrate);})
+                                    .style("stroke-width", "1px");
+
+                                Scale.domain([0, d3.max(draftData, function(d) { return (d.PTS*7); })]);
+                            });
                         }
                     }
-                    break;
                 }
             }
-            
 
+           
             //Map the winrate to fontsize[10, 20] 
             var FontSize = d3.scale.linear()
                 .domain([15, 1])
@@ -603,21 +615,20 @@ function readDraft(year) {
                 })
                 .style("cursor", "pointer")
                 .on("click", teamClick); //點node 呼叫teamclick
-            
-            //Text for temm abbreviation
+
             nodes.append("text")
                 .attr("class", function(d) {
                     return "text " + d.abb;})
                 .attr("dx", function(d){
                     return Scale(d.winrate);})
                 .attr("dy", ".3em")
-                .attr("font-size", function(d) {
-                    return FontSize(d.rank) + "px";})
                 .style("fill", "#888888")
                 .style("font-weight", "bold")
                 .style("cursor", "default")
-                .text(function(d) {
+                .text(function(d){
                     return d.abb;});
+            
+            
         });
     });
 }
