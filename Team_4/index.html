@@ -50,22 +50,8 @@
 		<script type="text/javascript" src="js/radar-chart.js"></script>
 		<script type="text/javascript" src="js/d3.tip.v0.6.3.js"></script>
 		<script type="text/javascript" src="js/index.js"></script>
-		<script src="//code.jquery.com/jquery-1.10.2.js"></script>
-		<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-		<script>
-			  $(function() {
-				$( "#slider-range-min" ).slider({
-				  range: "min",
-				  value: 2015,
-				  min: 1950,
-				  max: 2015,
-				  slide: function( event, ui ) {
-					$( "#amount" ).val( ui.value + " year" );
-				  }
-				});
-				$( "#amount" ).val( $( "#slider-range-min" ).slider( "value" ) + " year" );
-			  });
-		</script>
+		<script type="text/javascript" src="js/jquery-1.10.2.js"></script>
+		<script type="text/javascript" src="js/jquery-ui.js"></script>
     </body>
 </html>
 

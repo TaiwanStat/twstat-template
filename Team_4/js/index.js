@@ -1,3 +1,17 @@
+function createTimeLine() {
+    $( "#slider-range-min" ).slider({
+        range: "min",
+        value: 2015,
+        min: 1996,
+        max: 2015,
+        slide: function( event, ui ) { //滾動時間時
+            $( "#amount" ).val( ui.value );
+            readDraft(ui.value);
+        }
+    });
+    $( "#amount" ).val( $( "#slider-range-min" ).slider( "value" ) );
+};
+
 //Width and height for whole
 var w = 1024;
 var h = 768;
@@ -51,13 +65,15 @@ g.call(zoom.event);
     
 //Load in state data, draw the map
 d3.csv("data/US-states.csv", function(data) {
+    createTimeLine();
+
     //Load in GeoJSON data
     d3.json("data/US-geo.json", function(json) {
         //Merge the EastorWest data and GeoJSON
         //Loop through once for each EastorWest data value
         for (var i = 0; i < data.length; i++) {
-            var dataState = data[i].state;				//Grab state name
-            var dataValue = parseFloat(data[i].value);	//Grab data value, and convert from string to float
+            var dataState = data[i].state;              //Grab state name
+            var dataValue = parseFloat(data[i].value);  //Grab data value, and convert from string to float
             var dataEASTorWEST = data[i].EASTorWEST;
             //Find the corresponding state inside the GeoJSON
             for (var j = 0; j < json.features.length; j++) {
@@ -98,66 +114,11 @@ d3.csv("data/US-states.csv", function(data) {
             })
             .on("click", stateClick);
 
-        //Load in NBA teams data
-        d3.csv("data/NBA-teams.csv", function(data) {
-            //Map the rank to radius[2, 20] 
-            Scale.domain([0, d3.max(data, function(d) { return d.winrate; })]);
-
-            //Map the rank to opacity[0.3, 0.9] 
-            Opacity.domain([0, d3.max(data, function(d) { return d.winrate; })]);
-
-            //Map the winrate to fontsize[10, 20] 
-            var FontSize = d3.scale.linear()
-                .domain([15, 1])
-                .range([10, 20]);
-
-            //Create nodes group
-            var nodes = g.selectAll("nodes")
-                .data(data)
-                .enter()
-                .append("g")
-                .attr("class", "team")
-                .attr("transform", function(d) {
-                    return "translate(" + projection([d.lon, d.lat])[0] + "," + projection([d.lon, d.lat])[1] + ")";})
-                .on("mouseover", nodeMouseover)
-                .on("mouseout", nodeMouseout);
-
-            
-            //Circles for teams
-            nodes.append("circle")
-                .attr("class", function(d) { return d.abb })
-                .attr("r", function(d){
-                    return Scale(d.winrate);})
-                .style("fill", function(d){
-                    if (d.EASTorWEST == "East") {
-                        return "blue";
-                    } else {
-                        return "red";
-                    };
-                })
-                .style("opacity", function(d){
-                    return Opacity(d.winrate);})
-                .style("cursor", "pointer")
-				//close the click & rader chart
-                //.on("click", teamClick);
-            
-            //Text for temm abbreviation
-            nodes.append("text")
-                .attr("class", function(d) {
-                    return "text " + d.abb;})
-                .attr("dx", function(d){
-                    return Scale(d.winrate);})
-                .attr("dy", ".3em")
-                .attr("font-size", function(d) {
-                    return FontSize(d.rank) + "px";})
-                .style("fill", "#888888")
-                .style("font-weight", "bold")
-                .style("cursor", "default")
-                .text(function(d) {
-                    return d.abb;});
-        });
+        //顯示2015年的新秀資料    
+        readDraft(2015);
     });
 });
+
 
 //Craete the radar chart
 var radarChart = RadarChart.chart();
@@ -239,41 +200,25 @@ function teamClick(d) {
         teamList.remove(selectedTeamName);
 
         //Existing node number after deleting
-        if (teamList.length == 0) {
+        if (teamList.length == 0) { //點掉node
             d3.selectAll(".pie-chart").remove();
         } 
-        if (teamList.length == 1) {
-            createPieChart();
-            d3.selectAll(".teamRadar").remove();
-        }
-        if  (teamList.length >= 2) {
-            renderRadarChart();
-        }
     } else {    //Does not contain the node
         teamList.push(selectedTeamName);
         active = d3.select(this).style("fill", "orange");
         if (teamList.length == 1) {
-            createPieChart();
+            createPieChart(); // 產生旁邊的表格
             //Push the team data for radar chart, but not display
-            d3.csv("data/teamstats.csv", function(teamData) {
+            //d3.csv("data/teamstats.csv", function(teamData) {
                 //Loop through once for each team data value
-                pushTeamRadarData(teamData);
-            });
+            //    pushTeamRadarData(teamData);
+            //});
 
         }
-        if (teamList.length >= 2) {
-            //remove the pie chart
-            d3.selectAll(".pie-chart").remove();
-
-            //Push the team data for radar chart, draw but not display
-            d3.csv("data/teamstats.csv", function(teamData) {
-                //Loop through once for each team data value
-                pushTeamRadarData(teamData);
-                renderRadarChart();
-            });
-        }
+        
     }
 
+    //這裡用不到
     //Push team data for radar chart
     function pushTeamRadarData(teamData){
         for (var i = 0; i < teamData.length; i++) { 
@@ -456,210 +401,7 @@ function teamClick(d) {
     }
 }
 
-//Draw radar chart
-function renderRadarChart() {
-    var teamRadar = svg.selectAll("g.teamRadar").data([teamDataset(teamRadarData)]);
-    teamRadar.enter().append("g").classed("teamRadar", 1);
-    teamRadar.attr("transform", "translate(645,100)").call(radarChart);
 
-    //Render the legend
-    renderLengend(teamList);
-}
-
-//Draw the lengend of the radar chart
-function renderLengend(teamList) {
-    var colorscale = d3.scale.category10();
-
-    //Initiate Legend   
-    var legend = svg.select(".teamRadar").selectAll("g.legend-tag").data(teamList).enter()
-        .append("g")
-        .attr("class", "legend-tag")
-        .attr("height", 100)
-        .attr("width", 200)
-        .attr("transform", "translate(285,0)") ;
-
-    //Create colour squares
-    legend.selectAll("rect").data(teamList).enter()
-        .append("rect")
-        .attr("x", 0)
-        .attr("y", function(d, i){ return i * 20;})
-        .attr("width", 10)
-        .attr("height", 10)
-        .style("fill", function(d, i){ return colorscale(i);});
-
-    //Create text next to squares
-    legend.selectAll(".legend-team").data(teamList).enter()
-        .append("text")
-        .attr("class", "legend-team")
-        .attr("x", 12)
-        .attr("y", function(d, i){ return i * 20 + 9;})
-        .attr("font-size", "10px")
-        .attr("fill", "#737373")
-        .text(function(d) { return d; }); 
-}
-
-//Click button to show
-function createStackBar() {
-    d3.selectAll(".stack-bar").remove();
-    d3.selectAll(".bar-option").style("display", "inline");
-    svg.selectAll(".pie-chart").style("display","none");
-
-    //Coefficient of the weights
-    var ptsWeight = parseInt(document.getElementById("pts-weight").value);
-    var astWeight = parseInt(document.getElementById("ast-weight").value);
-    var rebWeight = parseInt(document.getElementById("reb-weight").value);
-    var tovWeight = parseInt(document.getElementById("tov-weight").value);
-    var stlWeight = parseInt(document.getElementById("stl-weight").value);
-    var blkWeight = parseInt(document.getElementById("blk-weight").value);
-
-    var stackBarMargin = {top: 10, right: 20, bottom: 20, left: 60};
-    var stackBarWidth = 950 - stackBarMargin.left - stackBarMargin.right;
-    var stackBarHeight = 300 - stackBarMargin.top - stackBarMargin.bottom;
-
-    var barY0 = d3.scale.ordinal()
-        .rangeRoundBands([stackBarHeight, 0], .2);
-
-    var barY1 = d3.scale.linear();
-
-    var barX = d3.scale.ordinal()
-        .rangeRoundBands([0, stackBarWidth], .1, 0);
-
-    var xAxis = d3.svg.axis()
-        .scale(barX)
-        .orient("bottom");
-
-    var nest = d3.nest()
-        .key(function(d) { return d.group; });
-
-    var stack = d3.layout.stack()
-        .values(function(d) { return d.values; })
-        .x(function(d) { return d.abb; })
-        .y(function(d) { return d.value; }) //the thickness of the value
-        .out(function(d, barY0) { d.valueOffset = barY0; });
-
-    var barColor  = d3.scale.linear()
-        .domain([0, 6])
-        .range(["yellow", "red"])
-        .interpolate(d3.interpolateLab);
-
-    var stackedBarChart = svg.append("g")
-        .attr("class","stack-bar")
-        .attr("width", stackBarWidth + stackBarMargin.left + stackBarMargin.right)
-        .attr("height", stackBarHeight + stackBarMargin.top + stackBarMargin.bottom)
-        .append("g")
-        .attr("transform", "translate(70,440)");
-
-    d3.csv("data/teambar.csv", function(error, barData) {
-        barData.forEach(function(d) {
-            //Assign the weights
-            if (d.groupname == "Points") {
-                d.value = (+d.value) * ptsWeight;
-            } else if (d.groupname == "Assists"){
-                d.value = (+d.value) * astWeight;
-            } else if (d.groupname == "Rebounds"){
-                d.value = (+d.value) * rebWeight;
-            } else if (d.groupname == "Turnovers"){
-                d.value = (+d.value) * tovWeight;
-            } else if (d.groupname == "Steals"){
-                d.value = (+d.value) * stlWeight;
-            } else if (d.groupname == "Blocks"){
-                d.value = (+d.value) * blkWeight;
-            } else {
-                d.value = +d.value;
-            }
-        });
-
-        var dataByGroup = nest.entries(barData);
-
-        stack(dataByGroup);
-        barX.domain(dataByGroup[0].values.map(function(d) { return d.abb; }));
-        barY0.domain(dataByGroup.map(function(d) { return d.key; }));
-        barY1.domain([0, d3.max(barData, function(d) { return d.value; })]).range([barY0.rangeBand(), 0]);
-
-        //Create the tooltips of a team's data 
-        var tip = d3.tip()
-            .attr('class', 'd3-tip')
-            .offset([-10, -128])
-            .html(function(d) {
-                return "<strong>"+ d.groupname +"</strong> of <strong><span style='color:red'>" + d.team + "</span></strong>";
-            })
-
-        stackedBarChart.call(tip);
-
-        //Horizontal group
-        var group = stackedBarChart.selectAll(".bar-group")
-            .data(dataByGroup)
-            .enter().append("g")
-            .attr("class", "bar-group")
-            .attr("transform", function(d) { return "translate(0," + barY0(d.key) + ")"; });
-
-        group.append("text")
-            .attr("class", "group-label")
-            .attr("x", -6)
-            .attr("y", function(d) { return barY1(d.values[0].value / 2); })
-            .attr("dy", ".35em")
-            .text(function(d) { return d.values[0].groupname; });
-
-        group.selectAll("rect")
-            .data(function(d) { return d.values; })
-            .enter().append("rect")
-            .style("fill", function(d) { return barColor(d.group); })
-            //.style("fill-opacity", "0.7")
-            .attr("x", function(d) { return barX(d.abb); })
-            .attr("y", function(d) { return barY1(d.value); })
-            .attr("width", barX.rangeBand())
-            .attr("height", function(d) { return barY0.rangeBand() - barY1(d.value); })
-            .on("mouseover", tip.show)
-            .on("mouseout", tip.hide);
-
-        group.filter(function(d, i) { return !i; }).append("g")
-            .attr("class", "x axis")
-            .attr("transform", "translate(0," + barY0.rangeBand() + ")")
-            .call(xAxis);
-
-        //Change the display when click the radio
-        d3.selectAll("input").on("change", change);
-
-        //change after the first two seconds
-        var timeout = setTimeout(function() {
-            d3.select("input[value=\"stacked\"]").property("checked", true).each(change);
-        }, 2000);
-
-        function change() {
-            clearTimeout(timeout);
-            if (this.value == "multiples") {
-                transitionMultiples();
-            } else {
-                transitionStacked();
-            }
-        }
-
-        function transitionMultiples() {
-            var t = stackedBarChart.transition().duration(750);
-            var g = t.selectAll(".bar-group").attr("transform", function(d) { return "translate(0," + barY0(d.key) + ")"; });
-            g.selectAll("rect").attr("y", function(d) { return barY1(d.value); });
-            g.select(".group-label").attr("y", function(d) { return barY1(d.values[0].value / 2); })
-            //Hide the pie chart 
-            svg.selectAll(".pie-chart").style("display","none");
-        }
-
-        function transitionStacked() {
-            var t = stackedBarChart.transition().duration(750);
-            var g = t.selectAll(".bar-group").attr("transform", "translate(0," + barY0(barY0.domain()[0]) + ")");
-            g.selectAll("rect").attr("y", function(d) { return barY1(d.value + d.valueOffset); });
-            g.select(".group-label").attr("y", function(d) { return barY1(d.values[0].value / 2 + d.values[0].valueOffset); })
-            //Display the pie chart
-            svg.selectAll(".pie-chart").style("display","inline");
-        }
-    });
-}
-
-//Click button to hide
-function hideStackBar() {
-    d3.selectAll(".stack-bar").remove();
-    d3.selectAll(".bar-option").style("display", "none");
-    svg.selectAll(".pie-chart").style("display","inline");
-}
 
 //Click the state to zoom
 function stateClick(d) {
@@ -755,6 +497,7 @@ function stopped() {
     }
 }
 
+//滑鼠滑過點的時候顯示圈圈
 //Emphasize
 function nodeMouseover(d){
     d3.select(this).select("circle")
@@ -807,4 +550,64 @@ function nodeMouseout(d){
 
     g.select("image")
         .remove();
+}
+
+//讀取當年度新秀資料
+function readDraft(year) {
+    //Load in NBA teams data
+        d3.csv("data/NBA-teams.csv", function(data) {
+            //Map the rank to radius[2, 20] 
+            Scale.domain([0, d3.max(data, function(d) { return d.winrate; })]);
+
+
+            //Map the winrate to fontsize[10, 20] 
+            var FontSize = d3.scale.linear()
+                .domain([15, 1])
+                .range([10, 20]);
+
+            //Create nodes group
+            var nodes = g.selectAll("nodes")
+                .data(data)
+                .enter()
+                .append("g")
+                .attr("class", "team")
+                .attr("transform", function(d) {
+                    return "translate(" + projection([d.lon, d.lat])[0] + "," + projection([d.lon, d.lat])[1] + ")";})
+                .on("mouseover", nodeMouseover)
+                .on("mouseout", nodeMouseout);
+
+            
+            //Circles for teams
+            nodes.append("circle")
+                .attr("class", function(d) { return d.abb })
+                .attr("r", function(d){
+                    return Scale(d.winrate);})
+                .style("fill", function(d){
+                    if (d.EASTorWEST == "East") {
+                        return "blue";
+                    } else {
+                        return "red";
+                    };
+                })
+                .style("opacity", function(d){
+                    return Opacity(d.winrate);})
+                .style("cursor", "pointer")
+                .on("click", teamClick); //點node 呼叫teamclick
+            
+            //Text for temm abbreviation
+            nodes.append("text")
+                .attr("class", function(d) {
+                    return "text " + d.abb;})
+                .attr("dx", function(d){
+                    return Scale(d.winrate);})
+                .attr("dy", ".3em")
+                .attr("font-size", function(d) {
+                    return FontSize(d.rank) + "px";})
+                .style("fill", "#888888")
+                .style("font-weight", "bold")
+                .style("cursor", "default")
+                .text(function(d) {
+                    return d.abb;});
+        });
+
 }
