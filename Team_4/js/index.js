@@ -497,38 +497,6 @@ function stopped() {
     }
 }
 
-//滑鼠滑過點的時候顯示圈圈
-//Emphasize
-function nodeMouseover(d){
-    d3.select(this).select("circle")
-        .transition()
-        .duration(200)
-        .attr("r", function(d){ 
-            return 1.5 * Scale(d.winrate); })
-        .style("opacity", 1)
-        .style("stroke-width", "2px");
-
-    d3.select(this).select("text")
-        .transition()
-        .duration(200)
-        .attr("dx", function(d){
-            return 1.5 * Scale(d.winrate);})
-        .style("fill", "#000000")
-        .text(function(d) {
-            return d.abb + " (" + d.winrate + "%)";
-        });
-
-    //Append the logo of the team
-    g.append("image")
-        .attr("class", d.abb)
-        .attr("xlink:href", "logo/" + d.abb + "_logo.svg")
-        .attr("width", image_w + "px")
-        .attr("height", image_h + "px")
-        //remove the blink effect
-        .attr("x", projection([d.lon, d.lat])[0] + 5)
-        .attr("y", projection([d.lon, d.lat])[1] + 5);
-}
-
 //Get back to original status
 function nodeMouseout(d){
     d3.select(this).select("circle")
@@ -548,6 +516,9 @@ function nodeMouseout(d){
         .style("fill", "#888888")
         .text(function(d) {
             return d.abb});
+
+    g.select("image")
+        .remove();
 }
 
 var thisYearDraft = {};
@@ -619,12 +590,12 @@ function readDraft(year) {
                             //Text for temm abbreviation
                             nodes.on("mouseover", function(d){
                                 console.log(thisYearDraft.year);
-                                console.log(thisYearDraft[d.abb]);
+                                console.log(thisYearDraft[d.abb][0]["PTS"]);
                                 d3.select(this).select("text")
                                     .transition()
                                     .duration(200)
                                     .attr("dx", function(d){
-                                        return Scale(d.winrate);})
+                                        return Scale(100);})
                                     .style("fill", "#888888")
                                     .text(function(d) {
                                         return thisYearDraft[d.abb][0]["Name"]});
@@ -633,10 +604,20 @@ function readDraft(year) {
                                     .transition()
                                     .duration(200)
                                     .attr("r", function(d) { 
-                                        return Scale(d.winrate); })
+                                        return Scale(thisYearDraft[d.abb][0]["PTS"]*5); })
                                     .style("opacity", function(d){
                                         return Opacity(d.winrate);})
                                     .style("stroke-width", "1px");
+
+                                //Append the logo of the team
+                                g.append("image")
+                                    .attr("class", d.abb)
+                                    .attr("xlink:href", "logo/" + d.abb + "_logo.svg")
+                                    .attr("width", image_w + "px")
+                                    .attr("height", image_h + "px")
+                                    //remove the blink effect
+                                    .attr("x", projection([d.lon, d.lat])[0] + 5)
+                                    .attr("y", projection([d.lon, d.lat])[1] + 5);
 
                             });
                         }
