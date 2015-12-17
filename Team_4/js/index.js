@@ -597,7 +597,7 @@ function readDraft(year) {
                         return "pointer";}
                     else{return "default";}
                 })
-                .on("click", teamClick); //點node 呼叫teamclick
+                //.on("click", teamClick); //點node 呼叫teamclick
 
             //text for teams
             nodes.append("text")
