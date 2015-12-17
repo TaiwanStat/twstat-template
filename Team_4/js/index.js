@@ -499,21 +499,33 @@ function stopped() {
 
 //Get back to original status
 function nodeMouseout(d){
+    g.selectAll("circle").style("opacity", function(d){
+        if(typeof thisYearDraft[d.abb] != "undefined"){
+            return Opacity(1);}
+        else{return Opacity(-1);}
+    })
+
     d3.select(this).select("circle")
         .transition()
         .duration(200)
         .attr("r", function(d) { 
-            return Scale(d.winrate); })
+            if(typeof thisYearDraft[d.abb] != "undefined"){
+                return Scale(thisYearDraft[d.abb][0]["PTS"]*3);}
+            else{return 40;}
+        })
         .style("opacity", function(d){
-            return Opacity(d.winrate);})
+            if(typeof thisYearDraft[d.abb] != "undefined"){
+                return Opacity(1);}
+            else{return Opacity(-1);}
+        })
         .style("stroke-width", "1px");
 
     d3.select(this).select("text")
         .transition()
         .duration(200)
-        .attr("dx", function(d){
-            return Scale(d.winrate);})
+        .attr("dx", "20")
         .style("fill", "#888888")
+        .style("font-size", "16px")
         .text(function(d) {
             return d.abb});
 
@@ -525,11 +537,12 @@ var thisYearDraft = {};
 //讀取當年度新秀資料
 function readDraft(year) {
     thisYearDraft = {};
-
+    var nodes = g.selectAll("circle").remove();
+    nodes = g.selectAll("text").remove();
     //Load in NBA teams data
     d3.csv("data/NBA-teams.csv", function(teamData) {
         //Create nodes group
-        var nodes = g.selectAll("circle")
+        nodes = g.selectAll("circle")
             .data(teamData)
             .enter()
             .append("g")
@@ -538,36 +551,7 @@ function readDraft(year) {
                 return "translate(" + projection([d.lon, d.lat])[0] + "," + projection([d.lon, d.lat])[1] + ")";})
             .on("mouseout", nodeMouseout);
 
-        Scale.domain([0, d3.max(teamData, function(d) { return (d.winrate); })]);
-           
-        //Circles for teams
-        nodes.append("circle")
-            .attr("class", function(d) { return d.abb })
-            .attr("r", function(d){
-                return Scale(d.winrate);})
-            .style("fill", function(d){
-                if (d.EASTorWEST == "East") {
-                    return "blue";
-                } else {
-                    return "red";
-                };
-            })
-            .style("cursor", "pointer")
-            .on("click", teamClick); //點node 呼叫teamclick
-
-        //text for teams
-        nodes.append("text")
-            .attr("class", function(d) {
-                return "text " + d.abb;})
-            .attr("dx", function(d){
-                return Scale(d.winrate);})
-            .attr("dy", ".3em")
-            .style("fill", "#888888")
-            .style("font-weight", "bold")
-            .style("cursor", "default")
-            .text(function(d){
-                console.log("done");
-            return d.abb;});                 
+        Scale.domain([0, 70]);
 
         d3.csv("data/draft_NBA_1996-2015.csv", function(draftData) {
             for (var i = 0; i < draftData.length; i++) { //every draft
@@ -582,50 +566,103 @@ function readDraft(year) {
                             playerInfo["Name"] = draftData[i].Player;
                             playerInfo["PTS"] = draftData[i].PTS;
                             console.log(playerInfo);
-                            thisYearDraft[draftData[i].Tm].push(playerInfo);
-                            //console.log(i);
-                            //console.log(draftData[i].Player);
-                            //console.log(draftData[i].Tm);
-
-                            
+                            thisYearDraft[draftData[i].Tm].push(playerInfo);    
                         }
                     }
                 }
             }
 
-            //Text for temm abbreviation
-                            nodes.on("mouseover", function(d){
-                                console.log(thisYearDraft.year);
-                                console.log(thisYearDraft[d.abb][0]["PTS"]);
-                                d3.select(this).select("text")
-                                    .transition()
-                                    .duration(200)
-                                    .attr("dx", function(d){
-                                        return Scale(100);})
-                                    .style("fill", "#888888")
-                                    .text(function(d) {
-                                        return thisYearDraft[d.abb][0]["Name"]});
+            //Circles for teams
+            nodes.append("circle")
+                .attr("class", function(d) { return d.abb })
+                .attr("r", function(d){
+                    if(typeof thisYearDraft[d.abb] != "undefined"){
+                        return Scale(thisYearDraft[d.abb][0]["PTS"]*3);}
+                    else{return 10;}
+                })
+                .style("fill", function(d){
+                    if (d.EASTorWEST == "East") {
+                        return "blue";
+                    } else {
+                        return "red";
+                    };
+                })
+                .style("opacity", function(d){
+                    if(typeof thisYearDraft[d.abb] != "undefined"){
+                        return Opacity(1);}
+                    else{return Opacity(-1);}
+                })
+                .style("cursor", function(d){
+                    if(typeof thisYearDraft[d.abb] != "undefined"){
+                        return "pointer";}
+                    else{return "default";}
+                })
+                .on("click", teamClick); //點node 呼叫teamclick
 
-                                d3.select(this).select("circle")
-                                    .transition()
-                                    .duration(200)
-                                    .attr("r", function(d) { 
-                                        return Scale(thisYearDraft[d.abb][0]["PTS"]*5); })
-                                    .style("opacity", function(d){
-                                        return Opacity(d.winrate);})
-                                    .style("stroke-width", "1px");
+            //text for teams
+            nodes.append("text")
+                .attr("class", function(d) {
+                    return "text " + d.abb;})
+                .attr("dx", "20")
+                .attr("dy", ".5em")
+                .style("fill", "#888888")
+                .style("font-weight", "bold")
+                .style("cursor", "default")
+                .style("opacity", function(d){
+                    console.log(typeof thisYearDraft[d.abb]);
+                    if(typeof thisYearDraft[d.abb] != "undefined"){
+                        return Opacity(1);}
+                    else{return Opacity(-1);}
+                })
+                .style("font-size", "16px")
+                .text(function(d){
+                    console.log("done");
+                return d.abb;});            
 
-                                //Append the logo of the team
-                                g.append("image")
-                                    .attr("class", d.abb)
-                                    .attr("xlink:href", "logo/" + d.abb + "_logo.svg")
-                                    .attr("width", image_w + "px")
-                                    .attr("height", image_h + "px")
-                                    //remove the blink effect
-                                    .attr("x", projection([d.lon, d.lat])[0] + 5)
-                                    .attr("y", projection([d.lon, d.lat])[1] + 5);
+            //when mouseover
+            nodes.on("mouseover", function(d){
+                console.log(thisYearDraft.year);
+                console.log(thisYearDraft[d.abb][0]["PTS"]);
 
-                            });
+                g.selectAll("circle").style("opacity", function(d){
+                    if(typeof thisYearDraft[d.abb] != "undefined"){
+                        return Opacity(0.5);}
+                    else{return Opacity(-1);}
+                })
+
+                d3.select(this).select("text")
+                    .transition()
+                    .duration(200)
+                    .attr("dx", "30")
+                    .style("fill", "#000000")
+                    .style("font-size", "30px")
+                    .text(function(d) {
+                        return thisYearDraft[d.abb][0]["Name"];
+                    });
+
+                d3.select(this).select("circle")
+                    .transition()
+                    .duration(200)
+                    .attr("r", function(d) { 
+                         return Scale(thisYearDraft[d.abb][0]["PTS"]*5); 
+                    })
+                    .style("opacity", function(d){
+                        return Opacity(d.winrate);
+                    })
+                    .style("stroke-width", "1px");
+
+                //Append the logo of the team
+                g.append("image")
+                    .attr("class", d.abb)
+                    .attr("xlink:href", "logo/" + d.abb + "_logo.svg")
+                    .attr("width", image_w + "px")
+                    .attr("height", image_h + "px")
+                
+                //remove the blink effect
+                    .attr("x", projection([d.lon, d.lat])[0] + 5)
+                    .attr("y", projection([d.lon, d.lat])[1] + 5);
+
+            });
             //Map the winrate to fontsize[10, 20] 
             var FontSize = d3.scale.linear()
                 .domain([15, 1])
