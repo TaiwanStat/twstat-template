@@ -587,7 +587,13 @@ function readDraft(year) {
                             //console.log(draftData[i].Player);
                             //console.log(draftData[i].Tm);
 
-                            //Text for temm abbreviation
+                            
+                        }
+                    }
+                }
+            }
+
+            //Text for temm abbreviation
                             nodes.on("mouseover", function(d){
                                 console.log(thisYearDraft.year);
                                 console.log(thisYearDraft[d.abb][0]["PTS"]);
@@ -620,10 +626,6 @@ function readDraft(year) {
                                     .attr("y", projection([d.lon, d.lat])[1] + 5);
 
                             });
-                        }
-                    }
-                }
-            }
             //Map the winrate to fontsize[10, 20] 
             var FontSize = d3.scale.linear()
                 .domain([15, 1])
