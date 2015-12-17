@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    {{> head}}
+	
+	<style>
+.d3-tip {
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 2px;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 24px;
+  width: 100%;
+  line-height: 1;
+  color: blue;
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+/* Style northward tooltips differently */
+.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+		
+		div.tooltip {
+  position: absolute;	
+  text-align: center;	
+  width: 200px;	
+  height: 100px;		
+  padding: 2px;	
+  font: 24px sans-serif;	
+  background: lightsteelblue;	
+  border: 0px;					
+  border-radius: 8px;
+ /*  pointer-events: none;	This line needs to be removed */
+	
+}
+		div2.tooltip {
+  position: absolute;	
+  text-align: center;	
+  width: 200px;	
+  height: 130px;		
+  padding: 2px;	
+  font: 24px sans-serif;	
+  background: lightsteelblue;	
+  border: 0px;					
+  border-radius: 8px;
+ /*  pointer-events: none;	This line needs to be removed */
+	
+}
+				div3.tooltip {
+  position: absolute;	
+  text-align: center;	
+  width: 250px;	
+  height: 140px;		
+  padding: 2px;	
+  font: 24px sans-serif;	
+  background: lightsteelblue;	
+  border: 0px;					
+  border-radius: 8px;
+ /*  pointer-events: none;	This line needs to be removed */
+	
+}
+	</style>
+	
+</head>
+  <body>
+    {{> header}}
+    {{> start}}
+  <svg id="s"></svg>
+<svg id="k"></svg>
+ <svg id="q"></svg>
+	 <svg id="z"></svg>
+   <svg id="b"></svg>
+
+   {{> end}}
+	<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+  <script>
+  
+
+  var  width = 1200;
+  var   height = 800;
+
+  var s = d3.select('#s');
+  d3.csv("Newgoldprice.csv", function(data){
+  s.attr({
+      'width': 1300,
+      'height': 1000,
+	  
+    }).style({
+      'border':'1px dotted #ccc'
+    });
+
+  var minX = 0;
+  var maxX =200;
+  var minY = 1050;
+  var maxY = 1350;
+
+  var scaleX = d3.time.scale()
+                 .domain([new Date(2014, 10, 17), new Date(2015, 11, 13)])
+                 .range([0,width]);
+
+  var scaleY = d3.scale.linear()
+                 .range([height,0])
+                 .domain([minY,maxY]);
+
+// background
+
+
+var i = 0; //場上圓圈的數量，預設是0
+
+
+
+	//偵測是滑鼠還是觸控事件
+function particle(){
+	var m = d3.mouse(this)
+	//m是陣列，只有x,y 坐標
+
+	s.insert('circle', 'rect') //在rect內新增circle
+		.attr('cx', m[0])//滑鼠x坐標
+		.attr('cy', m[1])//滑鼠y坐標
+		.attr('r', 1e-6) //(0.000001 ,科學計算法)
+		.style('stroke', d3.hsl((i = (i+1) % 360), 1, .5))
+	    .attr(  'fill','none')
+		//(i = (i+1) % 360) 取餘數
+		.style('stroke-opacity', 1) //一開始是不透明
+		.transition() //轉場效果
+		.duration(2000) //動畫轉場時間2秒
+		.ease(Math.sqrt) //取得平方根，不懂在這邊有什麼意義
+		.attr('r', 50) //不斷放大
+		.style('stroke-opacity', 1e-6) //轉變成半透明
+		.remove(); //時間到後移除物件
+
+	d3.event.preventDefault();	//移除預設事件
+}
+
+	
+	  
+	  
+
+	  
+	  
+	  // pictures
+	  
+	  s.append("svg:image")
+   .attr('x',-65)
+   .attr('y',20)
+   .attr('width', 10)
+   .attr('height', 30)
+   .attr("xlink:href","https://fbcdn-sphotos-e-a.akamaihd.net/hphotos-ak-xfl1/v/t1.0-9/12341160_1030307330323515_3396539794060922267_n.jpg?oh=e4e6bb2520026a58526cb19ea91ff0d1&oe=56DCBF5B&__gda__=1458650654_b8b57111b8146f8ea49155470e0351ab")
+   .on('ontouchstart' in document ? 'touchmove' : 'mousemove', particle)
+   .transition()
+   .duration(2000)
+   .ease('bounce')
+	.attr('width', 1000)
+   .attr('height', 800)  ;
+	  
+	  
+	  
+
+	  
+	  //line
+//line1 animation
+var t =  d3.time.format("%Y/%m/%d").parse;
+	  
+	  
+	  
+  var line = d3.svg.line()
+    .x(function(d,i) {
+      return scaleX(t(d.NewDate));
+    })
+  .y(function(d,i) {
+      return scaleY(d.BuyingPrice);
+    });
+  	  
+ var giveMeEmpty = d3.svg.line()
+  .x(0)
+  .y(function(d,i) {
+      return scaleY(d.BuyingPrice);
+    });
+
+ var path = s.append("path")
+      .attr("d", line(data))
+      .attr("stroke", "blue")
+      .attr("stroke-width", "2")
+      .attr("fill", "none");
+
+    var totalLength = path.node().getTotalLength();
+
+    path
+      .attr("stroke-dasharray", totalLength + " " + totalLength)
+      .attr("stroke-dashoffset", totalLength)
+      .transition()
+        .duration(2000)
+        .ease("bounce")
+        .attr("stroke-dashoffset", 0)
+	    .attr('transform','translate(35,20)' );
+	  
+  s.append('path')
+    .attr('d', giveMeEmpty(data))
+    .on('ontouchstart' in document ? 'touchmove' : 'mousemove', particle)
+    .transition()
+    .duration(1000)
+    .attr({
+      'd':line(data),
+      'stroke':'navy',
+      'fill':'none',
+      'transform':'translate(35,20)' 
+    })
+   .ease('bounce') ;  
+
+
+	  
+// line1 mouse    
+
+
+	  // Define 'div' for tooltips
+var div = d3.select("body")
+	.append("div")  // declare the tooltip div 
+	.attr("class", "tooltip")              // apply the 'tooltip' class
+	.style("opacity", 0);                  // set the opacity to nil
+	  
+s.selectAll("dot")									
+		.data(data)											
+	.enter().append("circle")								
+		.attr("r", 0)	
+		.attr("cx", function(d,i) { return scaleX(t(d.NewDate)); })		 
+        .attr("fill", 'blue')
+		.attr("cy", function(d) { return scaleY(d.BuyingPrice); })
+	    .attr('transform','translate(35,20)' )
+// Tooltip stuff after this
+	    .on("mouseover", function(d,i) {		
+            div.transition()
+				.duration(500)	
+				.style("opacity", 0);
+			div.transition()
+				.duration(200)	
+				.style("opacity", .9);	
+			div.html(
+				'<a href= "http://rate.bot.com.tw/Pages/Static/UIP005.zh-TW.htm">' + // The first <a> tag
+				'日期:'+ d.NewDate+
+				"</a>" +   "<br/>"+             // closing </a> tag
+			 "<span style='color:blue'>" +'買價:' + d.BuyingPrice+'元'+'/公克'+"</span>"+"<br/>"+
+			 "<span style='color:red'>" +'賣價:' + d.SellingPrice+'元'+'/公克'+"</span>")	 
+				.style("left", (d3.event.pageX) + "px")			 
+				.style("top", (d3.event.pageY - 28) + "px");
+			})
+            .transition()
+            .delay(2000)
+            .duration(1000)
+	     	.attr("r", 3)	;
+
+	  
+// line1 image
+	 
+	  
+
+
+	  
+	  
+	  
+	  
+	  
+
+// line2 animation
+	  
+	  var giveMeEmpty2 = d3.svg.line()
+  .x(function(d,i) {
+      return scaleX(t(d.NewDate));
+    })
+  .y(0);
+	  
+	  
+	  
+	   var line2 = d3.svg.line()
+    .x(function(d,i) {
+      return scaleX(t(d.NewDate));
+    }).y(function(d) {
+      return scaleY(d.SellingPrice);
+    });
+s.append('path')
+    .attr('d', giveMeEmpty2(data))
+    .transition()
+    .delay(2000)
+    .duration(1000)
+    .attr({
+      'd':line2(data),
+      'stroke':'yellow',
+      'fill':'none',
+      'transform':'translate(35,20)' 
+	   })
+      .ease('bounce');
+	  
+	  var path2 = s.append("path")
+      .attr("d", line2(data))
+      .attr("stroke", "red")
+      .attr("stroke-width", "2")
+      .attr("fill", "none");
+
+    var totalLength2 = path2.node().getTotalLength();
+
+    path2
+      .attr("stroke-dasharray", totalLength2 + " " + totalLength2)
+      .attr("stroke-dashoffset", totalLength2)
+      .transition()
+        .duration(1000)
+	    .delay(2000)
+        .ease("bounce")
+        .attr("stroke-dashoffset", 0)
+	    .attr('transform','translate(35,20)' );
+	  
+	  
+	  // line2 mouse    
+
+
+	  // Define 'div' for tooltips
+var div = d3.select("body")
+	.append("div")  // declare the tooltip div 
+	.attr("class", "tooltip")              // apply the 'tooltip' class
+	.style("opacity", 0);                  // set the opacity to nil
+	  
+s.selectAll("dot")									
+		.data(data)											
+	.enter().append("circle")								
+		.attr("r", 0)	
+		.attr("cx", function(d,i) { return scaleX(t(d.NewDate)); })		 
+		.attr("cy", function(d) { return scaleY(d.SellingPrice); })
+        .attr("fill", 'red')
+	    .attr('transform','translate(35,20)' )
+// Tooltip stuff after this
+	    .on("mouseover", function(d,i) {		
+            div.transition()
+				.duration(500)	
+				.style("opacity", 0);
+			div.transition()
+				.duration(200)	
+				.style("opacity", .9);	
+			div	.html(
+				'<a href= "http://rate.bot.com.tw/Pages/Static/UIP005.zh-TW.htm">' + // The first <a> tag
+				'日期:'+ d.NewDate+
+				"</a>" +   "<br/>"+             // closing </a> tag
+			 "<span style='color:blue'>" +'買價:' + d.BuyingPrice+'元'+'/公克'+"</span>"+"<br/>"+
+			 "<span style='color:red'>" +'賣價:' + d.SellingPrice+'元'+'/公克'+"</span>")	 
+				.style("left", (d3.event.pageX) + "px")			 
+				.style("top", (d3.event.pageY - 28) + "px");
+			})
+            .transition()
+            .delay(2000)
+            .duration(1000)
+	     	.attr("r", 3)	;
+
+	  
+	  
+	  
+	  
+	  
+	  
+	  
+ //text
+	s.append('text').attr('x', 900).attr('y', 120).style('fill', 'red').style('font-size', '24px').text('紅線為每公克黃金的賣價');	  
+	s.append('text').attr('x', 900).attr('y', 90).style('fill', 'blue').style('font-size', '24px').text('藍線為每公克黃金的買價');	 
+//text
+
+  //axis
+  var axisX = d3.svg.axis()
+    .scale(scaleX)
+    .orient("bottom")
+    .ticks(10)
+  .tickFormat(d3.time.format("%Y-%m-%d"));
+
+  var axisY = d3.svg.axis()
+    .scale(scaleY)
+    .orient("left")
+    .ticks(5);
+
+  //grid
+  var axisXGrid = d3.svg.axis()
+    .scale(scaleX)
+    .orient("bottom")
+    .ticks(10)
+    .tickFormat("")
+    .tickSize(-height,0);
+
+  var axisYGrid = d3.svg.axis()
+    .scale(scaleY)
+    .orient("left")
+    .ticks(10)
+    .tickFormat("")
+    .tickSize(-width,0);
+
+  // Axis Grid line
+  s.append('g')
+   .call(axisXGrid)
+   .attr({
+    'fill':'none',
+    'stroke':'rgba(0,0,0,.1)',
+    'transform':'translate(35,'+(height+20)+')' 
+   });
+
+  s.append('g')
+   .call(axisYGrid)
+   .attr({
+    'fill':'none',
+    'stroke':'rgba(0,0,0,.1)',
+    'transform':'translate(35,20)'
+   });
+
+  // Axis 
+  s.append('g')
+   .call(axisX)
+   .attr({
+    'fill':'none',
+    'stroke':'#000',
+    'transform':'translate(35,'+(height+20)+')' 
+   }).selectAll('text')
+   .attr({
+    'fill':'#000',
+    'stroke':'none',
+   }).style({
+    'font-size':'15px'
+   });
+
+  s.append('g')
+   .call(axisY)
+   .attr({
+    'fill':'none',
+    'stroke':'#000',
+    'transform':'translate(35,20)'
+   }).selectAll('text')
+   .attr({
+    'fill':'#000',
+    'stroke':'none',
+   }).style({
+    'font-size':'13px'
+   });
+  })
+  
+	</script>
+
+	
+	
+	
+	<script>
+		
+
+		  var k = d3.select('#k');
+	d3.csv("stock_year.csv", function(data){
+  k.attr({
+      'width': 1300,
+      'height': 1000,
+    }).style({
+      'border':'1px dotted #ccc'
+    });
+
+  var minX = 80;
+  var maxX =120;
+  var minY = 00;
+  var maxY = 50;
+
+  var scaleX = d3.scale.linear()
+                 .range([0,width])
+                 .domain([minX,maxX]);
+var scaleX = d3.time.scale()
+                 .domain([new Date(1997, 10, 17), new Date(2015, 11, 13)])
+                 .range([0,width]);
+
+  var scaleY = d3.scale.linear()
+                 .range([height,0])
+                 .domain([minY,maxY]);
+		
+var t =  d3.time.format("%Y").parse;
+  //line
+  var line = d3.svg.line()
+    .x(function(d,i) {
+      return scaleX(t(d.NewYear));
+    }).y(function(d) {
+      return scaleY(d.average_on_each_stock);
+    });
+	var line2 = d3.svg.line()
+    .x(function(d,i) {
+      return scaleX(t(d.NewYear));
+    }).y(function(d) {
+      return scaleY(d.average_earning_on_each_stock);
+    });
+	var line3 = d3.svg.line()
+    .x(function(d,i) {
+      return scaleX(t(d.NewYear));
+    }).y(function(d) {
+      return scaleY(d.average_on_each_stock_xxx);
+    });
+	// text	
+		k.append('text').attr('x', 400).attr('y', 80).style('fill', 'black').style('font-size', '72px').text('台灣股市(依年份)');
+		k.append('text').attr('x', 700).attr('y', 150).style('fill', 'red').style('font-size', '24px').text('紅線為每年上市股票-平均每股市值(元)');
+		k.append('text').attr('x', 700).attr('y', 750).style('fill', 'blue').style('font-size', '24px').text('藍線為每年上市股票-平均每股盈餘(元)');
+		k.append('text').attr('x', 700).attr('y', 600).style('fill', 'green').style('font-size', '24px').text('藍線為每年上市股票-平均每股淨值(元)');
+		
+		
+// text
+
+		
+		// line 1 mouse
+		 // Define 'div' for tooltips
+var div2 = d3.select("body")
+	.append("div2")  // declare the tooltip div 
+	.attr("class", "tooltip")              // apply the 'tooltip' class
+	.style("opacity", 0);                  // set the opacity to nil
+	  
+k.selectAll("dot")									
+		.data(data)											
+	.enter().append("circle")								
+		.attr("r", 0)	
+		.attr("cx", function(d,i) { return scaleX(t(d.NewYear)); })		 
+		.attr("cy", function(d) { return scaleY(d.average_on_each_stock); })
+        .attr("fill", 'red')
+	    .attr('transform','translate(35,20)' )
+// Tooltip stuff after this
+	    .on("mouseover", function(d,i) {		
+            div2.transition()
+				.duration(500)	
+				.style("opacity", 0);
+			div2.transition()
+				.duration(200)	
+				.style("opacity", .9);	
+			div2	.html(
+				'<a href= "http://rate.bot.com.tw/Pages/Static/UIP005.zh-TW.htm">' + // The first <a> tag
+				'日期:'+ d.NewYear+'年'+
+				"</a>" +   "<br/>"+             // closing </a> tag
+			 "<span style='color:red'>" +'市值:' + d.average_on_each_stock+'元'+"</span>"+"<br/>"+
+			"<span style='color:blue'>" +'盈餘:' + d.average_earning_on_each_stock+'元'+"</span>"+"<br/>"+
+			 "<span style='color:green'>" +'淨值:' + d.average_on_each_stock_xxx+'元'+"</span>")	 
+				.style("left", (d3.event.pageX) + "px")			 
+				.style("top", (d3.event.pageY - 28) + "px");
+			})
+            .transition()
+            .delay(1000)
+            .duration(500)
+	     	.attr("r", 5)	;
+		
+	// line 2 mouse
+		 // Define 'div' for tooltips
+var div2 = d3.select("body")
+	.append("div2")  // declare the tooltip div 
+	.attr("class", "tooltip")              // apply the 'tooltip' class
+	.style("opacity", 0);                  // set the opacity to nil
+	  
+k.selectAll("dot")									
+		.data(data)											
+	.enter().append("circle")								
+		.attr("r", 0)	
+		.attr("cx", function(d,i) { return scaleX(t(d.NewYear)); })		 
+		.attr("cy", function(d) { return scaleY(d.average_earning_on_each_stock); })
+        .attr("fill", 'blue')
+	    .attr('transform','translate(35,20)' )
+// Tooltip stuff after this
+	    .on("mouseover", function(d,i) {		
+            div2.transition()
+				.duration(500)	
+				.style("opacity", 0);
+			div2.transition()
+				.duration(200)	
+				.style("opacity", .9);	
+			div2	.html(
+				'<a href= "http://rate.bot.com.tw/Pages/Static/UIP005.zh-TW.htm">' + // The first <a> tag
+				'日期:'+ d.NewYear+'年'+
+				"</a>" +   "<br/>"+             // closing </a> tag
+			 "<span style='color:red'>" +'市值:' + d.average_on_each_stock+'元'+"</span>"+"<br/>"+
+			"<span style='color:blue'>" +'盈餘:' + d.average_earning_on_each_stock+'元'+"</span>"+"<br/>"+
+			 "<span style='color:green'>" +'淨值:' + d.average_on_each_stock_xxx+'元'+"</span>")	 
+				.style("left", (d3.event.pageX) + "px")			 
+				.style("top", (d3.event.pageY - 28) + "px");
+			})
+            .transition()
+            .delay(1000)
+            .duration(500)
+	     	.attr("r", 5)	;		
+		
+		
+// line 2 mouse
+		 // Define 'div' for tooltips
+var div2 = d3.select("body")
+	.append("div2")  // declare the tooltip div 
+	.attr("class", "tooltip")              // apply the 'tooltip' class
+	.style("opacity", 0);                  // set the opacity to nil
+	  
+k.selectAll("dot")									
+		.data(data)											
+	.enter().append("circle")								
+		.attr("r", 0)	
+		.attr("cx", function(d,i) { return scaleX(t(d.NewYear)); })		 
+		.attr("cy", function(d) { return scaleY(d.average_on_each_stock_xxx); })
+        .attr("fill", 'green')
+	    .attr('transform','translate(35,20)' )
+// Tooltip stuff after this
+	    .on("mouseover", function(d,i) {		
+            div2.transition()
+				.duration(500)	
+				.style("opacity", 0);
+			div2.transition()
+				.duration(200)	
+				.style("opacity", .9);	
+			div2	.html(
+				'<a href= "http://rate.bot.com.tw/Pages/Static/UIP005.zh-TW.htm">' + // The first <a> tag
+				'日期:'+ d.NewYear+'年'+
+				"</a>" +   "<br/>"+             // closing </a> tag
+			 "<span style='color:red'>" +'市值:' + d.average_on_each_stock+'元'+"</span>"+"<br/>"+
+			"<span style='color:blue'>" +'盈餘:' + d.average_earning_on_each_stock+'元'+"</span>"+"<br/>"+
+			 "<span style='color:green'>" +'淨值:' + d.average_on_each_stock_xxx+'元'+"</span>")	 
+				.style("left", (d3.event.pageX) + "px")			 
+				.style("top", (d3.event.pageY - 28) + "px");
+			})
+            .transition()
+            .delay(1000)
+            .duration(500)
+	     	.attr("r", 5)	;			
+		
+		
+  k.append('path')
+    .attr({
+      'd':line(data),
+      'stroke':'red',
+      'fill':'none',
+      'transform':'translate(35,20)' 
+    })
+  .attr("stroke-width", 2);
+		
+  k.append('path')
+    .attr({
+      'd':line2(data),
+      'stroke':'blue',
+      'fill':'none',
+      'transform':'translate(35,20)' 
+    })
+  .attr("stroke-width", 2);
+	
+	 k.append('path')
+    .attr({
+      'd':line3(data),
+      'stroke':'green',
+      'fill':'none',
+      'transform':'translate(35,20)' 
+    })
+  .attr("stroke-width", 2);
+  
+  //axis
+  var axisX = d3.svg.axis()
+    .scale(scaleX)
+    .orient("bottom")
+    .ticks(15)  
+  .tickFormat(d3.time.format("%Y"));
+
+  var axisY = d3.svg.axis()
+    .scale(scaleY)
+    .orient("left")
+    .ticks(5);
+
+  //grid
+  var axisXGrid = d3.svg.axis()
+    .scale(scaleX)
+    .orient("bottom")
+    .ticks(10)
+    .tickFormat("")
+    .tickSize(-height,0);
+
+  var axisYGrid = d3.svg.axis()
+    .scale(scaleY)
+    .orient("left")
+    .ticks(10)
+    .tickFormat("")
+    .tickSize(-width,0);
+
+  // Axis Grid line
+  k.append('g')
+   .call(axisXGrid)
+   .attr({
+    'fill':'none',
+    'stroke':'rgba(0,0,0,.1)',
+    'transform':'translate(35,'+(height+20)+')' 
+   });
+
+  k.append('g')
+   .call(axisYGrid)
+   .attr({
+    'fill':'none',
+    'stroke':'rgba(0,0,0,.1)',
+    'transform':'translate(35,20)'
+   });
+
+  // Axis 
+  k.append('g')
+   .call(axisX)
+   .attr({
+    'fill':'none',
+    'stroke':'#000',
+    'transform':'translate(35,'+(height+20)+')' 
+   }).selectAll('text')
+   .attr({
+    'fill':'#000',
+    'stroke':'none',
+   }).style({
+    'font-size':'20px'
+   });
+
+  k.append('g')
+   .call(axisY)
+   .attr({
+    'fill':'none',
+    'stroke':'#000',
+    'transform':'translate(35,20)'
+   }).selectAll('text')
+   .attr({
+    'fill':'#000',
+    'stroke':'none',
+   }).style({
+    'font-size':'15px'
+   });
+
+		
+		
+		
+		
+		
+  })
+  
+	
+	</script>
+	  
+	
+	
+	
+<script>
+		
+
+		  var q = d3.select('#q');
+	d3.csv("stock_month.csv", function(data){
+  q.attr({
+      'width': 1300,
+      'height': 1000,
+    }).style({
+      'border':'1px dotted #ccc'
+    });
+
+  var minX = 80;
+  var maxX =120;
+  var minY = 00;
+  var maxY = 50;
+
+  var scaleX = d3.scale.linear()
+                 .range([0,width])
+                 .domain([minX,maxX]);
+var scaleX = d3.time.scale()
+                 .domain([new Date(2002, 10, 17), new Date(2015, 11, 13)])
+                 .range([0,width]);
+
+  var scaleY = d3.scale.linear()
+                 .range([height,0])
+                 .domain([minY,maxY]);
+		
+var t =  d3.time.format("%Y%m").parse;
+  //line
+  var line = d3.svg.line()
+    .x(function(d,i) {
+      return scaleX(t(d.NewYear));
+    }).y(function(d) {
+      return scaleY(d.average_on_each_stock);
+    });
+	var line2 = d3.svg.line()
+    .x(function(d,i) {
+      return scaleX(t(d.NewYear));
+    }).y(function(d) {
+      return scaleY(d.average_earning_on_each_stock);
+    });
+	var line3 = d3.svg.line()
+    .x(function(d,i) {
+      return scaleX(t(d.NewYear));
+    }).y(function(d) {
+      return scaleY(d.average_on_each_stock_xxx);
+    });
+	// text	
+		q.append('text').attr('x', 400).attr('y', 80).style('fill', 'black').style('font-size', '72px').text('台灣股市(依月份)');
+		q.append('text').attr('x', 700).attr('y', 150).style('fill', 'red').style('font-size', '24px').text('紅線為每年上市股票-平均每股市值(元)');
+		q.append('text').attr('x', 700).attr('y', 750).style('fill', 'blue').style('font-size', '24px').text('藍線為每年上市股票-平均每股盈餘(元)');
+		q.append('text').attr('x', 700).attr('y', 600).style('fill', 'green').style('font-size', '24px').text('藍線為每年上市股票-平均每股淨值(元)');
+		
+		
+// text
+
+		
+		// line 1 mouse
+		 // Define 'div' for tooltips
+var div2 = d3.select("body")
+	.append("div2")  // declare the tooltip div 
+	.attr("class", "tooltip")              // apply the 'tooltip' class
+	.style("opacity", 0);                  // set the opacity to nil
+	  
+q.selectAll("dot")									
+		.data(data)											
+	.enter().append("circle")								
+		.attr("r", 0)	
+		.attr("cx", function(d,i) { return scaleX(t(d.NewYear)); })		 
+		.attr("cy", function(d) { return scaleY(d.average_on_each_stock); })
+        .attr("fill", 'red')
+	    .attr('transform','translate(35,20)' )
+// Tooltip stuff after this
+	    .on("mouseover", function(d,i) {		
+            div2.transition()
+				.duration(500)	
+				.style("opacity", 0);
+			div2.transition()
+				.duration(200)	
+				.style("opacity", .9);	
+			div2	.html(
+				'<a href= "http://rate.bot.com.tw/Pages/Static/UIP005.zh-TW.htm">' + // The first <a> tag
+				'日期:'+ d.year+'年'+d.month+'月'+
+				"</a>" +   "<br/>"+             // closing </a> tag
+			 "<span style='color:red'>" +'市值:' + d.average_on_each_stock+'元'+"</span>"+"<br/>"+
+			"<span style='color:blue'>" +'盈餘:' + d.average_earning_on_each_stock+'元'+"</span>"+"<br/>"+
+			 "<span style='color:green'>" +'淨值:' + d.average_on_each_stock_xxx+'元'+"</span>")	 
+				.style("left", (d3.event.pageX) + "px")			 
+				.style("top", (d3.event.pageY - 28) + "px");
+			})
+            .transition()
+            .delay(1000)
+            .duration(500)
+	     	.attr("r", 3)	;
+		
+	// line 2 mouse
+		 // Define 'div' for tooltips
+var div2 = d3.select("body")
+	.append("div2")  // declare the tooltip div 
+	.attr("class", "tooltip")              // apply the 'tooltip' class
+	.style("opacity", 0);                  // set the opacity to nil
+	  
+q.selectAll("dot")									
+		.data(data)											
+	.enter().append("circle")								
+		.attr("r", 0)	
+		.attr("cx", function(d,i) { return scaleX(t(d.NewYear)); })		 
+		.attr("cy", function(d) { return scaleY(d.average_earning_on_each_stock); })
+        .attr("fill", 'blue')
+	    .attr('transform','translate(35,20)' )
+// Tooltip stuff after this
+	    .on("mouseover", function(d,i) {		
+            div2.transition()
+				.duration(500)	
+				.style("opacity", 0);
+			div2.transition()
+				.duration(200)	
+				.style("opacity", .9);	
+			div2	.html(
+				'<a href= "http://rate.bot.com.tw/Pages/Static/UIP005.zh-TW.htm">' + // The first <a> tag
+				'日期:'+ d.year+'年'+d.month+'月'+
+				"</a>" +   "<br/>"+             // closing </a> tag
+			 "<span style='color:red'>" +'市值:' + d.average_on_each_stock+'元'+"</span>"+"<br/>"+
+			"<span style='color:blue'>" +'盈餘:' + d.average_earning_on_each_stock+'元'+"</span>"+"<br/>"+
+			 "<span style='color:green'>" +'淨值:' + d.average_on_each_stock_xxx+'元'+"</span>")	 
+				.style("left", (d3.event.pageX) + "px")			 
+				.style("top", (d3.event.pageY - 28) + "px");
+			})
+            .transition()
+            .delay(1000)
+            .duration(500)
+	     	.attr("r", 3)	;		
+		
+		
+// line 2 mouse
+		 // Define 'div' for tooltips
+var div2 = d3.select("body")
+	.append("div2")  // declare the tooltip div 
+	.attr("class", "tooltip")              // apply the 'tooltip' class
+	.style("opacity", 0);                  // set the opacity to nil
+	  
+q.selectAll("dot")									
+		.data(data)											
+	.enter().append("circle")								
+		.attr("r", 0)	
+		.attr("cx", function(d,i) { return scaleX(t(d.NewYear)); })		 
+		.attr("cy", function(d) { return scaleY(d.average_on_each_stock_xxx); })
+        .attr("fill", 'green')
+	    .attr('transform','translate(35,20)' )
+// Tooltip stuff after this
+	    .on("mouseover", function(d,i) {		
+            div2.transition()
+				.duration(500)	
+				.style("opacity", 0);
+			div2.transition()
+				.duration(200)	
+				.style("opacity", .9);	
+			div2	.html(
+				'<a href= "http://rate.bot.com.tw/Pages/Static/UIP005.zh-TW.htm">' + // The first <a> tag
+				'日期:'+ d.year+'年'+d.month+'月'+
+				"</a>" +   "<br/>"+             // closing </a> tag
+			 "<span style='color:red'>" +'市值:' + d.average_on_each_stock+'元'+"</span>"+"<br/>"+
+			"<span style='color:blue'>" +'盈餘:' + d.average_earning_on_each_stock+'元'+"</span>"+"<br/>"+
+			 "<span style='color:green'>" +'淨值:' + d.average_on_each_stock_xxx+'元'+"</span>")	 
+				.style("left", (d3.event.pageX) + "px")			 
+				.style("top", (d3.event.pageY - 28) + "px");
+			})
+            .transition()
+            .delay(1000)
+            .duration(500)
+	     	.attr("r", 3)	;			
+		
+		
+  q.append('path')
+    .attr({
+      'd':line(data),
+      'stroke':'red',
+      'fill':'none',
+      'transform':'translate(35,20)' 
+    })
+  .attr("stroke-width", 2);
+		
+  q.append('path')
+    .attr({
+      'd':line2(data),
+      'stroke':'blue',
+      'fill':'none',
+      'transform':'translate(35,20)' 
+    })
+  .attr("stroke-width", 2);
+	
+	 q.append('path')
+    .attr({
+      'd':line3(data),
+      'stroke':'green',
+      'fill':'none',
+      'transform':'translate(35,20)' 
+    })
+  .attr("stroke-width", 2);
+  
+  //axis
+  var axisX = d3.svg.axis()
+    .scale(scaleX)
+    .orient("bottom")
+    .ticks(15)  
+  .tickFormat(d3.time.format("%Y"));
+
+  var axisY = d3.svg.axis()
+    .scale(scaleY)
+    .orient("left")
+    .ticks(5);
+
+  //grid
+  var axisXGrid = d3.svg.axis()
+    .scale(scaleX)
+    .orient("bottom")
+    .ticks(10)
+    .tickFormat("")
+    .tickSize(-height,0);
+
+  var axisYGrid = d3.svg.axis()
+    .scale(scaleY)
+    .orient("left")
+    .ticks(10)
+    .tickFormat("")
+    .tickSize(-width,0);
+
+  // Axis Grid line
+  q.append('g')
+   .call(axisXGrid)
+   .attr({
+    'fill':'none',
+    'stroke':'rgba(0,0,0,.1)',
+    'transform':'translate(35,'+(height+20)+')' 
+   });
+
+  q.append('g')
+   .call(axisYGrid)
+   .attr({
+    'fill':'none',
+    'stroke':'rgba(0,0,0,.1)',
+    'transform':'translate(35,20)'
+   });
+
+  // Axis 
+  q.append('g')
+   .call(axisX)
+   .attr({
+    'fill':'none',
+    'stroke':'#000',
+    'transform':'translate(35,'+(height+20)+')' 
+   }).selectAll('text')
+   .attr({
+    'fill':'#000',
+    'stroke':'none',
+   }).style({
+    'font-size':'20px'
+   });
+
+  q.append('g')
+   .call(axisY)
+   .attr({
+    'fill':'none',
+    'stroke':'#000',
+    'transform':'translate(35,20)'
+   }).selectAll('text')
+   .attr({
+    'fill':'#000',
+    'stroke':'none',
+   }).style({
+    'font-size':'15px'
+   });		
+  })
+  
+	
+	</script>	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+	
+<script>
+////////////////////////////////////////////////////////////////////////////////		
+	// gdp
+		  var z = d3.select('#z');
+	d3.csv("gdp.csv", function(data){
+  z.attr({
+      'width': 1300,
+      'height': 1000,
+    }).style({
+      'border':'1px dotted #ccc'
+    });
+
+  var minX = 80;
+  var maxX =120;
+  var minY = -20;
+  var maxY = 100;
+
+
+var scaleX = d3.time.scale()
+                 .domain([new Date(1962, 01, 01), new Date(2015, 11, 13)])
+                 .range([0,width]);
+
+  var scaleY = d3.scale.linear()
+                 .range([height,0])
+                 .domain([minY,maxY]);
+		
+  var scaleZ = d3.scale.linear()
+    .domain([0, d3.max(data, function(d) { return d.GDP; })])
+    .range([100,0]);
+		
+var t =  d3.time.format("%Y%m").parse;
+  //line
+  var line = d3.svg.line()
+    .x(function(d,i) {
+      return scaleX(t(d.NewYear));
+    }).y(function(d) {
+      return scaleY(d.eco_rating);
+    });
+	
+	// text	
+		z.append('text').attr('x', 250).attr('y', 80).style('fill', 'black').style('font-size', '72px').text('台灣GDP(1962年到2015年6月)');
+		z.append('text').attr('x', 100).attr('y', 200).style('fill', 'red').style('font-size', '24px').text('紅線為每年經濟成長率(%)');
+
+		
+		
+// text
+
+		// rect
+		//Draw the bar graph
+z.selectAll(".bar")
+    .data(data)
+  .enter().append("rect")
+    .attr('fill', 'green')
+    .attr("x", function(d) { return scaleX(t(d.NewYear)); })
+    .attr("y", function(d) { return scaleZ(d.GDP)/2+300; })
+    .attr("height", function(d) { return  500-scaleZ(d.GDP)/2; })
+    .attr("width", 5)
+   .attr('transform','translate(35,20)' )
+	.on("mouseover", function(d,i) {		
+            div3.transition()
+				.duration(500)	
+				.style("opacity", 0);
+			div3.transition()
+				.duration(200)	
+				.style("opacity", .9);	
+			div3	.html(
+				'<a href= "http://rate.bot.com.tw/Pages/Static/UIP005.zh-TW.htm">' + // The first <a> tag
+				'日期:'+ d.year+'年'+'Q'+d.month/3+
+				"</a>" +   "<br/>"+             // closing </a> tag
+			 "<span style='color:red'>" +'經濟成長率:' + d.eco_rating+'%'+"</span>"+"<br/>"+
+			 "<span style='color:green'>" +'GDP:' + d.GDP+"<br/>"+
+				'(單位:百萬元臺幣)'+"</span>")	 
+				.style("left", (d3.event.pageX) + "px")			 
+				.style("top", (d3.event.pageY - 28) + "px");
+			})
+            .transition()
+            .delay(1000)
+            .duration(500)
+	     	.attr("r", 3)	;
+		
+		
+		
+		// line 1 mouse
+		 // Define 'div' for tooltips
+var div3 = d3.select("body")
+	.append("div3")  // declare the tooltip div 
+	.attr("class", "tooltip")              // apply the 'tooltip' class
+	.style("opacity", 0);                  // set the opacity to nil
+	  
+z.selectAll("dot")									
+		.data(data)											
+	.enter().append("circle")								
+		.attr("r", 0)	
+		.attr("cx", function(d,i) { return scaleX(t(d.NewYear)); })		 
+		.attr("cy", function(d) { return scaleY(d.eco_rating); })
+        .attr("fill", 'red')
+	    .attr('transform','translate(35,20)' )
+// Tooltip stuff after this
+	    .on("mouseover", function(d,i) {		
+            div3.transition()
+				.duration(500)	
+				.style("opacity", 0);
+			div3.transition()
+				.duration(200)	
+				.style("opacity", .9);	
+			div3	.html(
+				'<a href= "http://rate.bot.com.tw/Pages/Static/UIP005.zh-TW.htm">' + // The first <a> tag
+				'日期:'+ d.year+'年'+'Q'+d.month/3+
+				"</a>" +   "<br/>"+             // closing </a> tag
+			 "<span style='color:red'>" +'經濟成長率:' + d.eco_rating+'%'+"</span>"+"<br/>"+
+			 "<span style='color:green'>" +'GDP:' + d.GDP+"<br/>"+
+				'(單位:百萬元臺幣)'+"</span>")	 
+				.style("left", (d3.event.pageX) + "px")			 
+				.style("top", (d3.event.pageY - 28) + "px");
+			})
+            .transition()
+            .delay(1000)
+            .duration(500)
+	     	.attr("r", 3)	;
+		
+
+		
+  z.append('path')
+    .attr({
+      'd':line(data),
+      'stroke':'red',
+      'fill':'none',
+      'transform':'translate(35,20)' 
+    })
+  .attr("stroke-width", 2);
+		
+ 
+  
+  //axis
+  var axisX = d3.svg.axis()
+    .scale(scaleX)
+    .orient("bottom")
+    .ticks(15)  
+  .tickFormat(d3.time.format("%Y"));
+
+  var axisY = d3.svg.axis()
+    .scale(scaleY)
+    .orient("left")
+    .ticks(5);
+
+  //grid
+  var axisXGrid = d3.svg.axis()
+    .scale(scaleX)
+    .orient("bottom")
+    .ticks(10)
+    .tickFormat("")
+    .tickSize(-height,0);
+
+  var axisYGrid = d3.svg.axis()
+    .scale(scaleY)
+    .orient("left")
+    .ticks(10)
+    .tickFormat("")
+    .tickSize(-width,0);
+
+  // Axis Grid line
+  z.append('g')
+   .call(axisXGrid)
+   .attr({
+    'fill':'none',
+    'stroke':'rgba(0,0,0,.1)',
+    'transform':'translate(35,'+(height+20)+')' 
+   });
+
+  z.append('g')
+   .call(axisYGrid)
+   .attr({
+    'fill':'none',
+    'stroke':'rgba(0,0,0,.1)',
+    'transform':'translate(35,20)'
+   });
+
+  // Axis 
+  z.append('g')
+   .call(axisX)
+   .attr({
+    'fill':'none',
+    'stroke':'#000',
+    'transform':'translate(35,'+(height+20)+')' 
+   }).selectAll('text')
+   .attr({
+    'fill':'#000',
+    'stroke':'none',
+   }).style({
+    'font-size':'20px'
+   });
+
+  z.append('g')
+   .call(axisY)
+   .attr({
+    'fill':'none',
+    'stroke':'#000',
+    'transform':'translate(35,20)'
+   }).selectAll('text')
+   .attr({
+    'fill':'#000',
+    'stroke':'none',
+   }).style({
+    'font-size':'15px'
+   });		
+  })
+  
+	
+	</script>	
+
+<script>
+
+var margin = {top: 20, right: 20, bottom: 30, left: 40},
+    widthx = 1300 - margin.left - margin.right,
+    heightx = 900 - margin.top - margin.bottom;
+
+var x0 = d3.scale.ordinal()
+    .rangeRoundBands([0, widthx], .1);
+
+var x1 = d3.scale.ordinal();
+
+var y = d3.scale.linear()
+    .range([heightx, 0]);
+
+var color = d3.scale.ordinal()
+    .range(["steelblue", "brown"]);
+
+var xAxis = d3.svg.axis()
+    .scale(x0)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .tickFormat(d3.format(".2s"));
+
+var svg = d3.select("body").append("svg")
+    .attr("width", widthx + margin.left + margin.right)
+    .attr("height", heightx + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+    
+svg.append("svg:image")
+	.attr("xlink:href", "http://img.freeflagicons.com/thumb/round_icon/republic_of_china/republic_of_china_640.png")
+	.attr("class", "opacity")
+	.attr("x", -40)
+	.attr("y", -30)
+	.attr("width", widthx + margin.left + margin.right)
+	.attr("height" , heightx + margin.top + margin.bottom);
+
+d3.csv("ExchangeRateXXX.csv", function(error, data) {
+  if (error) throw error;
+
+  svg.append("text")
+	.attr("class", "title")
+	.attr("x", 220)
+	.attr("y", 5)
+	.text("Spot Foreign Exchange of Taiwan");
+
+  var ageNames = d3.keys(data[0]).filter(function(key) { return key !== "State"; });
+
+  data.forEach(function(d) {
+    d.ages = ageNames.map(function(name) { return {name: name, value: +d[name]}; });
+  });
+
+  x0.domain(data.map(function(d) { return d.State; }));
+  x1.domain(ageNames).rangeRoundBands([0, x0.rangeBand()]);
+  y.domain([0, d3.max(data, function(d) { return d3.max(d.ages, function(d) { return d.value; }); })]);
+
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + heightx + ")")
+      .call(xAxis);
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Value");
+
+  var tip = d3.tip()
+		.attr("class", "d3-tip")
+		.offset([-10, 0])
+		.html(function(d) { return d.value; });
+  svg.call(tip);
+
+  var state = svg.selectAll(".state")
+      .data(data)
+    .enter().append("g")
+      .attr("class", "g")
+      .attr("transform", function(d) { return "translate(" + x0(d.State) + ",0)"; });
+
+  state.selectAll("rect")
+      .data(function(d) { return d.ages; })
+    .enter().append("rect")
+      .attr("width", x1.rangeBand())
+      .attr("x", function(d) { return x1(d.name); })
+      .attr("y", function(d) { return y(d.value); })
+      .attr("height", function(d) { return heightx - y(d.value); })
+      .style("fill", function(d) { return color(d.name); })
+      .on("mouseover", tip.show)
+      .on("mouseout", tip.hide);
+
+  var legend = svg.selectAll(".legend")
+      .data(ageNames.slice().reverse())
+    .enter().append("g")
+      .attr("class", "legend")
+      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+  legend.append("rect")
+      .attr("x", widthx - 18)
+      .attr("width", 18)
+      .attr("height", 18)
+      .style("fill", color);
+
+  legend.append("text")
+      .attr("class", "sign")
+      .attr("x", widthx - 24)
+      .attr("y", 9)
+      .attr("dy", ".35em")
+      .style("text-anchor", "end")
+      .text(function(d) { return d; });
+});
+
+</script>	
+	
+	
+	
+	
+	
+	
+
+	<p> 資料來源：台灣銀行 黃金牌價通告匯率(2014年11月17日～2015年11月13日）,總體統計處, 政府資料開放平臺</p>
+	{{> footer}}
+</body>
+
+</html>
