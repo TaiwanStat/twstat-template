@@ -4,46 +4,43 @@
 		<meta charset="utf-8">
 		<title>NBA</title>
      <!-- my js & css -->
-		<link rel="stylesheet" type="text/css" href="css/style.css">
 		<link rel="stylesheet" href="css/jquery-ui.css">
 		<link type="text/css" rel="stylesheet" href="css/index.css"></link>
-		<link type="text/css" rel="stylesheet" href="css/radar-chart.css"></link>
 		
     </head>
     <body>
-		<!--<span class="date-text">NBA Data through September, 2014</span>-->
-		<form class="bar-form">
-		<!--	
-			<label for="show-btn"><b>Stacked Bar Chart</b></label>
-			<input id="show-btn" type="button" value=" Show " onclick="createStackBar()" />
-			<input id="hide-btn" type="button" value=" Hide " onclick="hideStackBar()" />
-			<label class="bar-option" for="pts-weight"><b>PTS: </b></label>
-			<input class="bar-option" name="pts-weight" id="pts-weight" type="text" value="1" />
-			<label class="bar-option" for="ast-weight"><b>AST: </b></label>
-			<input class="bar-option" name="ast-weight" id="ast-weight" type="text" value="1" />
-			<label class="bar-option" for="reb-weight"><b>REB: </b></label>
-			<input class="bar-option" name="reb-weight" id="reb-weight" type="text" value="1" />
-			<label class="bar-option" for="tov-weight"><b>TOV: </b></label>
-			<input class="bar-option" name="tov-weight" id="tov-weight" type="text" value="1" />
-			<label class="bar-option" for="stl-weight"><b>STL: </b></label>
-			<input class="bar-option" name="stl-weight" id="stl-weight" type="text" value="1" />
-			<label class="bar-option" for="blk-weight"><b>BLK: </b></label>
-			<input class="bar-option" name="blk-weight" id="blk-weight" type="text" value="1" />
-			<label class="bar-option"><input class="bar-option" type="radio" name="mode" value="multiples" checked> Multiples</label>
-			<label class="bar-option"><input class="bar-option" type="radio" name="mode" value="stacked"> Stacked</label>
-		-->
-		</form>
-	
-    <!-- my charts -->
-		<div class="chart">
+
+	<div id="container" style="width: 100%;">
+    	<h1 class="map" style="width: 100%;"></h1>
+
+		<div style="width: 40%; float: left;">
+			<p>
+				<label for="amount">TIME:</label>
+				<input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
+			</p>
+			<div id="slider-range-min"></div>
 		</div>
-	<!-- slider -->	
-		<p>
-			<label for="amount">TIME:</label>
-			<input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
-		</p>
-		 
-		<div id="slider-range-min" style="width: 40%;"></div>
+		<div style="width: 50%; float: left; margin-left: 10%;">
+			<table border="2">
+				<tr style="text-align: center;">
+					<td colspan="2"><b id="Pk" style="font-size: large;">排名</b></td>
+				</tr>
+				<tr>
+					<td rowspan="4" ><img id="pic" src="" width="150" hight="200"></td>
+					<td>球員名字 : <span id="name"></span></td>
+				</tr>
+				<tr>
+					<td>平均得分 : <span id="PTS"></span></td>
+				</tr>
+				<tr>
+					<td>平均籃板 : <span id="TRB"></span></td>
+				</tr>
+				<tr>
+					<td>平均助攻 : <span id="AST"></span></td>
+				</tr>				
+			</table>
+		</div>
+	</div>
 
     <!-- my js & css -->
 		<script type="text/javascript" src="js/d3.min.js"></script>

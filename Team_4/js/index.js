@@ -1,31 +1,19 @@
-function createTimeLine() {
-    $( "#slider-range-min" ).slider({
-        range: "min",
-        value: 2015,
-        min: 1996,
-        max: 2015,
-        slide: function( event, ui ) { //滾動時間時
-            $( "#amount" ).val( ui.value );
-            readDraft(ui.value);
-        }
-    });
-    $( "#amount" ).val( $( "#slider-range-min" ).slider( "value" ) );
-};
+
 
 //Width and height for whole
-var w = 1280;
-var h = 1024;
+var w = 1000;
+var h = 500;
 
 //image width and height
-var image_w = 200;
-var image_h = 200;
+var image_w = 150;
+var image_h = 150;
 
 //For selected node
 var active = d3.select(null);
 
 //Define map projection
 var projection = d3.geo.albersUsa()
-    .translate([w/3, h/3.5])
+    .translate([w/2, h/3])
     .scale([1000]);
 
 //Zoom behavior
@@ -41,14 +29,14 @@ var path = d3.geo.path()
 
 //Map the winrate to opacity[0.3, 0.9] 
 var Opacity = d3.scale.linear()
-    .range([0.2, 0.9]);
+    .range([0.2, 1.0]);
 
 //Map the rank to radius[2, 20] 
 var Scale = d3.scale.linear()
     .range([2, 20]);
 
 //Create SVG element
-var svg = d3.select("body")
+var svg = d3.select("h1")
     .append("svg")
     .attr("width", w)
     .attr("height", h)
@@ -148,7 +136,7 @@ function regularizeRank(rank) {
 }
 
 //Judge if is in the array
-function contains(array, obj) { 
+function contains(array, obj) {
     var i = array.length; 
     while (i--) { 
         if (array[i] === obj) { 
@@ -188,216 +176,25 @@ function teamClick(d) {
             };
         });
 
-        //Remove the selected team data
-        for (var i = 0; i < teamRadarData.length; i++) {
-            if (selectedTeamName == teamRadarData[i].className) {
-                teamRadarData.remove(teamRadarData[i]);
-                break;
-            };
-        }
-
         //Remove in the teamList;
         teamList.remove(selectedTeamName);
 
         //Existing node number after deleting
         if (teamList.length == 0) { //點掉node
-            d3.selectAll(".pie-chart").remove();
+            
         } 
     } else {    //Does not contain the node
         teamList.push(selectedTeamName);
         active = d3.select(this).style("fill", "orange");
-        if (teamList.length == 1) {
-            createPieChart(); // 產生旁邊的表格
-            //Push the team data for radar chart, but not display
-            //d3.csv("data/teamstats.csv", function(teamData) {
-                //Loop through once for each team data value
-            //    pushTeamRadarData(teamData);
-            //});
-
-        }
+        //if (teamList.length == 1) {
+            document.getElementById("name").innerHTML = thisYearDraft[d.abb][0]["Name"];
+            document.getElementById("PTS").innerHTML = thisYearDraft[d.abb][0]["PTS"];
+            document.getElementById("Pk").innerHTML = thisYearDraft[d.abb][0]["Pk"];
+            document.getElementById("TRB").innerHTML = thisYearDraft[d.abb][0]["TRB"];
+            document.getElementById("AST").innerHTML = thisYearDraft[d.abb][0]["AST"];
+            document.getElementById("pic").src = thisYearDraft[d.abb][0]["pic"];
+        //}
         
-    }
-
-    //這裡用不到
-    //Push team data for radar chart
-    function pushTeamRadarData(teamData){
-        for (var i = 0; i < teamData.length; i++) { 
-            if (teamData[i].team == selectedTeamName) { //Grab the team
-                var teamAxes = [];
-                teamAxes.push({axis: "Points", value: regularizeRank(teamData[i].rPTS)});
-                teamAxes.push({axis: "Turnovers", value: regularizeRank(teamData[i].rTOV)});
-                teamAxes.push({axis: "Steals", value: regularizeRank(teamData[i].rSTL)});
-                teamAxes.push({axis: "Blocks", value: regularizeRank(teamData[i].rBLK)});
-                teamAxes.push({axis: "Rebounds", value: regularizeRank(teamData[i].rREB)});
-                teamAxes.push({axis: "Assists", value: regularizeRank(teamData[i].rAST)});
-
-                teamRadarData.push({className: teamData[i].team, axes: teamAxes});
-            }
-        }
-    }
-
-    //Create PieChart for players
-    function createPieChart() {
-        d3.selectAll(".pie-chart").remove();
-
-        var width = 150;
-        var height = 500;
-        var radius = Math.min(width, height) / 2;
-        var innerRadius = 0.3 * radius;
-
-        //Players' data in a team
-        teamPlayer = [];
-        //teamPlayerName for returning a color;
-        teamPlayerName = [];
-
-        //Load each players' data
-        d3.csv("data/players.csv", function(error, playerData) {
-            playerData.forEach(function(d) {
-                //change into number
-                d.PTS = +d.PTS
-                d.AST = +d.AST
-                d.REB = +d.REB
-                d.BLK = +d.BLK
-                d.STL = +d.STL
-                d.TOV = +d.TOV
-
-                //Save the selected team data
-                if (d.team == teamList[teamList.length - 1]) {
-                    teamPlayer.push({
-                        player: d.player, 
-                        team: d.team,
-                        PTS: d.PTS, 
-                        PIE: d.PIE, 
-                        REB: d.REB, 
-                        AST: d.AST, 
-                        STL: d.STL, 
-                        BLK: d.BLK, 
-                        TOV: d.TOV
-                    });
-                    teamPlayerName.push(d.player);
-                }
-            });
-
-            //For full percentage of the pie chart
-            var maxPlayerPTS = d3.max(playerData, function(d) { return d.PTS; }); 
-            var maxPlayerAST = d3.max(playerData, function(d) { return d.AST; });   
-            var maxPlayerREB = d3.max(playerData, function(d) { return d.REB; });
-            var maxPlayerBLK = d3.max(playerData, function(d) { return d.BLK; });
-            var maxPlayerSTL = d3.max(playerData, function(d) { return d.STL; });
-            var maxPlayerTOV = d3.max(playerData, function(d) { return d.TOV; });
-
-            var tip = d3.tip()
-                .attr("class", "d3-tip pie-chart-tip")
-                .offset([0, -128])
-                .html(function(d) { return "<span>" + d.data.player + "</span>"; });;
-
-            var outlineArc = d3.svg.arc()
-                .innerRadius(innerRadius)
-                .outerRadius(radius);
-
-            //Six pie charts
-            for (var i = 0 ; i < 6; i++) {
-                var pie = d3.layout.pie().sort(null);
-                var arc = d3.svg.arc().innerRadius(innerRadius);
-                //In the center
-                var shortAttrName = ["PTS", "AST", "REB", "BLK", "STL", "TOV"];
-                //For the title when hover
-                var fullAttrName = ["Points", "Assists", "Rebounds", "Blokcks", "Steals", "Turnovers"];
-
-                var pieChart = svg.append("g")
-                    .attr("class", "pie-chart")
-                    .attr("width", width)
-                    .attr("height", height)
-
-                    .append("g");
-
-                //position of the pie charts
-                pieChart.attr("class", "single-pie-chart").attr("transform", function() { 
-                    if (i <= 2){
-                        return "translate(" + 770 + "," + (110 + i * 160) +")" ;
-                    } else {
-                        return "translate(" + 930 + "," + (110 + (i - 3) * 160) +")" ;
-                    }
-                });
-
-                //words in the center
-                pieChart.append("g:text")
-                    .attr("class", "aster-score")
-                    .attr("dy", ".35em")
-                    .attr("text-anchor", "middle") // text-align: right
-                    .text(function() { return shortAttrName[i]; })
-                    .append("title")
-                    .text(function() { return fullAttrName[i] })
-                    .call(tip); 
-
-                if (i == 0) { 
-                    pie.value(function(d) { return d.PTS; });
-                    arc.outerRadius(function (d) { return (radius - innerRadius) * d.data.PTS / maxPlayerPTS + innerRadius; });
-                }
-                if (i == 1) { 
-                    pie.value(function(d) { return d.AST; });
-                    arc.outerRadius(function (d) { return (radius - innerRadius) * d.data.AST / maxPlayerAST + innerRadius; });
-                }
-                if (i == 2) { 
-                    pie.value(function(d) { return d.REB; }); 
-                    arc.outerRadius(function (d) { return (radius - innerRadius) * d.data.REB / maxPlayerREB + innerRadius; });
-                }
-                if (i == 3) { 
-                    pie.value(function(d) { return d.BLK; }); 
-                    arc.outerRadius(function (d) { return (radius - innerRadius) * d.data.BLK / maxPlayerBLK + innerRadius; })
-                }
-                if (i == 4) {
-                    pie.value(function(d) { return d.STL; }); 
-                    arc.outerRadius(function (d) { return (radius - innerRadius) * d.data.STL / maxPlayerSTL + innerRadius; })
-                }
-                if (i == 5) { 
-                    pie.value(function(d) { return d.TOV; });
-                    arc.outerRadius(function (d) { return (radius - innerRadius) * d.data.TOV / maxPlayerTOV + innerRadius; });
-                }
-
-                var pieColor = d3.scale.linear()
-                    .domain([0, 15])
-                    .range(["yellow", "green"])
-                    .interpolate(d3.interpolateLab);
-
-                var path = pieChart.selectAll(".solidArc")
-                    .data(pie(playerDataset(teamPlayer)))
-                    .enter().append("path")
-                    .attr("fill", function(d) { return pieColor(teamPlayerName.indexOf(d.data.player)); })
-                    .attr("class", "solidArc")
-                    .attr("stroke", "gray")
-                    .attr("d", arc)
-                    .on('mouseover', tip.show)
-                    .on('mouseout', tip.hide)
-                    .append("title")
-                    .text(function(d){ return "Team: " + d.data.team; });
-
-                var outerPath = pieChart.selectAll(".outlineArc")
-                    .data(pie(playerDataset(teamPlayer)))
-                    .enter().append("path")
-                    .attr("fill", "none")
-                    .attr("stroke", "gray")
-                    .attr("class", "outlineArc")
-                    .attr("d", outlineArc);  
-            }
-        });
-        
-        //Return the map of Players' data
-        function playerDataset(teamPlayer) {
-            return teamPlayer.map(function(d) {
-                return {
-                    player: d.player,
-                    team: d.team,
-                    PTS: d.PTS,
-                    PIE: d.PIE,
-                    REB: d.REB,
-                    AST: d.AST, 
-                    STL: d.STL, 
-                    BLK: d.BLK, 
-                    TOV: d.TOV
-                };
-            });
-        }
     }
 }
 
@@ -533,6 +330,21 @@ function nodeMouseout(d){
         .remove();
 }
 
+//Timeline
+function createTimeLine() {
+    $("#slider-range-min").slider({
+        range: "min",
+        value: 2015,
+        min: 1996,
+        max: 2015,
+        slide: function( event, ui ) { //滾動時間時
+            $( "#amount" ).val( ui.value );
+            readDraft(ui.value);
+        }
+    });
+    $("#amount").val( $( "#slider-range-min" ).slider( "value" ) );
+};
+
 var thisYearDraft = {};
 //讀取當年度新秀資料
 function readDraft(year) {
@@ -565,7 +377,12 @@ function readDraft(year) {
                             var playerInfo = {};
                             playerInfo["Name"] = draftData[i].Player;
                             playerInfo["PTS"] = draftData[i].PTS;
-                            console.log(playerInfo);
+                            playerInfo["Pk"] = draftData[i].Pk;
+                            playerInfo["TRB"] = draftData[i].TRB;
+                            playerInfo["AST"] = draftData[i].AST;
+                            playerInfo["pic"] = draftData[i].PICTURE;
+
+                            console.log(draftData[i]);
                             thisYearDraft[draftData[i].Tm].push(playerInfo);    
                         }
                     }
@@ -597,7 +414,7 @@ function readDraft(year) {
                         return "pointer";}
                     else{return "default";}
                 })
-                //.on("click", teamClick); //點node 呼叫teamclick
+                .on("click", teamClick); //點node 呼叫teamclick
 
             //text for teams
             nodes.append("text")
@@ -609,24 +426,22 @@ function readDraft(year) {
                 .style("font-weight", "bold")
                 .style("cursor", "default")
                 .style("opacity", function(d){
-                    console.log(typeof thisYearDraft[d.abb]);
                     if(typeof thisYearDraft[d.abb] != "undefined"){
                         return Opacity(1);}
                     else{return Opacity(-1);}
                 })
                 .style("font-size", "16px")
                 .text(function(d){
-                    console.log("done");
-                return d.abb;});            
+                    return d.abb;});            
 
             //when mouseover
             nodes.on("mouseover", function(d){
                 console.log(thisYearDraft.year);
-                console.log(thisYearDraft[d.abb][0]["PTS"]);
+                console.log(thisYearDraft[d.abb][0]["pic"]);
 
                 g.selectAll("circle").style("opacity", function(d){
                     if(typeof thisYearDraft[d.abb] != "undefined"){
-                        return Opacity(0.5);}
+                        return Opacity(0.3);}
                     else{return Opacity(-1);}
                 })
 
