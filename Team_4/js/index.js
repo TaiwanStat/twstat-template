@@ -1,7 +1,7 @@
 
 
 //Width and height for whole
-var w = 1000;
+var w = 1200;
 var h = 500;
 
 //image width and height
@@ -13,7 +13,7 @@ var active = d3.select(null);
 
 //Define map projection
 var projection = d3.geo.albersUsa()
-    .translate([w/2, h/3])
+    .translate([w/2.5, h/2.5])
     .scale([1000]);
 
 //Zoom behavior
