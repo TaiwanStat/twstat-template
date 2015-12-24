@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang='zh-TW'>
+  <head>
+    {{> head}}
+    <!-- my js & css -->
+    <link rel="stylesheet" type="text/css" href="./css/style.css">
+  </head>
+  <body>
+    {{> header}}
+    {{> start}}
+    <!-- my charts -->
+    <div class="chart">
+        <div class="ui grid">
+            <div class="sixteen wide column">
+                <div class="ui six steps">
+                    <div class="step">
+                        <div class="content">
+                            <div class="title">遊戲名稱</div>
+                            <div class="description"></div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="content">
+                            <div class="title">遊戲類型</div>
+                            <div class="description"></div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="content">
+                            <div class="title">語言</div>
+                            <div class="description"></div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="content">
+                            <div class="title">發行時間</div>
+                            <div class="description"></div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="content">
+                            <div class="title">遊戲平台</div>
+                            <div class="description"></div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="content">
+                            <div class="title">瀏覽人次</div>
+                            <div class="description"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="twelve wide column" id="plot">
+                <svg>
+                    <g class="g-chart"></g>
+                </svg>
+            </div>
+            <div class="four wide column">
+                <div class="ui grid">
+                    <div class="row">
+                        <div class="ui compact menu">
+                            <div class="ui simple dropdown item">
+                                依&nbsp;<span id="cata">類型</span>&nbsp;標記顏色
+                                <i class="dropdown icon"></i>
+                                <div class="menu">
+                                    <div class="item" onclick="changeCata(this, 'version')">語言</div>
+                                    <div class="item" onclick="changeCata(this, 'platform')">平台</div>
+                                    <div class="item" onclick="changeCata(this, 'type')">類型</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="ui search">
+                          <div class="ui icon input">
+                            <input class="prompt" placeholder="遊戲名稱" type="text">
+                            <i class="search icon" onclick="updateFlot()"></i>
+                          </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <button class="ui orange button" onclick="toggleAll()">反選</button>
+                        <button class="ui yellow button" onclick="resetAll()">重置</button>
+                        <button class="ui red button" onclick="updateFlot()">套用</button>
+                    </div>
+                    <div class="row">
+                        <div class="ui form">
+                            <div class="grouped fields" id="checkbox-fields">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{> end}}
+    <!-- my js & css -->
+    {{> footer}}
+    <script src="https://cdn.firebase.com/js/client/2.3.2/firebase.js"></script>
+    <script type="text/javascript" src="./js/index.js"></script>
+  </body>
+</html>
