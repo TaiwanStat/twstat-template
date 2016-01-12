@@ -4,10 +4,10 @@
 <link rel="icon" type="image/png" href="/favicon.ico">
 <meta property="og:title" content="用數據看台灣 - Team_1-台北公車">
 <meta property="og:site_name" content="用數據看台灣 - Team_1-台北公車">
-<meta property="og:description" content="Project description">
+<meta property="og:description" content="公車站牌資訊">
 <title>用數據看台灣 - Team_1-台北公車</title>
 <meta http-equiv="Content-Type" content="text/html" ;="" charset="utf-8">
-<meta property="og:image" content="http://real.taiwanstat.com/images/assert/background.png">
+<meta property="og:image" content="http://real.taiwanstat.com/http://i.imgur.com/aFuTih5.png">
 <meta property="og:image:type" content="image/png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!--<base href="http://real.taiwanstat.com/" target="_blank">-->
@@ -19,9 +19,7 @@
     <!-- my js & css -->
 	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css">
 	<link rel="stylesheet" type="text/css" href="css/map.css">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">	
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 </head>
 <body>
   <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header" id="layout-header">
@@ -61,10 +59,20 @@
 
 
     <!-- my charts -->
-    <div class="container">
-    	<div class="row">
-    		<div id="map"></div>
-    	</div>
+    <div class="ui container">
+      <div class="ui active dimmer" id="loading">
+        <div class="ui text loader">Loading</div>
+      </div>      
+      <div class="ui middle aligned grid">
+        <div class="three column row">
+          <div class="column"></div>
+          <div class="column" id="info"><p>台北</p><p></p></div>
+          <div class="column"></div>
+        </div>
+      	<div class="sixteen wide column">
+      		<div id="map"></div>
+      	</div>
+      </div>
     </div>
    
 <div class="mdl-card mdl-shadow--2dp author"><h4><a href="http://taiwanstat_members.cannerapp.com/">About Author</a></h4>
