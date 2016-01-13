@@ -100,10 +100,6 @@ function timeFunc(t) {
 	}
 }
 
-function init() {
-
-}
-
 function getLocation() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function (p) {
