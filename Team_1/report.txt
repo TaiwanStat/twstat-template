@@ -1,0 +1,29 @@
+﻿組別: Team_1
+
+組員: 呂開誠, 李昱勳, 謝佳茹
+
+主題: 台北公車
+
+描述: 即時抓取台北公車資料,在地圖上標出資訊
+
+資料來源: http://taipeicity.github.io/traffic_realtime/
+
+技術:
+    後端: 
+        php抓取資料
+
+    前端:
+        地圖: Leaflet + Leaflet.markercluster
+
+        定位: navigator.geolocation.getCurrentPosition
+              如果不在台北,地圖位置就會跑到台北火車站
+
+	資料: 用jquery $.getJSON從後端讀取資料
+              http://andy.emath.tw/taipei.php?data=Stop
+              http://andy.emath.tw/taipei.php?data=EstiamteTime
+
+預計加強:
+
+    改善讀取速度
+    程式讀取資料的速度很慢,所以也不敢再加更多的資料進去了.
+    
