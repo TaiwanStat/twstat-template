@@ -1,14 +1,49 @@
 {
   "data": {
     "page": [
-     {
+	  {
+        "title": "Team1-台北公車",
+        "url": "Team_1",
+        "img": "http://i.imgur.com/aFuTih5.png",
+        "description": "公車站牌資訊",
+        "author": "呂開誠、李昱勳、謝佳茹"
+      },
+      {
+        "title": "Team_8",
+        "url": "Team_8",
+        "img": "images/assert/background.png",
+        "description": "Project description",
+        "author": ""
+      },
+      {
+        "title": "Team_16-棒球",
+        "url": "Team_16",
+        "img": "images/assert/background.png",
+        "description": "Project description",
+        "author": ""
+      },
+      {
+        "title": "Team_12-遊戲數據",
+        "url": "Team_12",
+        "img": "images/assert/background.png",
+        "description": "Project description",
+        "author": "林簡民、魏廷龍、朱詠徽"
+      },
+      {
+        "title": "Team4",
+        "url": "Team_4",
+        "img": "images/assert/background.png",
+        "description": "NBA Year draft visualization",
+        "author": "陳自泓、唐子軒、林勢祥"
+      },
+      {
         "title": "Team15",
         "url": "Team_15",
         "img": "images/assert/background.png",
         "description": "description",
         "author": "Your Name"
       },
-     {
+      {
         "title": "Team7",
         "url": "Team_7",
         "img": "images/assert/background.png",
@@ -36,7 +71,7 @@
         "description": "description",
         "author": "Your Name"
       },
-	    {
+      {
         "title": "Team2-油價知多少",
         "url": "Team_2",
         "img": "images/assert/background.png",

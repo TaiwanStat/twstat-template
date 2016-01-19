@@ -1,0 +1,23 @@
+.content {
+	stroke: black;
+	stroke-width: 1;
+	fill: none;
+}
+
+.line {
+	stroke: red;
+}
+
+.axis {
+	font-size: 11px;
+	fill: none;
+}
+
+.xaxis {
+  stroke: gray;
+}
+
+
+.yaxis{
+  stroke: gray;
+}
