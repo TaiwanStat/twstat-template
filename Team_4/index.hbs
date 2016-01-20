@@ -2,19 +2,54 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang='zh-TW'>
   <head>
     {{> head}}
+    <meta charset="utf-8">
+    <title>NBA Year draft visualization</title>
     <!-- my js & css -->
-    <link rel="stylesheet" type="text/css" href="./css/style.css">
+   <link rel="stylesheet" href="css/jquery-ui.css">
+    <link type="text/css" rel="stylesheet" href="css/index.css"></link>
   </head>
   <body>
     {{> header}}
     {{> start}}
     <!-- my charts -->
     <div class="chart">
+    <div id="container" style="width: 100%;">
+      <h1 class="map" style="width: 100%;"></h1>
 
+    <div style="width: 40%; float: left;">
+      <p>
+        <label for="amount">TIME:</label>
+        <input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
+      </p>
+      <div id="slider-range-min"></div>
+    </div>
+    <div style="width: 50%; float: left; margin-left: 10%;">
+      <table>
+        <tr style="text-align: center;">
+          <td colspan="2"><b id="Pk" style="font-size: 24px;">選秀順位</b></td>
+        </tr>
+        <tr>
+          <td rowspan="4" ><img id="pic" src="" width="150" hight="200"></td>
+          <td>球員名字 : <span id="name"></span></td>
+        </tr>
+        <tr>
+          <td>平均得分 : <span id="PTS"></span></td>
+        </tr>
+        <tr>
+          <td>平均籃板 : <span id="TRB"></span></td>
+        </tr>
+        <tr>
+          <td>平均助攻 : <span id="AST"></span></td>
+        </tr>       
+      </table>
+    </div>
+  </div>
     </div>
     {{> end}}
     <!-- my js & css -->
-    {{> footer}}
-    <script type="text/javascript" src="./js/index.js"></script>
+    <script type="text/javascript" src="js/radar-chart.js"></script>
+    <script type="text/javascript" src="js/d3.tip.v0.6.3.js"></script>
+    <script type="text/javascript" src="js/jquery-ui.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
   </body>
 </html>
