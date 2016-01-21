@@ -51,7 +51,7 @@ function estTimeFunc() {
 
 		}
 		console.log('sec finished');
-		markAll();
+		busname();
 	});
 }
 
