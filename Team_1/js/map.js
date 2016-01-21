@@ -1,6 +1,10 @@
 var map;
 getLocation();
-
+var wifi = new Array("1", "12", "15", "21", "22", "72", "74", "63", "72", "74", "202", "203", "207", "208",
+"212", "214", "220", "223", "263", "266", "270", "277", "278", "280", "282", "284", "285", "287", "292", "304",
+"307", "311", "518", "556", "601", "611", "620", "630", "645", "671", "685", "756", "902", "905", "912", "935",
+"936", "937", "938", "212直", "645副", "中山幹線", "市民小巴10", "忠孝新幹線", "信義新幹線", "紅10", "紅2",
+"紅30", "紅31", "紅32", "紅50", "紅7", "重慶新幹線", "棕1", "棕9", "綠1", "藍25");
 var data = {};
 
 function loadStop() {
@@ -21,7 +25,7 @@ function loadStop() {
 			if (lon < 121.281991 || lon > 122.012727)
 				continue;
 
-			data[stopId] = {nameZh: nameZh, nameEn: nameEn, 
+			data[stopId] = {nameZh: nameZh, nameEn: nameEn,
 							lon: lon, lat: lat};
 		}
 		console.log('loadStop finished');
@@ -51,6 +55,38 @@ function estTimeFunc() {
 	});
 }
 
+function busname() {
+	var routeURL = "http://andy.emath.tw/taipei.php?data=ROUTE";
+	$.getJSON(routeURL, function(d) {
+		var arr = d.BusInfo;
+
+		for (var i = 0; i < arr.length; i++) {
+			var routeID = arr[i].Id;
+			var nameZh = arr[i].nameZh;
+			var roadMapUrl = arr[i].roadMapUrl
+
+			for(var stop in data){
+				if (data[stop]['RouteID'] == routeID) {
+					data[stop]['busnameZh'] = nameZh;
+					data[stop]['roadMapUrl'] = roadMapUrl;
+				}
+			}
+		}
+		buswifi();
+	});
+}
+
+
+function buswifi() {
+	for(var stop in data){
+		for (var i = 0; i < wifi.length; i++) {
+			if (data[stop]['busnameZh'] == wifi[i]) {
+				data[stop]['wifi'] = true;
+			}
+		}
+	}
+	markAll();
+}
 
 function markAll() {
 	console.log('mark start');
@@ -60,14 +96,21 @@ function markAll() {
 	for (var stop in data) {
 		var stopObj = data[stop];
 		var m = L.marker([stopObj['lat'], stopObj['lon']]);
-		m.bindPopup("站名: " + stopObj['nameZh'] + '<br>Stop: ' + stopObj['nameEn'] +
-			"<br>路線編號: " + stopObj['RouteID'] + "<br>預估等待時間: " + stopObj['EstimateTime']);
-		markers.addLayer(m);	
+		if(stopObj['wifi'] == true){
+			m.bindPopup("站名: " + stopObj['nameZh'] + '<br>Stop: ' + stopObj['nameEn'] +
+			"<br>公車名稱: <a href=" + stopObj['roadMapUrl'] + " target='_new'>" + stopObj['busnameZh'] + "</a>" +
+			"<i class='material-icons'>wifi</i>" + "<br>預估等待時間: " + stopObj['EstimateTime']);
+		}else{
+			m.bindPopup("站名: " + stopObj['nameZh'] + '<br>Stop: ' + stopObj['nameEn'] +
+			"<br>公車名稱: <a href=" + stopObj['roadMapUrl'] + " target='_new'>" + stopObj['busnameZh'] + "</a>" +
+			"<br>預估等待時間: " + stopObj['EstimateTime']);
+		}markers.addLayer(m);
 	}
 	map.addLayer(markers);
 	$("#loading").removeClass("active");
 	console.log('mark finished');
 }
+
 
 function estTimeTransfer(x) {
 	switch(x) {
@@ -114,7 +157,7 @@ function getLocation() {
 			else
         		init(p.coords.latitude, p.coords.longitude);
         });
-    } 
+    }
     else {
         alert("Geolocation is not supported by this browser.");
         init(25.047238, 121.516777);
