@@ -6,9 +6,6 @@ function drawMultilineChart(domobj, domobjsel, _width){
         width = _width - margin.left - margin.right,
         height = 500 - margin.top - margin.bottom;
 
-    // reserve for expressing
-    //     label of each line
-
     var x = d3.time.scale()
         .range([0, width]);
 
@@ -132,15 +129,16 @@ function drawMultilineChart(domobj, domobjsel, _width){
             v.value.forEach( function(e) {
                 e.Date = new Date(e.date.year,e.date.month-1,e.date.day);
             });
-            v.value = v.value.filter( function(e) { return e.Date > new Date(2015,0,0); });
+            //v.value = v.value.filter( function(e) { return e.Date > new Date(2015,0,0); });
         });
 
-        tydata = tydata.filter(function(ty) { return ty.start_date > new Date(2015,0,0); });
+		$('#wait').remove();
+
+        //tydata = tydata.filter(function(ty) { return ty.start_date > new Date(2015,0,0); });
 
         // set color domain by vegetable name
         //     vegetable name --mapping--> specific color
         color.domain(data.map(function(v) { return v.name}));
-
 
         // set x domain by range from min of date to max of date
         //     x invoked in xAxis
@@ -206,6 +204,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
             .style("stroke", function(v) { return color(v.name); });
 
         // append label for each line
+		/*
         vg.append("text")
             .datum(function(d) { return {name: d.name, value: d.value[d.value.length - 1]}; })
             .attr("class","vglabel")
@@ -214,13 +213,11 @@ function drawMultilineChart(domobj, domobjsel, _width){
             .attr("x", 3)
             .attr("dy", ".35em")
             .text(function(d) { return d.name; })
-
-            // can be modiy by css
             .style("font-size","20px")
             .style("font-weight","bold")
             .style("stroke", "#000")
             .style("fill", function(v) { return color(v.name); });
-
+		*/
         // typhoon
         var tybar = multi.selectAll("bar")
                 .data(tydata)
@@ -365,6 +362,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
             })
             .on("mousemove", mousemove);
 
+
         // check box
         var eachInputDiv = domobjsel
             .append("div")
@@ -409,10 +407,6 @@ function drawMultilineChart(domobj, domobjsel, _width){
 					this.checked ^ true;
 					rain_click(r);
 				});
-	
-        /*eachInputDiv
-            .append("label")
-            .text(function(v) { return "" + v.name; });*/
 
 		function getToday() {
 			var today = new Date();
@@ -500,14 +494,13 @@ function drawMultilineChart(domobj, domobjsel, _width){
                     });
 
                     focus.select("#tag_" + v.name + ".x")
-                        .attr("transform", "translate(" + x(d.Date) + ","
-                                                        + y(0) + ")");
+                        .attr("transform", "translate("+x(d.Date)+","+y(0)+")");
+
                     focus.select("#tag_" + v.name + ".y")
-                        .attr("transform", "translate(" + 0 + ","
-                                                        + y(d.price) + ")");
+                        .attr("transform", "translate("+0+","+y(d.price)+")");
+
                     focus.select("#tag_" + v.name + ".dot")
-                        .attr("transform", "translate(" + x(d.Date) + ","
-                                                        + y(d.price) + ")");
+                        .attr("transform", "translate("+x(d.Date)+","+y(d.price)+")");
 
 					tooltip
 						.select("div#tag_" + v.name + ".tip")
@@ -534,8 +527,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
 
 					change_white = false;
 				} else {
-					tooltip
-					.select("#tag_"+ty.name+".typhoon")
+					tooltip.select("#tag_"+ty.name+".typhoon")
 						.style("display", "none");
 				}
 			});
@@ -552,7 +544,6 @@ function drawMultilineChart(domobj, domobjsel, _width){
             tooltip
                 .style("left",d3.event.pageX+"px")
                 .style("top",d3.event.pageY+"px");
-
 
 			var _r = raindata[0];
 			var _bisectDate = d3.bisector(function(v) { return v.date; }).left;
@@ -652,7 +643,6 @@ function drawMultilineChart(domobj, domobjsel, _width){
 				.attr("width", __rain_width )
 				.attr("y", function(r) { return y3(r.rainfall); })
 				.attr("height", function(r) { return height - y3(r.rainfall); });
-			
 		}
 
     ///// brush
