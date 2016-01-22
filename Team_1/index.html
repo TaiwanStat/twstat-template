@@ -2,10 +2,10 @@
   <meta charset="utf-8">
 <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
 <link rel="icon" type="image/png" href="/favicon.ico">
-<meta property="og:title" content="用數據看台灣 - Team1-台北公車">
-<meta property="og:site_name" content="用數據看台灣 - Team1-台北公車">
-<meta property="og:description" content="公車站牌資訊">
-<title>用數據看台灣 - Team1-台北公車</title>
+<meta property="og:title" content="用數據看台灣 - Team1-台北交通">
+<meta property="og:site_name" content="用數據看台灣 - Team1-台北交通">
+<meta property="og:description" content="台北交通資訊">
+<title>用數據看台灣 - Team1-台北交通</title>
 <meta http-equiv="Content-Type" content="text/html" ;="" charset="utf-8">
 <meta property="og:image" content="http://real.taiwanstat.com/http://i.imgur.com/aFuTih5.png">
 <meta property="og:image:type" content="image/png">
@@ -51,7 +51,7 @@
   
   <main class="mdl-layout__content" id="main-content">
 
-<h2 id="title">Team1-台北公車</h2>
+<h2 id="title">Team1-台北交通</h2>
     <div class="fb-plugin">
     <div class="fb-like-box" data-href="https://www.facebook.com/taiwanstat?fref=ts" data-colorscheme="light" data-show-faces="false"></div>
     <div class="fb-like" data-href="http://real.taiwanstat.com/Team_1" data-width="300px" data-layout="standard" data-action="like" data-show-faces="true" data-share="true"></div>
@@ -60,15 +60,46 @@
 
     <!-- my charts -->
     <div class="ui container">
-      <div class="ui active dimmer" id="loading">
+      <div class="ui dimmer" id="loading">
         <div class="ui text loader">Loading</div>
-      </div>      
+      </div>
+
       <div class="ui middle aligned grid">
         <div class="three column row">
           <div class="column"></div>
-          <div class="column" id="info"><p>台北</p><p></p></div>
+          <div class="column" id="info"><p></p><p></p></div>
           <div class="column"></div>
         </div>
+
+        <div class="ui form grouped fields eight column row">
+          <!-- <div class="grouped fields ui eight column"> -->
+            <div class="field column">
+              <div class="ui toggle checkbox">
+                <input type="radio" name="throughput" checked="checked">
+                <label>YouBike</label>
+              </div>
+            </div>
+            <div class="field column">
+              <div class="ui toggle checkbox">
+                <input type="radio" name="throughput">
+                <label>捷運</label>
+              </div>
+            </div>
+            <div class="field column">
+              <div class="ui toggle checkbox">
+                <input type="radio" name="throughput">
+                <label>公車</label>
+              </div>
+            </div>
+            <div class="field column">
+              <div class="ui toggle checkbox checked">
+                <input type="radio" name="throughput">
+                <label>停車場</label>
+              </div>
+            </div>
+          <!-- </div> -->
+        </div>
+
       	<div class="sixteen wide column">
       		<div id="map"></div>
       	</div>

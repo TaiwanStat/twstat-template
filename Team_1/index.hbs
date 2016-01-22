@@ -11,15 +11,46 @@
   {{> start}}
     <!-- my charts -->
     <div class="ui container">
-      <div class="ui active dimmer" id="loading">
+      <div class="ui dimmer" id="loading">
         <div class="ui text loader">Loading</div>
-      </div>      
+      </div>
+
       <div class="ui middle aligned grid">
         <div class="three column row">
           <div class="column"></div>
-          <div class="column" id="info"><p>台北<p></div>
+          <div class="column" id="info"><p><p></div>
           <div class="column"></div>
         </div>
+
+        <div class="ui form grouped fields eight column row">
+          <!-- <div class="grouped fields ui eight column"> -->
+            <div class="field column">
+              <div class="ui toggle checkbox">
+                <input type="radio" name="throughput" checked="checked">
+                <label>YouBike</label>
+              </div>
+            </div>
+            <div class="field column">
+              <div class="ui toggle checkbox">
+                <input type="radio" name="throughput">
+                <label>捷運</label>
+              </div>
+            </div>
+            <div class="field column">
+              <div class="ui toggle checkbox">
+                <input type="radio" name="throughput">
+                <label>公車</label>
+              </div>
+            </div>
+            <div class="field column">
+              <div class="ui toggle checkbox checked">
+                <input type="radio" name="throughput">
+                <label>停車場</label>
+              </div>
+            </div>
+          <!-- </div> -->
+        </div>
+
       	<div class="sixteen wide column">
       		<div id="map"></div>
       	</div>

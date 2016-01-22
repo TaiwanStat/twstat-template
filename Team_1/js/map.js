@@ -1,4 +1,6 @@
 var map;
+var busMarkers = L.markerClusterGroup();
+var busMarkersLoaded = false;
 getLocation();
 var wifi = new Array("1", "12", "15", "21", "22", "72", "74", "63", "72", "74", "202", "203", "207", "208",
 "212", "214", "220", "223", "263", "266", "270", "277", "278", "280", "282", "284", "285", "287", "292", "304",
@@ -8,6 +10,8 @@ var wifi = new Array("1", "12", "15", "21", "22", "72", "74", "63", "72", "74", 
 var data = {};
 
 function loadStop() {
+	$("#loading").addClass("active");
+	console.log('loadStop started');
 	var stopURL = "http://andy.emath.tw/taipei.php?data=Stop";
 	$.getJSON(stopURL, function(d) {
 		var stopArr = d.BusInfo;
@@ -34,7 +38,7 @@ function loadStop() {
 }
 
 function estTimeFunc() {
-	console.log('sec');
+	console.log('estTime started');
 	var estimateTimeURL = "http://andy.emath.tw/taipei.php?data=EstiamteTime";
 	$.getJSON(estimateTimeURL, function(d) {
 		var arr = d.BusInfo;
@@ -50,7 +54,7 @@ function estTimeFunc() {
 			}
 
 		}
-		console.log('sec finished');
+		console.log('estTime finished');
 		busname();
 	});
 }
@@ -85,32 +89,40 @@ function buswifi() {
 			}
 		}
 	}
-	markAll();
+	busMarkAll();
 }
 
-function markAll() {
-	console.log('mark start');
-
-	var markers = L.markerClusterGroup();
+function busMarkAll() {
+	console.log('busMarkAll started');
 
 	for (var stop in data) {
 		var stopObj = data[stop];
 		var m = L.marker([stopObj['lat'], stopObj['lon']]);
-		if(stopObj['wifi'] == true){
+		if (stopObj['wifi'] == true) {
 			m.bindPopup("站名: " + stopObj['nameZh'] + '<br>Stop: ' + stopObj['nameEn'] +
 			"<br>公車名稱: <a href=" + stopObj['roadMapUrl'] + " target='_new'>" + stopObj['busnameZh'] + "</a>" +
 			"<i class='material-icons'>wifi</i>" + "<br>預估等待時間: " + stopObj['EstimateTime']);
-		}else{
+		}
+		else {
 			m.bindPopup("站名: " + stopObj['nameZh'] + '<br>Stop: ' + stopObj['nameEn'] +
 			"<br>公車名稱: <a href=" + stopObj['roadMapUrl'] + " target='_new'>" + stopObj['busnameZh'] + "</a>" +
 			"<br>預估等待時間: " + stopObj['EstimateTime']);
-		}markers.addLayer(m);
+		}
+		busMarkers.addLayer(m);
 	}
-	map.addLayer(markers);
+	map.addLayer(busMarkers);
+
 	$("#loading").removeClass("active");
-	console.log('mark finished');
+	busMarkersLoaded = true;
+	console.log('busMarkAll finished');
 }
 
+function deleteBusMarkers() {
+	busMarkers.eachLayer(function (layer) {
+		busMarkers.removeLayer(layer);
+	});
+	$("#loading").removeClass("active");
+}
 
 function estTimeTransfer(x) {
 	switch(x) {
@@ -164,6 +176,58 @@ function getLocation() {
     }
 }
 
+function checkboxCtrl(checkboxes) {
+	checkboxes[0].checkbox({
+		// youbike
+		onChecked: function() {
+			deleteBusMarkers();
+		},
+		onUnchecked: function() {
+
+		}
+	});
+
+	checkboxes[1].checkbox({
+		// mrt
+		onChecked: function() {
+
+			deleteBusMarkers();
+		},
+		onUnchecked: function() {
+
+		}
+	});
+
+	checkboxes[2].checkbox({
+		// bus
+		onChecked: function() {
+			if (busMarkersLoaded) {
+				$("#loading").addClass("active");
+				busMarkAll();
+			}
+			else {
+				loadStop();
+			}
+			
+		},
+		onUnchecked: function() {
+
+			deleteBusMarkers();
+		}
+	});
+
+	checkboxes[3].checkbox({
+		// parking
+		onChecked: function() {
+
+			deleteBusMarkers();
+		},
+		onUnchecked: function() {
+
+		}
+	});
+}
+
 function init(lat, lon) {
 	map = L.map('map').setView([lat, lon], 17);
 
@@ -175,5 +239,9 @@ function init(lat, lon) {
 		id: 'mapbox.streets'
 	}).addTo(map);
 
-	loadStop();
+	var checkboxes = [];
+	$('.ui.checkbox').each(function() {
+		checkboxes.push($(this));
+	});
+	checkboxCtrl(checkboxes);
 }
