@@ -2,107 +2,111 @@
 
 <head>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-<script>
+	<meta charset="UTF-8" />
 
-	var veg_list = ["菠菜","香菜","芹菜","空心菜","茼蒿","蘆筍","茴香","生菜","莧菜","萵苣","蒜頭","洋蔥頭","韭菜","菜瓜","苦瓜","南瓜"];
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.13/d3.js"></script>
 
-	function set_veg_item_event(){
-		$("#veg_not_selected").children(".vegitem").unbind();
-		$("#veg_not_selected").children(".vegitem").click(function(){
-			$("#veg_selected").append("<div class='vegitem'>" + $(this).html() + "</div>");
-			$(this).remove();
-			set_veg_item_event();
+	<script src="js/DataLoadM.js"></script>
+	<script src="js/DataProcessM.js"></script>
+	<script src="js/VagListM.js"></script>
+
+	<script>
+
+		var list;
+
+		$(document).ready(function(){
+
+			DataLoadM.loadRawText("csv/merge.csv", function(a){
+				DataProcessM.processData(a, function(){}, function(){
+
+					list = new VagListM(d3.select("#vaglist"), DataProcessM.priceList);
+					list.show("avg");
+					//list.removeItem("FC");
+					//list.sortByOptionAndAnimate(true, "avg");
+				});
+			});
+
+			$(".menuitem").click(function(){
+				$(".slider").css("left", "-" + $(this).data("index") + "00%");
+			});
+
+			menuheight = parseInt($(".menu").css("height"));
+			$("img").css("width", menuheight*0.6);
+			$("img").css("height", menuheight*0.6);
+
 		});
 
-		$("#veg_selected").children(".vegitem").unbind();
-		$("#veg_selected").children(".vegitem").click(function(){
-			$("#veg_not_selected").append("<div class='vegitem'>" + $(this).html() + "</div>");
-			$(this).remove();
-			set_veg_item_event()
-		});
-	}
+	</script>
 
-	$(document).ready(function(){
+	<style>
 
-		for(var veg in veg_list){
-			$("#veg_not_selected").html($("#veg_not_selected").html() + "<div class='vegitem'>" + veg_list[veg] + "</div>");
+		body {
+			/*border-style: solid;*/
+			margin: 0px;
+			padding: 0px;
 		}
 
-		$(".menuitem").click(function(){
-			$(".slider").css("left", "-" + $(this).data("index") + "00%");
-		});
+		::-webkit-scrollbar {
+    		display: none;
+		}
 
-		set_veg_item_event();
-		
-	});
+		.outerborder {
+			overflow: hidden;
+			width: 100%;
+			height: 100%;
+		}
 
-</script>
+		.title {
+			height: 10%;
+		}
 
-<style>
+		.menu {
+			height: 10%;
+			white-space: nowrap;
+		}
 
-	body {
-		border-style: solid;
-	}
+		.menuitem {
+			display: inline-block;
+			width: 49%;
+			height: 100%;
+		}
 
-	.outerborder {
-		overflow: hidden;
-		width: 100%;
-		height: 100%;
-	}
+		.slider {
+			height: 80%;
+			white-space: nowrap;
+			position: relative;
+			/* overflow-x: hidden; */
 
-	.title {
-		height: 10%;
-	}
+			left: 0%;
+			transition: left 0.6s;
+			transition-timing-function: ease-out;
+		}
 
-	.menu {
-		height: 10%;
-		white-space: nowrap;
-	}
+		.panel {
+			overflow-y: scroll;
 
-	.menuitem {
-		border-style: solid;
+			display: inline-block;
+			width: 100%;
+			height: 100%;
+		}
 
-		display: inline-block;
-		width: 30%;
-		height: 100%;
-	}
+		img {
+			display: block;
+			margin: auto;
+			margin-top: 5%;
+			/*margin-right: auto;*/
+		}
 
-	.slider {
-		height: 80%;
-		white-space: nowrap;
-		position: relative;
-		/* overflow-x: hidden; */
+		#vaglist {
+			width: 100%;
+		}
 
-		left: -100%;
-		transition: left 0.6s;
-		transition-timing-function: ease-out;
-	}
+		div > * {
+	    	vertical-align:middle;
+		}
 
-	.panel {
-		border-style: solid;
-
-		display: inline-block;
-		width: 100%;
-		height: 100%;
-	}
-
-	#veg_not_selected, #veg_selected {
-		border-style: solid;
-		height: 45%;
-		white-space: normal;
-	}
-
-	.vegitem {
-		display: inline-block;
-		border-style: solid;
-	}
-
-	div > * {
-    	vertical-align:middle;
-	}
-
-</style>
+	</style>
 
 </head>
 
@@ -114,20 +118,22 @@
 	</div>
 
 	<div class="menu">
-	<div class="menuitem" data-index="0">vegitable</div>
-	<div class="menuitem" data-index="1">price</div>
-	<div class="menuitem" data-index="2">chart</div>
+		<div class="menuitem" data-index="0">
+			<img src="img/price.png"/>
+		</div>
+		<div class="menuitem" data-index="1">
+			<img src="img/settings.png"/>
+		</div>
 	</div>
 
 	<div class="slider">
-	<div class="panel">
-		<div id="veg_selected"></div>
-		<hr>
-		<div id="veg_not_selected"></div>
-	</div>
-	<div class="panel"></div>
-	<div class="panel"></div>
-	</div>
+
+		<div class="panel">
+			<svg id="vaglist"></svg>
+		</div>
+
+		<div class="panel"></div>
+		</div>
 
 	</div>
 

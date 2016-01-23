@@ -19,7 +19,9 @@
 			DataProcessM.processData(a, function(){}, function(){
 
 				list = new VagListM(d3.select("#vaglist"), DataProcessM.priceList);
-				list.sortByYesterday(true);
+				list.show("avg");
+				//list.removeItem("FC");
+				//list.sortByOptionAndAnimate(true, "avg");
 				
 
 			});
@@ -40,7 +42,7 @@
 
 		#vaglist {
 			width: 100%;
-			height: 200%;
+			height: 0%;
 		}
 
 		div > * {
@@ -55,14 +57,13 @@
 
 	<div class="outerborder">
 
-		<div onclick="list.sortByToday(true);">123<div>
+		<div onclick="list.removeItem('FC');">123</div>
 
 		<div class="title">
 		</div>
 
 		<div>
-			<svg id="vaglist">
-			</svg>
+			<svg id="vaglist"></svg>
 		</div>
 
 	</div>

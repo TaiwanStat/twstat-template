@@ -12,27 +12,33 @@ VagListM = function(d3svg, items){
 	this.svgObj = d3svg;
 	this.svgWidth = parseInt(d3svg.style("width"));
 
+	this.secondBarOption = "";
+	this.sortOptionBool = true;
+	this.sortOption = "";
 	this.itemMargin = 5;
-	this.itemBeginX = 0;
+	this.itemBeginX = 10;
 	this.itemBeginY = 0;
-	this.itemWidth = this.svgWidth - this.itemMargin*2;
+	this.itemWidth = this.svgWidth - this.itemBeginX*2;
 	this.itemHeight = this.itemWidth / 6;
-	this.itemBarsRatio = 0.8;
+	if(this.itemHeight > 80) this.itemHeight=80;
+	this.itemBarsRatio = 0.77;
 	this.itemPadding = 1;
 	this.itemPadding2 = (this.itemWidth - this.itemPadding * 2) * this.itemBarsRatio;
 
 	this.svgHeight = (this.itemHeight + this.itemMargin) * items.length;
 	d3svg.style("height", "" + this.svgHeight + "px");
 
+	this.itemData = items;
 	this.itemList = items.map(function(a){
+		round = function(a){ return Math.round(a*10) / 10; };
 		return {
 			id: a.id,
 			name: a.name,
 
 			price: a.price[a.price.length-1],
 			yesterday: a.price[a.price.length-1] - a.price[a.price.length-2],
-			smallavg: a.price[a.price.length-1] - a.smallavg,
-			avg: a.price[a.price.length-1] - a.avg,
+			smallavg: round(a.price[a.price.length-1] - a.smallavg),
+			avg: round(a.price[a.price.length-1] - a.avg),
 
 			d3group: d3svg.append("g")
 		};
@@ -43,11 +49,22 @@ VagListM = function(d3svg, items){
 		Public Method
 	*/
 
-	// Constructor
+	this.show = function(secondBarOption){
 
-	for(var i = 0; i < this.itemList.length; i++){
+		this.secondBarOption = secondBarOption;
+		this.svgObj.selectAll("g > *").remove();
+
+		for(var i = 0; i < this.itemList.length; i++){
+			this.drawItem(i);
+		}
+
+		this.arrange();
+	};
+
+	this.drawItem = function(i){
 
 		var d = this.itemList[i].d3group;
+		d.attr("id", this.itemList[i].id);
 
 		d.append("rect")
 			.attr("x",this.itemBeginX)
@@ -66,22 +83,22 @@ VagListM = function(d3svg, items){
 			.attr("height",this.itemHeight - this.itemPadding*2)
 			.style("fill","#99ff99");
 
-		var ypercentage = this.itemList[i].yesterday / 20;
-		ypercentage = ypercentage > 1 ? 1 : ypercentage;
-		var ybarLength = ypercentage * (this.itemWidth - this.itemPadding * 2) * (1-this.itemBarsRatio);
-		if(ybarLength > 0){
+		var increase = this.itemList[i][this.secondBarOption] / 30;
+		increase = increase > 1 ? 1 : increase;
+		var increaseBarLength = increase * (this.itemWidth - this.itemPadding * 2) * (1-this.itemBarsRatio);
+		if(increaseBarLength > 0){
 			d.append("rect")
 				.attr("class", "secondbar")
 				.attr("x",this.itemBeginX + this.itemPadding + this.itemPadding2)
 				.attr("y",this.itemBeginY + this.itemPadding)
-				.attr("width",ybarLength)
+				.attr("width",increaseBarLength)
 				.attr("height",this.itemHeight - this.itemPadding*2)
 				.style("fill","#ff6666");
 		} else {
 			d.append("rect")
 				.attr("x",this.itemBeginX + this.itemPadding + this.itemPadding2)
 				.attr("y",this.itemBeginY + this.itemPadding)
-				.attr("width",-ybarLength)
+				.attr("width",-increaseBarLength)
 				.attr("height",this.itemHeight - this.itemPadding*2)
 				.style("fill","#99ccff");
 		}
@@ -90,23 +107,27 @@ VagListM = function(d3svg, items){
 			.attr("x",this.itemBeginX + 5)
 			.attr("y",this.itemHeight*0.6)
 			.text(this.itemList[i].name + ": " + this.itemList[i].price + " NTD")
-			.style("fill","#333333");
+			.style("fill","#333333")
+			.style("font-size", this.itemHeight*0.5);
 
+		var increaseText = this.itemList[i][this.secondBarOption];
+		if(increaseText >=0) increaseText = "+" + increaseText;
 		d.append("text")
 			.attr("class", "secondtext")
 			.attr("x",this.itemPadding2 + 5)
 			.attr("y",this.itemHeight*0.6)
-			.text(this.itemList[i].yesterday >= 0 ? "+" + this.itemList[i].yesterday : this.itemList[i].yesterday)
-			.style("fill","#333333");
+			.text(increaseText)
+			.style("fill","#333333")
+			.style("font-size", this.itemHeight*0.5);
+	};
 
-	}
-
-	//////
-
-	this.sortByToday = function(reverse){
+	this.sortByOptionAndAnimate = function(reverse, sortOption){
 		
+		this.sortOption = sortOption;
+		this.sortOptionBool = reverse;
+
 		this.itemList.sort(function(a, b){
-			return a.price - b.price;
+			return a[sortOption] - b[sortOption];
 		});
 		
 		if(reverse){
@@ -116,42 +137,48 @@ VagListM = function(d3svg, items){
 		this.arrange();
 	};
 
-	this.sortByYesterday = function(reverse){
+	this.sort = function(reverse, sortOption){
 		
+		this.sortOption = sortOption;
+		this.sortOptionBool = reverse;
+
 		this.itemList.sort(function(a, b){
-			return a.yesterday - b.yesterday;
+			return a[sortOption] - b[sortOption];
 		});
 		
 		if(reverse){
 			this.itemList.reverse();
 		}
 
+	};
+
+	this.removeItem = function(id){
+		for(var i = 0; i < this.itemList.length; i++){
+			if(this.itemList[i].id == id){
+				this.itemList.splice(i, 1);
+				break;
+			}
+		}
+		this.svgObj.selectAll("#" + id).remove();
 		this.arrange();
 	};
 
-	this.sortBySmallAvg = function(reverse){
+	this.addItem = function(index){
+		round = function(a){ return Math.round(a*10) / 10; };
+		var a = this.itemData[index];
+		var obj = {
+			id: a.id,
+			name: a.name,
 
-		this.itemList.sort(function(a, b){
-			return a.smallavg - b.smallavg;
-		});
-		
-		if(reverse){
-			this.itemList.reverse();
+			price: a.price[a.price.length-1],
+			yesterday: a.price[a.price.length-1] - a.price[a.price.length-2],
+			smallavg: round(a.price[a.price.length-1] - a.smallavg),
+			avg: round(a.price[a.price.length-1] - a.avg),
+
+			d3group: d3svg.append("g")
 		}
-
-		this.arrange();
-	};
-
-	this.sortByAvg = function(reverse){
-
-		this.itemList.sort(function(a, b){
-			return a.avg - b.avg;
-		});
-		
-		if(reverse){
-			this.itemList.reverse();
-		}
-
+		this.itemList.push(obj);
+		this.drawItem(this.itemList[this.itemList.length-1])
 		this.arrange();
 	};
 
