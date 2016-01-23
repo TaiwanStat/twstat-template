@@ -35,6 +35,7 @@ function checkboxCtrl(checkboxes) {
 		onChecked: function() {
 			console.log("1 c");
 			deleteMarkers(busMarkers);
+			deleteMarkers(parkMarkers);
 			markYoubike();
 		},
 		onUnchecked: function() {
@@ -52,6 +53,7 @@ function checkboxCtrl(checkboxes) {
 			console.log("2 c");
 			deleteMarkers(youbikeMarkers);
 			deleteMarkers(busMarkers);
+			deleteMarkers(parkMarkers);
 		},
 		onUnchecked: function() {
 			console.log("2 u");
@@ -66,6 +68,7 @@ function checkboxCtrl(checkboxes) {
 		onChecked: function() {
 			console.log("3 c");
 			deleteMarkers(youbikeMarkers);
+			deleteMarkers(parkMarkers);
 			if (busMarkersLoaded) {
 				busMarkAll();
 			}
@@ -89,10 +92,17 @@ function checkboxCtrl(checkboxes) {
 			console.log("4 c");
 			deleteMarkers(youbikeMarkers);
 			deleteMarkers(busMarkers);
+			if (parkMarkersLoaded) {
+				markParking();
+			}
+			else {
+				parkingAVAILABLE();
+			}
 		},
 		onUnchecked: function() {
 			console.log("4 u");
 			if (markerOn) {
+				deleteMarkers(parkMarkers);
 				markerOn = false;
 			}
 		}
