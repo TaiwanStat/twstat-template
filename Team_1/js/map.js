@@ -54,6 +54,7 @@ function checkboxCtrl(checkboxes) {
 			deleteMarkers(youbikeMarkers);
 			deleteMarkers(busMarkers);
 			deleteMarkers(parkMarkers);
+			markMrt();
 		},
 		onUnchecked: function() {
 			console.log("2 u");
@@ -75,7 +76,7 @@ function checkboxCtrl(checkboxes) {
 			else {
 				loadStop();
 			}
-			
+
 		},
 		onUnchecked: function() {
 			console.log("3 u");
