@@ -186,6 +186,15 @@ VagListM = function(d3svg, items){
 		this.sortByDefaultAndAnimate();
 	};
 
+	this.idInList = function(id){
+		for(var i = 0; i < this.itemList.length; i++){
+			if(this.itemList[i].id == id){
+				return true;
+			}
+		}
+		return false;
+	};
+
 	/**
 		Private Method
 	*/

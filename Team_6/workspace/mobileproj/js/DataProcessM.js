@@ -79,6 +79,16 @@ var DataProcessM = {
 			//console.log(DataProcessM.priceList);
 			CALLBACK_FINISH();
 
+		},
+
+	getIndexFromId:
+
+		function(id){
+			for(var i = 0; i < DataProcessM.vagNum; i++){
+				if(DataProcessM.priceList[i].id == id){
+					return i;
+				}
+			}
 		}
 
 }
