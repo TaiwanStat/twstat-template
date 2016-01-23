@@ -64,7 +64,7 @@ var DataProcessM = {
 			}
 			CALLBACK(75);
 
-			for(var i = 0; i < DataProcessM.priceList.length; i++){
+			for(var i = 0; i < DataProcessM.vagNum; i++){
 				for(var j = 0; j < DataProcessM.smallDayPeriod; j++){
 					DataProcessM.priceList[i].avg += DataProcessM.priceList[i].price[j];
 				}

@@ -71,7 +71,7 @@ VagListM = function(d3svg, items){
 			.attr("y",this.itemBeginY)
 			.attr("width",this.itemWidth)
 			.attr("height",this.itemHeight)
-			.style("fill","#f2f2f2");
+			.style("fill","#e4e4e4");
 
 		var ppercentage = this.itemList[i].price / 200;
 		ppercentage = ppercentage > 1 ? 1 : ppercentage;
@@ -114,7 +114,7 @@ VagListM = function(d3svg, items){
 		if(increaseText >=0) increaseText = "+" + increaseText;
 		d.append("text")
 			.attr("class", "secondtext")
-			.attr("x",this.itemPadding2 + 5)
+			.attr("x",this.itemBeginX + this.itemPadding + this.itemPadding2 + 2)
 			.attr("y",this.itemHeight*0.6)
 			.text(increaseText)
 			.style("fill","#333333")
@@ -135,6 +135,10 @@ VagListM = function(d3svg, items){
 		}
 
 		this.arrange();
+	};
+
+	this.sortByDefaultAndAnimate = function(){
+		this.sortByOptionAndAnimate(this.sortOptionBool, this.sortOption);
 	};
 
 	this.sort = function(reverse, sortOption){
@@ -178,8 +182,8 @@ VagListM = function(d3svg, items){
 			d3group: d3svg.append("g")
 		}
 		this.itemList.push(obj);
-		this.drawItem(this.itemList[this.itemList.length-1])
-		this.arrange();
+		this.drawItem(this.itemList.length-1);
+		this.sortByDefaultAndAnimate();
 	};
 
 	/**

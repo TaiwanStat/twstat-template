@@ -15,27 +15,98 @@
 
 		var list;
 
+		var isInSettingMode = false;
+		var increaseTag = "yesterday";
+
 		$(document).ready(function(){
 
 			DataLoadM.loadRawText("csv/merge.csv", function(a){
 				DataProcessM.processData(a, function(){}, function(){
 
 					list = new VagListM(d3.select("#vaglist"), DataProcessM.priceList);
-					list.show("avg");
-					//list.removeItem("FC");
-					//list.sortByOptionAndAnimate(true, "avg");
+					list.show(increaseTag);
+					list.sortByOptionAndAnimate(true, "price");
+
+					for(var i = 0; i < DataProcessM.vagNum; i++){
+						var name = DataProcessM.vagNameMap[DataProcessM.vagIdList[i]];
+						var id = DataProcessM.vagIdList[i];
+						$("#chooseVagetable").append("<div class='cvItem cvItemVag' data-vagid='" + id + "'>" + name + "</div>");
+					}
+
+					$(".cvItemVag").click(function(){
+						var find = false;
+						for(var i = 0; i < list.itemList.length; i++){
+							if(list.itemList[i].id == $(this).data("vagid")){
+								find = true;
+							}
+						}
+						if(find){
+							$(this).css("color", "#bbbbbb");
+							list.removeItem($(this).data("vagid"));
+						} else {
+							$(this).css("color", "#000000");
+							for(var i = 0; i < DataProcessM.vagNum; i++){
+								if(DataProcessM.priceList[i].id == $(this).data("vagid")){
+									list.addItem(i);
+								}
+							}
+						}
+					});
+
 				});
 			});
 
 			$(".menuitem").click(function(){
-				$(".slider").css("left", "-" + $(this).data("index") + "00%");
-			});
+				if($(this).data("index") == "0"){
 
+					if(list.sortOption == "price"){
+						$(this).html("改為以價格排序");
+						list.sortByOptionAndAnimate(list.sortOptionBool, increaseTag);
+					}else{
+						$(this).html("改為以漲幅排序");
+						list.sortByOptionAndAnimate(list.sortOptionBool, "price");
+					}
+
+				} else if($(this).data("index") == "1"){
+
+					list.sortOptionBool = !list.sortOptionBool;
+					list.sortByDefaultAndAnimate();
+
+				} else if($(this).data("index") == "2"){
+
+					if(isInSettingMode == true){
+						$(".slider").css("left", "0%");
+						isInSettingMode = false;
+					} else {
+						$(".slider").css("left", "-100%");
+						isInSettingMode = true;
+					}
+					
+				}
+			});
+			
 			menuheight = parseInt($(".menu").css("height"));
 			$("img").css("width", menuheight*0.6);
 			$("img").css("height", menuheight*0.6);
+			$(".settingmenu").children("img").css("margin-top", "2%");
+			$(".settingmenu").css("height", menuheight);
 
 		});
+
+	function vagDeselectAll(){
+		$(".cvItemVag").css("color", "#bbbbbb");
+		for(var i = 0; i < DataProcessM.vagNum; i++){
+			list.removeItem(DataProcessM.vagIdList[i]);
+		}
+	}
+
+	function vagSelectAll(){
+		vagDeselectAll();
+		$(".cvItemVag").css("color", "#000000");
+		for(var i = 0; i < DataProcessM.vagNum; i++){
+			list.addItem(i);
+		}
+	}
 
 	</script>
 
@@ -66,14 +137,18 @@
 			white-space: nowrap;
 		}
 
-		.menuitem {
+		.mainmenu {
 			display: inline-block;
-			width: 49%;
 			height: 100%;
 		}
 
+		.settingmenu {
+			display: inline-block;
+			width: 100%;
+		}
+
 		.slider {
-			height: 80%;
+			height: 90%;
 			white-space: nowrap;
 			position: relative;
 			/* overflow-x: hidden; */
@@ -114,25 +189,50 @@
 
 	<div class="outerborder">
 
-	<div class="title">
-	</div>
-
-	<div class="menu">
-		<div class="menuitem" data-index="0">
-			<img src="img/price.png"/>
-		</div>
-		<div class="menuitem" data-index="1">
-			<img src="img/settings.png"/>
-		</div>
-	</div>
-
-	<div class="slider">
-
-		<div class="panel">
-			<svg id="vaglist"></svg>
+		<div class="title">
 		</div>
 
-		<div class="panel"></div>
+		<div class="slider">
+
+			<div class="panel">
+
+				<div class="menu">
+					<div class="menuitem mainmenu" data-index="0" style="width: 40%">
+						改為以漲幅排序
+					</div>
+					<div class="menuitem mainmenu" data-index="1" style="width: 40%">
+						降序升序
+					</div>
+					<div class="menuitem mainmenu" data-index="2" style="width: 20%">
+						<img src="img/settings.png"/>
+					</div>
+				</div>
+
+				<svg id="vaglist"></svg>
+
+			</div>
+
+			<div class="panel">
+				
+				<div class="menuitem settingmenu" data-index="2">
+					<img src="img/back.png"/>
+				</div>
+
+				<div id="setIntreaseTag">
+					<div> 與什麼比較漲跌幅？ </div>
+					<div class="sitItem">昨日價格</div>
+					<div class="sitItem">近十日價格平均</div>
+					<div class="sitItem">近三十日價格平均</div>
+				</div>
+
+				<div id="chooseVagetable">
+					<div> 選擇蔬菜 </div>
+					<div class="cvItem" onclick="vagSelectAll();"> 選擇全部 </div>
+					<div class="cvItem" onclick="vagDeselectAll();"> 清除全部 </div>
+				</div>
+
+			</div>
+				
 		</div>
 
 	</div>
