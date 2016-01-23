@@ -34,6 +34,7 @@
 			});
 
 			$(".menuitem").click(MobilePage.menuItemEvent);
+			$(".sitItem").click(MobilePage.sitItemEvent);
 			
 			menuheight = parseInt($(".menu").css("height"));
 			$("img").css("width", menuheight*0.6);
@@ -157,9 +158,9 @@
 
 				<div id="setIntreaseTag">
 					<div> 與什麼比較漲跌幅？ </div>
-					<div class="sitItem">昨日價格</div>
-					<div class="sitItem">近十日價格平均</div>
-					<div class="sitItem">近三十日價格平均</div>
+					<div class="sitItem" data-mode="yesterday">昨日價格</div>
+					<div class="sitItem" data-mode="smallavg">近十日價格平均</div>
+					<div class="sitItem" data-mode="avg">近三十日價格平均</div>
 				</div>
 
 				<div id="chooseVagetable">

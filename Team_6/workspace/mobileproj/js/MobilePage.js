@@ -45,6 +45,18 @@ MobilePage = {
 			}
 		},
 
+	sitItemEvent:
+
+		function(){
+			increaseTag = $(this).data("mode");
+			list.show(increaseTag);
+			if(list.sortOption == "price"){
+				list.sortByDefaultAndAnimate();
+			}else{
+				list.sortByOptionAndAnimate(list.sortOptionBool, increaseTag);
+			}
+		},
+
 	vagDeselectAllEvent:
 
 		function(){
