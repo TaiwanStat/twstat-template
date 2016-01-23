@@ -6,10 +6,6 @@ header('Access-Control-Allow-Methods: GET');
 $type=$_GET["type"];
 $data=$_GET["data"];
 $url="http://data.taipei/".$type."/".$data;
-if($data=="Stop" && $type=="bus" ){
-    //Bus Stop Cache
-    $url="GetSTOP.json";
-}
 
 //for Taipei Metro data
 if($type=="mrt"){
