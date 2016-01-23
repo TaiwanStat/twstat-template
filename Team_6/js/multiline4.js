@@ -36,7 +36,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
 
     var line = d3.svg.line()
         //.interpolate("cardinal")
-        .x(function(d) { return x(d.Date); })
+        .x(function(d) { return x(d.date); })
         .y(function(d) { return y(d.price); });
 
     // basic form
@@ -60,83 +60,38 @@ function drawMultilineChart(domobj, domobjsel, _width){
     //end--line chart feature setting
 
 
-    // connect to firebase db
-    var firebaseRef = new Firebase("https://ikdde-team6.firebaseio.com/all_data/");
-
     // store data from firebase and drawing charts
 	//   Read only once
-    firebaseRef.once("value", function(snapshot) {
+    d3.json("./data/alldata.json", function(error, _data) {
 
-        var vgsnap = snapshot.child("vegetable_data");
+        var dateArray = [];
 
-        var tysnap = snapshot.child("typhoon_data");
+        var data = _data.vgdata;
 
-		var rainsnap = snapshot.child("rainfall");
-
-        var data = [];
-
-        var tydata = [];
+        var tydata = _data.tydata;
 
 		var raindata = [];
 
 		var timeDomain = getTimeDomain();
 
-        // get all vegetable name
-        var name = d3.keys(vgsnap.val()).filter(function(name) { return name != 'default'});
-
-        //console.log(name);
-
-        vgsnap.forEach( function(child) {
-            child.forEach( function(grandChild) {
-                data.push( {
-                    cate: child.key(),
-                    name: grandChild.key(),
-                    value: grandChild.val(),
-                    opacity: +0
-                });
-            });
-        });
-
-		console.log(data);
-
-        tysnap.forEach( function(child) {
-            var ty = child.val();
-            tydata.push( {
-                name: ty.typhoon_name,
-                rank: +ty.rank,
-                start_date: new Date(+ty.start_year, +ty.start_month-1, +ty.start_day),
-                end_date: new Date(+ty.end_year, +ty.end_month-1, +ty.end_day)
-            });
-        });
-
-		rainsnap.forEach( function(child) {
-			var tmpt = [];
-			child.forEach( function(grandChild) {
-				var r = grandChild.val();
-				tmpt.push({
-					date: new Date(r.year, r.month, r.day),
-					rainfall: r.rainfall
-				});
-			});
-			raindata.push({
-				name: child.key(),
-				opacity: +0,
-				value: tmpt
-			});
-		});
-
+        console.log(data);
+        
         // reconstruct(rebuild) date
         data.forEach( function(v) {
-            v.value = d3.values(v.value);
             v.value.forEach( function(e) {
-                e.Date = new Date(e.date.year,e.date.month-1,e.date.day);
+                e.date = dateParse(e.date);
+				e.price = +e.price;
             });
-            //v.value = v.value.filter( function(e) { return e.Date > new Date(2015,0,0); });
         });
 
-		$('#wait').remove();
+        tydata.forEach( function(v) {
+                v.name = v.name,
+                v.rank = +v.rank,
+                v.start_date = dateParse(v.start_date),
+                v.end_date = dateParse(v.end_date)
+        });
 
-        //tydata = tydata.filter(function(ty) { return ty.start_date > new Date(2015,0,0); });
+        console.log(data);
 
         // set color domain by vegetable name
         //     vegetable name --mapping--> specific color
@@ -156,15 +111,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
         // set y domain by range from min of date to max of date
         //     y invoked in yAxis
         y.domain([0,y_max]);
-
-		y3.domain([	0,
-					d3.max(raindata,
-							function(r) {
-								return d3.max(r.value, function(e) { return e.rainfall; });
-							}
-					)+10
-		]);
-
+		
         // append x axis by feature xAxis
         var gxAxis = multi.append("g")
                 .attr("class","x axis")
@@ -205,22 +152,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
             .attr("d", function(v) { return line(v.value); })
             .style("stroke", function(v) { return color(v.name); });
 
-        // append label for each line
-		/*
-        vg.append("text")
-            .datum(function(d) { return {name: d.name, value: d.value[d.value.length - 1]}; })
-            .attr("class","vglabel")
-            .attr("id", function(v) { return "tag_"+v.name; })
-            .attr("transform", function(d) { return "translate(" + x(d.value.Date) + "," + y(d.value.price) + ")"; })
-            .attr("x", 3)
-            .attr("dy", ".35em")
-            .text(function(d) { return d.name; })
-            .style("font-size","20px")
-            .style("font-weight","bold")
-            .style("stroke", "#000")
-            .style("fill", function(v) { return color(v.name); });
-		*/
-        // typhoon
+
         var tybar = multi.selectAll("bar")
                 .data(tydata)
                 .enter()
@@ -237,32 +169,6 @@ function drawMultilineChart(domobj, domobjsel, _width){
                                     20;
                         return rankScale( _rank); })
                 .style("opacity", 0.5);
-		
-		var rainfall = multi.selectAll("rainfall")
-			.data(raindata)
-			.enter()
-		.append("g")
-			.attr("class","rainfall")
-			.attr("id", function(r) { return 'tag_'+r.name; })
-			.attr("clip-path", "url(#clip)")
-			.style("display", function(r) {
-				return (r.opacity===1)?null:'none';
-			});
-	
-		var rain_width = x(getToday()) - x(getYesterday());
-		var eachRainBar = rainfall.selectAll("rainbar")
-			.data(function(r) { return r.value; })
-			.enter()
-		.append("rect")
-			.attr("class","rainbar")
-			.attr("clip-path", "url(#clip)")
-			.attr("x", function(r) { return x(r.date) - rain_width/2; })
-			.attr("width", rain_width )
-			.attr("y", function(r) { return y3(r.rainfall); })
-			.attr("height", function(r) { return height - y3(r.rainfall); })
-			.style("fill",'blue')
-			.style("opacity", .2);
-
 
 		// x dash line
         focus.selectAll("x")
@@ -323,30 +229,20 @@ function drawMultilineChart(domobj, domobjsel, _width){
 		.append("text")
 			.style("color", function(v) { return color(v.name); });
 
-		tooltip
-			.selectAll("typhoon")
-				.data(tydata)
-				.enter()
-			.append("div")
-				.attr("class","typhoon")
-				.attr("id", function(v) { return "tag_"+v.name; })
-				.style("display","none")
-			.append("text")
-				.style("color", "black" )
-				.text(function(v){ return v.name+":"+v.rank+" rk"; });
 
-		var rain_tip = tooltip
-			.selectAll("raintip")
-				.data(raindata)
-				.enter()
-			.append("div")
-				.attr("class","raintip")
-				.attr("id", function(r) { return "tag_"+r.name; })
-				.style("display","none");
+        tooltip
+            .selectAll("typhoon")
+                .data(tydata)
+                .enter()
+            .append("div")
+                .attr("class","typhoon")
+                .attr("id", function(v) { return "tag_"+v.name; })
+                .style("display","none")
+            .append("text")
+                .style("color", "black" )
+                .text(function(v){ return v.name+":"+v.rank+" rk"; });
 
-		rain_tip
-			.append("text")
-				.style("color","blue");
+
 
 		// active plane
         multi.append("rect")
@@ -387,28 +283,6 @@ function drawMultilineChart(domobj, domobjsel, _width){
                     this.checked ^ true;
                     click(v);
                 });
-
-		var RainFallInput = domobjsel
-			.append("div")
-			.selectAll(".vginput")
-			.data(raindata)
-			.enter()
-				.append("div")
-				.style("display", "inline-block")
-				.style("margin", 3);
-	
-		RainFallInput
-			.append("div")
-			.style("font-size",'15px')
-			.text( function(r) { return "" + r.name; })
-				.append("input")
-				.attr("type","checkbox")
-				.property("position", "absolute")
-				.property("left", 0)
-				.on("change", function(r) {
-					this.checked ^ true;
-					rain_click(r);
-				});
 
 		function getToday() {
 			var today = new Date();
@@ -471,7 +345,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
             return [tenday, yesterday];
         }
 
-        var bisectDate = d3.bisector(function(v) { return v.Date; }).left;
+        var bisectDate = d3.bisector(function(v) { return v.date; }).left;
 
         function mousemove () {
 
@@ -487,22 +361,22 @@ function drawMultilineChart(domobj, domobjsel, _width){
 
                     var d0 = v.value[i - 1];
                     var d1 = v.value[i];
-                    var d = x0 - d0.Date > d1.Date - x0 ? d1 : d0;
+                    var d = x0 - d0.date > d1.date - x0 ? d1 : d0;
 
                     max.push({
                         name: v.name,
                         price: d.price,
-                        Date: d.Date
+                        date: d.date
                     });
 
                     focus.select("#tag_" + v.name + ".x")
-                        .attr("transform", "translate("+x(d.Date)+","+y(0)+")");
+                        .attr("transform", "translate("+x(d.date)+","+y(0)+")");
 
                     focus.select("#tag_" + v.name + ".y")
                         .attr("transform", "translate("+0+","+y(d.price)+")");
 
                     focus.select("#tag_" + v.name + ".dot")
-                        .attr("transform", "translate("+x(d.Date)+","+y(d.price)+")");
+                        .attr("transform", "translate("+x(d.date)+","+y(d.price)+")");
 
 					tooltip
 						.select("div#tag_" + v.name + ".tip")
@@ -510,61 +384,38 @@ function drawMultilineChart(domobj, domobjsel, _width){
 						.text(v.name+":"+d.price+" $/kg");
                 }
             });
+
+            var change_white = true;
+            tydata.forEach( function(ty) {
+                var ds1 = x(ty.start_date);
+                var ds2 = x(ty.end_date);
+
+                if (ds1<=_x && _x<=ds2) {
+                    var _rank = ty.rank <= 15 ? 0  :
+                                ty.rank <= 25 ? 10 :
+                                20;
+                    _color = rankScale(_rank);
+
+                    tooltip
+                        .style("background", _color)
+                    .select("#tag_"+ty.name+".typhoon")
+                        .style("display", null);
+
+                    change_white = false;
+                } else {
+                    tooltip.select("#tag_"+ty.name+".typhoon")
+                        .style("display", "none");
+                }
+            });
+
+            if (change_white) {
+            tooltip
+                .style("background", "white");
+            }
         
-			var change_white = true;
-			tydata.forEach( function(ty) {
-				var ds1 = x(ty.start_date);
-				var ds2 = x(ty.end_date);
-
-				if (ds1<=_x && _x<=ds2) {
-					var _rank =	ty.rank <= 15 ? 0  :
-								ty.rank <= 25 ? 10 :
-								20;
-					_color = rankScale(_rank);
-
-					tooltip
-						.style("background", _color)
-					.select("#tag_"+ty.name+".typhoon")
-						.style("display", null);
-
-					change_white = false;
-				} else {
-					tooltip.select("#tag_"+ty.name+".typhoon")
-						.style("display", "none");
-				}
-			});
-
-			if (change_white) {
-			tooltip
-				.style("background", "white");
-			}
-
-            var _max = max.length!==0?d3.max(max, function(v) { return v.price; }):0;
-
-			var y_pad = max.length * 20;
-		
             tooltip
                 .style("left",d3.event.pageX+"px")
                 .style("top",d3.event.pageY+"px");
-
-			var _r = raindata[0];
-			var _bisectDate = d3.bisector(function(v) { return v.date; }).left;
-			var i = _bisectDate(_r.value, x0, 1);
-
-			if (i >= _r.value.length)
-				i = _r.value.length - 1;
-
-			var _d0 = _r.value[i - 1];
-			var	_d1 = _r.value[i];
-			var	_i = x0 - _d0.date > _d1.date - x0 ? i : i-1;
-		
-			rain_tip
-				.style("display", function(r) { return r.opacity===1?null:'none'; });
-
-			rain_tip.select("text")
-				.style("color","blue")
-				.text(function(r) { return r.name+":"+r.value[_i].rainfall+" mm"; });
-
         }
 
 
@@ -601,7 +452,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
                 d3.select(".vglabel#tag_"+v.name)
                     .transition()
                     .duration(duration_time)
-                    .attr("transform", function(v) { return "translate(" + x(v.value.Date) + "," + y(v.value.price) + ")"; });
+                    .attr("transform", function(v) { return "translate(" + x(v.value.date) + "," + y(v.value.price) + ")"; });
                 */
 
                 d3.select(".x#tag_"+v.name)
@@ -618,34 +469,6 @@ function drawMultilineChart(domobj, domobjsel, _width){
 
             });
         }
-
-		function rain_click(r) {
-			var duration_time = 800;
-			r.opacity ^= 1;
-
-			var y_max = d3.max(
-				raindata.filter( function(e) { return e.opacity===1; }),
-				function(e) {return d3.max(e.value, function(d) { return d.rainfall; }); }
-			);
-
-			y_max = isNaN(y_max)?+50:y_max+20;
-			y3.domain([0,y_max]);
-
-			rainfall
-				.style("display", function(r) {
-					return (r.opacity===1)?null:'none';
-				});
-			
-			var __rain_width = x(getToday()) - x(getYesterday());
-
-			eachRainBar
-				.transition()
-				.duration(duration_time)
-				.attr("x", function(r) { return x(r.date) - __rain_width/2; })
-				.attr("width", __rain_width )
-				.attr("y", function(r) { return y3(r.rainfall); })
-				.attr("height", function(r) { return height - y3(r.rainfall); });
-		}
 
     ///// brush
 
@@ -692,7 +515,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
 
     var area2 = d3.svg.area()
         .interpolate("monotone")
-        .x(function(d) { return x2(d.Date); })
+        .x(function(d) { return x2(d.date); })
         .y0(height2)
         .y1(function(d) { return y2(d.price); });
 

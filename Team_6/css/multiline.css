@@ -1,3 +1,6 @@
+svg {
+  font: 10px sans-serif;
+}
 
 .axis path,
 .axis line {
@@ -43,7 +46,7 @@ div.tip{
 }
 
 .typhoon{
-	font: 12px sans-serif;
+	font: 15px sans-serif;
 }
 
 .raintip{
@@ -51,7 +54,6 @@ div.tip{
 }
 
 .area {
-  fill: steelblue;
   clip-path: url(#clip);
 }
 
