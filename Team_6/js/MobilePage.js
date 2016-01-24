@@ -8,7 +8,7 @@ MobilePage = {
 			for(var i = 0; i < DataProcessM.vagNum; i++){
 				var name = DataProcessM.vagNameMap[DataProcessM.vagIdList[i]];
 				var id = DataProcessM.vagIdList[i];
-				$("#chooseVagetable").append("<div class='cvItem cvItemVag' data-vagid='" + id + "'>" + name + "</div>");
+				$("#chooseVagetable").append("<div class='stItem cvItem cvItemVag' data-vagid='" + id + "'>" + name + "</div>");
 			}
 			$(".cvItemVag").click(MobilePage.cvItemVagEvent);
 		},
@@ -35,10 +35,10 @@ MobilePage = {
 			} else if($(this).data("index") == "2"){
 
 				if(isInSettingMode == true){
-					$(".slider").css("left", "0%");
+					$(".sliderM").css("left", "0%");
 					isInSettingMode = false;
 				} else {
-					$(".slider").css("left", "-100%");
+					$(".sliderM").css("left", "-100%");
 					isInSettingMode = true;
 				}
 
@@ -62,6 +62,7 @@ MobilePage = {
 		function(){
 
 			$(".cvItemVag").css("color", "#bbbbbb");
+			$(".cvItemVag").css("background-color", "#eeeeee");
 			for(var i = 0; i < DataProcessM.vagNum; i++){
 				list.removeItem(DataProcessM.vagIdList[i]);
 			}
@@ -72,6 +73,7 @@ MobilePage = {
 		function(){
 			MobilePage.vagDeselectAllEvent();
 			$(".cvItemVag").css("color", "#000000");
+			$(".cvItemVag").css("background-color", "#cccccc");
 			for(var i = 0; i < DataProcessM.vagNum; i++){
 				list.addItem(i);
 			}
@@ -82,9 +84,11 @@ MobilePage = {
 		function(){
 			if( list.idInList($(this).data("vagid")) ){
 				$(this).css("color", "#bbbbbb");
+				$(this).css("background-color", "#eeeeee");
 				list.removeItem($(this).data("vagid"));
 			} else {
 				$(this).css("color", "#000000");
+				$(this).css("background-color", "#cccccc");
 				list.addItem(DataProcessM.getIndexFromId($(this).data("vagid")));
 			}
 		}
