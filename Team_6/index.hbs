@@ -89,6 +89,7 @@
 			</div>
 
 		</div>
+	</div>
 
 
 	<div class="outerborder mobile-container" style='display:none;'>
@@ -142,17 +143,22 @@
     {{> footer}}
 
     <script>
-		
+		/* global variable */
+		var WIDTH_BOUNDARY = 700;
+
 		/* mobile variable*/
 		var list;
 		var isInSettingMode = false;
 		var increaseTag = "yesterday";
 
     	$(document).ready(function (){
+    		rerender();
+    	});//$(document).ready(function(){...});
 
+
+    	function rerender() {
 			var $window = $(window);
 			var width = $window.width();
-			var WIDTH_BOUNDARY = 500;
 
 			if ( width > WIDTH_BOUNDARY ) {
 				$('div.pc-container')
@@ -195,7 +201,7 @@
 				$(".stItem").css("padding-top", itemHeight/4);
 			}// if ( width > WIDTH_BOUNDARY) else ...
 
-    	});//$(document).ready(function(){...});
+		}
 
     </script>
 

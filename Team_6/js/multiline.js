@@ -555,12 +555,12 @@ function drawMultilineChart(domobj, domobjsel, _width){
             .on('click',function(){
                 if($(this).hasClass('active')) {
                     $(this).removeClass('active');
-                    $(this).text('不顯示');
+                    $(this).text('顯示');
                     tybar
                         .style('display','none');
                 } else {
                     $(this).addClass('active');
-                    $(this).text('顯示');
+                    $(this).text('不顯示');
                     tybar
                         .style('display',null);
                 }
