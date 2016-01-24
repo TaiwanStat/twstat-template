@@ -53,6 +53,11 @@ div.tip{
 	font: 12px sans-serif;
 }
 
+.vgInfo{
+	top: 20px;
+	left: 40px;
+}
+
 .area {
   clip-path: url(#clip);
 }

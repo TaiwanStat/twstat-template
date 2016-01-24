@@ -127,6 +127,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
                 e.date = dateParse(e.date);
                 e.price = +e.price;
             });
+            v.average = getAverage(v.value,timeDomain);
         });
 
         tydata.forEach( function(v) {
@@ -138,6 +139,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
 
 		$('#wait').remove();
 
+        console.log(vgdata);
 
         var y_max = d3.max(
                 vgdata.filter( function(v) { return v.opacity===1;}),
@@ -329,9 +331,11 @@ function drawMultilineChart(domobj, domobjsel, _width){
                     d3.select("g.focus > circle.dot#tag_" + v.name )
                         .attr("transform", "translate("+x(d.date)+","+y(d.price)+")");
 
-                    d3.select("div.tooltip > div#tag_" + v.name + ".tip")
-                        .select("text")
-                        .text(v.name+":"+d.price+" $/kg");
+                    d3.select("div.tooltip > div#tag_" + v.name + ".tip > text")
+                        .text(v.name+":"+d.price+" $NT/kg");
+
+                    d3.select("a.ui.label.mouseprice")
+                        .text(d.price);
 
                     }
                 })
@@ -374,7 +378,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
         }
 
         /*-------------------------------------------------*/
-        var dropDownTop = d3.select('select.ui.dropdown');
+        var dropDownTop = d3.select('select.ui.dropdown.cate');
 
         dropDownTop.append("option")
                 .attr("value","NONE")
@@ -389,7 +393,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
                 .text(function(d) { return d; });
 
 
-        var dropDown = d3.select('select.ui.eachVG');
+        var dropDown = d3.select('select.ui.dropdown.eachVG');
 
         dropDown.append("option")
                 .attr("value","NONE")
@@ -434,25 +438,26 @@ function drawMultilineChart(domobj, domobjsel, _width){
                 duration: 800,
                 onChange: function(text, value, $selectedItem){
                     vgdata.forEach(function(d){
-                        d.opacity = +0;
-                        d3.select("g.city#tag_"+d.name)
-                            .style("opacity",d.opacity);
+                        if(d.opacity===1) {
+                            d.opacity = +0;
+                            d3.select("g.city#tag_"+d.name).style("opacity",d.opacity);
 
-                        d3.select("g.brushArea#tag_"+d.name)
-                            .style("display", function(v) { return v.opacity===1 ?null:"none";});
-                            //.style("opacity",d.opacity);
+                            d3.select("g.brushArea#tag_"+d.name)
+                                .style("display", function(v) { return v.opacity===1 ?null:"none";});
+                                //.style("opacity",d.opacity);
 
-                        d3.select(".x#tag_"+d.name)
-                            .style("display", function(v) { return v.opacity===1 ?null:"none";});
+                            d3.select(".x#tag_"+d.name)
+                                .style("display", function(v) { return v.opacity===1 ?null:"none";});
 
-                        d3.select(".y#tag_"+d.name)
-                            .style("display", function(v) { return v.opacity===1 ?null:"none" ;});
+                            d3.select(".y#tag_"+d.name)
+                                .style("display", function(v) { return v.opacity===1 ?null:"none" ;});
 
-                        d3.select(".dot#tag_"+d.name)
-                            .style("display", function(v) { return v.opacity===1 ?null:"none"; });
+                            d3.select(".dot#tag_"+d.name)
+                                .style("display", function(v) { return v.opacity===1 ?null:"none"; });
 
-                        d3.select(".tip#tag_"+d.name)
-                            .style("display", function(v) { return v.opacity===1 ?null:"none"; });
+                            d3.select(".tip#tag_"+d.name)
+                                .style("display", function(v) { return v.opacity===1 ?null:"none"; });
+                        }
                     });
 
                     if(typeof text!='undefined'){
@@ -504,7 +509,25 @@ function drawMultilineChart(domobj, domobjsel, _width){
                             .style("display", function(v) { return v.opacity===1 ?null:"none"; });
 
                         d3.select("div.ui.header#vgName")
-                            .text(targetData.name+targetData.value[targetData.value.length-1].price);
+                            .text(targetData.name);
+
+                        d3.select("a.ui.label.todayprice")
+                            .text(targetData.value[targetData.value.length-1].price);
+
+                        d3.select("a.ui.label.updownprice")
+                            .text(
+                                Math.round(
+                                    (targetData.value[targetData.value.length-1].price
+                                       - targetData.value[targetData.value.length-2].price)*100
+                                )/100
+                            )
+                        ;
+
+                        d3.select("a.ui.label.averageprice")
+                            .text(targetData.average);
+
+                        d3.select("a.ui.label.mouseprice")
+                            .text(targetData.value[targetData.value.length-1].price);
 
                         d3.select(".tip#tag_"+targetData.name)
                             .style("display", function(v) { return v.opacity===1 ?null:"none"; });
@@ -614,4 +637,36 @@ function getTimeDomain() {
     yesterday.setSeconds(0);
 
     return [start_date, yesterday];
+}
+
+
+function getAverage(array, domain){
+
+    var a = [];
+
+    a = array.filter(function(d){ 
+            return d.date > domain[0] &&
+                    d.date < domain[1];
+        })
+    ;
+    return _average(a);
+
+
+    /*private function*/
+    function _average(array){
+        var total = +0;
+        var length = array.length;
+        var average = +0;
+
+        if (length > +0) {
+            for (i in array) {
+                total = total + array[i].price;
+            }
+
+            average = total/length;
+            average = Math.round(average*100)/100;
+        }
+
+        return average;
+    };
 }

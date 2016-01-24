@@ -22,21 +22,47 @@
   <!-- my charts -->
 <div class="top-container">
 	<div class="ui segment pc-container" style='display:none;'>
+
 		<div class="ui active inverted dimmer" id="wait">
 			<div class="ui large text loader">Loading</div>
 		</div>
 
 		<div class="ui grid">
-			<div class="two height row">
+
+			<div class="row">
+				<div class="column">
+					<div class="ui segment">
+						<div class="ui  horizontal list">
+
+							<div class="item">
+								<div class="ui header" id="vgName">fsafasd</div>
+							</div>
+
+  							<div class="item">
+								<a>今日價格</a><a class='ui label todayprice tag'>100</a><a>$NT/kg</a>
+  							</div>
+
+  							<div class="item">
+								<a>今日漲幅</a><a class='ui label updownprice tag'>100</a><a>$NT/kg</a>
+  							</div>
+
+	  						<div class="item">
+  								<a>平均</a><a class='ui label averageprice tag'>100</a><a>$NT/kg</a>
+  							</div>
+
+  							<div class="item">
+								<a>特定</a><a class='ui label mouseprice tag'>100</a><a>$NT/kg</a>
+  							</div>
+
+  						</div>
+					</div>
+				</div>
 			</div>
-			<div class="twelve height row">
+
+			<div class="row">
 				<div class="multilineChart twelve wide column"></div>
 				
 				<div class="multilineChartSelectorTop four wide column">
-
-					<div class="row">
-						<div class="ui header" id="vgName">Selection</div>
-					</div>
 
 					<div class="row">
 						<select class="ui dropdown cate"></select>
