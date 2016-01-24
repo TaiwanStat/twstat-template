@@ -273,7 +273,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
                 .attr("x2", width);
         
         // plot
-        focus.selectAll("dot")
+        focus.selectAll(".dot")
                 .data(vgdata)
                 .enter()
             .append("circle")
@@ -292,12 +292,12 @@ function drawMultilineChart(domobj, domobjsel, _width){
             .style("fill", "none")
             .style("pointer-events", "all")
             .on("mouseover", function() {
-                focus.style("display", null);
-                tooltip.style("display",null);
+                d3.select('g.focus').style('display', 'block');
+                d3.select('div.tooltip').style("display", 'block');
             })
             .on("mouseout", function() { 
-                focus.style("display", "none");
-                tooltip.style("display","none");
+                d3.select('g.focus').style('display', 'none');
+                d3.select('div.tooltip').style("display", 'none');
             })
             .on("mousemove", mousemove);
 
@@ -320,17 +320,16 @@ function drawMultilineChart(domobj, domobjsel, _width){
                     var d = x0 - d0.date > d1.date - x0 ? d1 : d0;
 
 
-                    focus.select("#tag_" + v.name + ".x")
+                    d3.select("g.focus > line.x#tag_" + v.name )
                         .attr("transform", "translate("+x(d.date)+","+y(0)+")");
 
-                    focus.select("#tag_" + v.name + ".y")
+                    d3.select("g.focus > line.y#tag_" + v.name )
                         .attr("transform", "translate("+0+","+y(d.price)+")");
 
-                    focus.select("#tag_" + v.name + ".dot")
+                    d3.select("g.focus > circle.dot#tag_" + v.name )
                         .attr("transform", "translate("+x(d.date)+","+y(d.price)+")");
 
-                    tooltip
-                        .select("div#tag_" + v.name + ".tip")
+                    d3.select("div.tooltip > div#tag_" + v.name + ".tip")
                         .select("text")
                         .text(v.name+":"+d.price+" $/kg");
 
@@ -340,6 +339,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
             
             if($('.typhoonbutton').hasClass('active')) {
                 var change_white = true;
+
                 tydata.forEach( function(ty) {
                     var ds1 = x(ty.start_date);
                     var ds2 = x(ty.end_date);
@@ -348,31 +348,32 @@ function drawMultilineChart(domobj, domobjsel, _width){
                         var _rank = ty.rank <= 15 ? 0  :
                                     ty.rank <= 25 ? 10 :
                                     20;
+
                         _color = rankScale(_rank);
 
-                        tooltip
-                            .style("background", _color)
-                        .select("#tag_"+ty.name+".typhoon")
-                            .style("display", null);
+                        d3.select('div.tooltip').style("background", _color);
+
+                        d3.select('div.tooltip > div.typhoon#tag_' + ty.name )
+                                .style("display", null);
 
                         change_white = false;
                     } else {
-                        tooltip.select("#tag_"+ty.name+".typhoon")
+                        d3.select('div.tooltip > div.typhoon#tag_'+ty.name )
                             .style("display", "none");
                     }
                 });
 
                 if (change_white) {
-                    tooltip
-                        .style("background", "white");
+                    d3.select('div.tooltip')
+                        .style('background', 'white');
                 }
             }
-                tooltip
+                d3.select('div.tooltip')
                     .style("left",d3.event.pageX+"px")
                     .style("top",d3.event.pageY+"px");
-            
         }
 
+        /*-------------------------------------------------*/
         var dropDownTop = d3.select('select.ui.dropdown');
 
         dropDownTop.append("option")
@@ -422,7 +423,6 @@ function drawMultilineChart(domobj, domobjsel, _width){
                             .attr("class","myitem")
                             .attr("value",function(d) { return d; })
                             .text(function(d) { return d; });
-
                     }
                 }
             })
@@ -493,8 +493,6 @@ function drawMultilineChart(domobj, domobjsel, _width){
 
                         d3.select("g.brushArea#tag_"+targetData.name)
                             .style("display", function(v) { return v.opacity===1 ?null:"none";});
-                            //.style("opacity",targetData.opacity);
-
 
                         d3.select(".x#tag_"+targetData.name)
                             .style("display", function(v) { return v.opacity===1 ?null:"none";});
@@ -506,7 +504,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
                             .style("display", function(v) { return v.opacity===1 ?null:"none"; });
 
                         d3.select("div.ui.header#vgName")
-                            .text(targetData.name);
+                            .text(targetData.name+targetData.value[targetData.value.length-1].price);
 
                         d3.select(".tip#tag_"+targetData.name)
                             .style("display", function(v) { return v.opacity===1 ?null:"none"; });
@@ -514,6 +512,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
                 }
             })
         ;
+        /*-------------------------------------------------*/
 
         $('button.typhoonbutton')
             .on('click',function(){
@@ -531,11 +530,6 @@ function drawMultilineChart(domobj, domobjsel, _width){
             })
         ;
 
-        /*
-        vgdata.forEach(function(v){
-            $('div.ui.dropdown .menu>.item [data-value'+v.name+']').css('color',color(v.name));
-        });
-        */
 
         ///// brush
 
