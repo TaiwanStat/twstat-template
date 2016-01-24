@@ -2,10 +2,16 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   {{> head}}
-  <!-- my js & css -->
 	<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700' rel='stylesheet' type='text/css'>
-
+	<!-- js -->
     <script src="js/multiline.js"></script>
+	<script src="js/DataLoadM.js"></script>
+	<script src="js/DataProcessM.js"></script>
+	<script src="js/VagListM.js"></script>
+	<script src="js/MobilePage.js"></script>
+
+	<!-- css -->
+	<link href='css/mobile.css' rel='stylesheet' type='text/css'>
 	<link href='css/multiline.css' rel='stylesheet' type='text/css'>
 
 </head>
@@ -14,8 +20,8 @@
 
   {{> start}}
   <!-- my charts -->
-	<div class="ui segment">
-
+<div class="top-container">
+	<div class="ui segment pc-container" style='display:none;'>
 		<div class="ui active inverted dimmer" id="wait">
 			<div class="ui large text loader">Loading</div>
 		</div>
@@ -45,18 +51,109 @@
 		</div>
 	</div>
 
+	<div class="outerborder mobile-container" style='display:none;'>
+
+		<div class="title">
+		</div>
+
+		<div class="slider">
+
+			<div class="panel">
+
+				<div class="menu">
+					<div class="menuitem mainmenu" data-index="0" style="width: 40%">
+						改為以漲幅排序
+					</div>
+					<div class="menuitem mainmenu" data-index="1" style="width: 40%">
+						降序升序
+					</div>
+					<div class="menuitem mainmenu" data-index="2" style="width: 20%">
+						<img src="img/settings.png"/>
+					</div>
+				</div>
+
+				<svg id="vaglist"></svg>
+
+			</div>
+
+			<div class="panel">
+				
+				<div class="menuitem settingmenu" data-index="2">
+					<img src="img/back.png"/>
+				</div>
+
+				<div id="setIntreaseTag">
+					<div> 與什麼比較漲跌幅？ </div>
+					<div class="sitItem" data-mode="yesterday">昨日價格</div>
+					<div class="sitItem" data-mode="smallavg">近十日價格平均</div>
+					<div class="sitItem" data-mode="avg">近三十日價格平均</div>
+				</div>
+
+				<div id="chooseVagetable">
+					<div> 選擇蔬菜 </div>
+					<div class="cvItem" onclick="MobilePage.vagSelectAllEvent();"> 選擇全部 </div>
+					<div class="cvItem" onclick="MobilePage.vagDeselectAllEvent();"> 清除全部 </div>
+				</div>
+
+			</div>
+				
+		</div>
+
+	</div>
+</div>
   {{> end}}
     <!-- my js & css -->
     {{> footer}}
 
     <script>
+		
+		/* mobile variable*/
+		var list;
+		var isInSettingMode = false;
+		var increaseTag = "yesterday";
 
     	$().ready(function (){
-            drawMultilineChart(d3.select(".multilineChart"),
-				d3.select(".multilineChartSelector"),
-				$(".multilineChart").width(),
-				$(".multilineChart").height());
-    	});
+			var $window = $(window);
+			var width = $window.width();
+			
+			var WIDTH_BOUNDARY = 500;
+
+			if ( width > WIDTH_BOUNDARY ) {
+				$('div.pc-container')
+					.css('display','block');
+
+            	drawMultilineChart(d3.select(".multilineChart"),
+					d3.select(".multilineChartSelector"),
+					$(".multilineChart").width(),
+					$(".multilineChart").height());
+			}
+			else {
+				$('div.mobile-container')
+					.css('display','block');
+
+				DataLoadM.loadRawText("data/merge.csv", function(a){
+					DataProcessM.processData(a, function(){}, function(){
+
+						list = new VagListM(d3.select("#vaglist"), DataProcessM.priceList);
+						list.show(increaseTag);
+						list.sortByOptionAndAnimate(true, "price");
+
+						MobilePage.appendCvItem();
+
+					});
+				});
+
+				$(".menuitem").click(MobilePage.menuItemEvent);
+				$(".sitItem").click(MobilePage.sitItemEvent);
+			
+				menuheight = parseInt($(".menu").css("height"));
+				$("img").css("width", menuheight*0.6);
+				$("img").css("height", menuheight*0.6);
+				$(".settingmenu").children("img").css("margin-top", "2%");
+				$(".settingmenu").css("height", menuheight);
+			}// if ( width > WIDTH_BOUNDARY) else ...
+	
+    	});//$().ready(...
 
     </script>
 
