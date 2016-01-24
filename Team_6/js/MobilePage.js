@@ -48,6 +48,8 @@ MobilePage = {
 	sitItemEvent:
 
 		function(){
+			$(".sitItem").css("background-color", "#eeeeee");
+			$(this).css("background-color", "#cccccc");
 			increaseTag = $(this).data("mode");
 			list.show(increaseTag);
 			if(list.sortOption == "price"){
