@@ -373,9 +373,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
             
         }
 
-        var dropDownTop =
-            domobjsel.append('select')
-                .attr('class','ui dropdown cate');
+        var dropDownTop = d3.select('select.ui.dropdown');
 
         dropDownTop.append("option")
                 .attr("value","NONE")
@@ -390,9 +388,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
                 .text(function(d) { return d; });
 
 
-        var dropDown =
-            domobjsel.append("select")
-                .attr("class","ui dropdown eachVG");
+        var dropDown = d3.select('select.ui.eachVG');
 
         dropDown.append("option")
                 .attr("value","NONE")
@@ -413,8 +409,10 @@ function drawMultilineChart(domobj, domobjsel, _width){
                 action: 'activate',
                 onChange: function(text, value, $selectedItem){
                     
+                    $('option.myitem').remove();
+
                     if(typeof text!='undefined'){
-                        $('option.myitem').remove();
+                        
                         var tmpt = dropDown.selectAll("option.myitem")
                                 .data(vgItem[text]);
 
@@ -424,6 +422,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
                             .attr("class","myitem")
                             .attr("value",function(d) { return d; })
                             .text(function(d) { return d; });
+
                     }
                 }
             })
