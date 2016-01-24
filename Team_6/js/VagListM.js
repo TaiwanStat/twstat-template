@@ -17,7 +17,7 @@ VagListM = function(d3svg, items){
 	this.sortOption = "";
 	this.itemMargin = 5;
 	this.itemBeginX = 10;
-	this.itemBeginY = 0;
+	this.itemBeginY = 10;
 	this.itemWidth = this.svgWidth - this.itemBeginX*2;
 	this.itemHeight = this.itemWidth / 6;
 	if(this.itemHeight > 80) this.itemHeight=80;
@@ -71,7 +71,7 @@ VagListM = function(d3svg, items){
 			.attr("y",this.itemBeginY)
 			.attr("width",this.itemWidth)
 			.attr("height",this.itemHeight)
-			.style("fill","#e4e4e4");
+			.style("fill","#dddddd");
 
 		var ppercentage = this.itemList[i].price / 200;
 		ppercentage = ppercentage > 1 ? 1 : ppercentage;
@@ -105,7 +105,7 @@ VagListM = function(d3svg, items){
 
 		d.append("text")
 			.attr("x",this.itemBeginX + 5)
-			.attr("y",this.itemHeight*0.6)
+			.attr("y",this.itemBeginY+this.itemHeight*0.6)
 			.text(this.itemList[i].name + ": " + this.itemList[i].price + " NTD")
 			.style("fill","#333333")
 			.style("font-size", this.itemHeight*0.5);
@@ -115,7 +115,7 @@ VagListM = function(d3svg, items){
 		d.append("text")
 			.attr("class", "secondtext")
 			.attr("x",this.itemBeginX + this.itemPadding + this.itemPadding2 + 2)
-			.attr("y",this.itemHeight*0.6)
+			.attr("y",this.itemBeginY+this.itemHeight*0.6)
 			.text(increaseText)
 			.style("fill","#333333")
 			.style("font-size", this.itemHeight*0.5);

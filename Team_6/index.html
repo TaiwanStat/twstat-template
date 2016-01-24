@@ -49,14 +49,11 @@
 
 	<div class="outerborder mobile-container" style="display:none;">
 
-		<div class="title">
-		</div>
-
-		<div class="slider">
+		<div class="sliderM">
 
 			<div class="panel">
 
-				<div class="menu">
+				<div class="menuM">
 					<div class="menuitem mainmenu" data-index="0" style="width: 40%">
 						改為以漲幅排序
 					</div>
@@ -79,16 +76,15 @@
 				</div>
 
 				<div id="setIntreaseTag">
-					<div> 與什麼比較漲跌幅？ </div>
-					<div class="sitItem" data-mode="yesterday">昨日價格</div>
-					<div class="sitItem" data-mode="smallavg">近十日價格平均</div>
-					<div class="sitItem" data-mode="avg">近三十日價格平均</div>
+					<div class="stItem stTitle"> 與什麼比較漲跌幅？ </div>
+					<div class="stItem sitItem" data-mode="yesterday">昨日價格</div>
+					<div class="stItem sitItem" data-mode="smallavg">近十日價格平均</div>
+					<div class="stItem sitItem" data-mode="avg">近三十日價格平均</div>
 				</div>
-
 				<div id="chooseVagetable">
-					<div> 選擇蔬菜 </div>
-					<div class="cvItem" onclick="MobilePage.vagSelectAllEvent();"> 選擇全部 </div>
-					<div class="cvItem" onclick="MobilePage.vagDeselectAllEvent();"> 清除全部 </div>
+					<div class="stItem stTitle"> 選擇蔬菜 </div>
+					<div class="stItem cvItem" onclick="MobilePage.vagSelectAllEvent();"> 選擇全部 </div>
+					<div class="stItem cvItem" onclick="MobilePage.vagDeselectAllEvent();"> 清除全部 </div>
 				</div>
 
 			</div>
@@ -140,11 +136,17 @@
 				$(".menuitem").click(MobilePage.menuItemEvent);
 				$(".sitItem").click(MobilePage.sitItemEvent);
 			
-				menuheight = parseInt($(".menu").css("height"));
+				menuheight = parseInt($(".menuM").css("height"));
 				$("img").css("width", menuheight*0.6);
 				$("img").css("height", menuheight*0.6);
 				$(".settingmenu").children("img").css("margin-top", "2%");
 				$(".settingmenu").css("height", menuheight);
+				$("#title").css("margin-top", 0);
+				$("#title").css("margin-bottom", 0);
+				var itemWidth = parseInt($(".cvItemVag").css("width"));
+				var itemHeight = itemWidth/6 > 80 ? 80 : itemWidth/6;
+				$(".stItem").css("height", itemHeight);
+				$(".stItem").css("padding-top", itemHeight/4);
 			}// if ( width > WIDTH_BOUNDARY) else ...
 	
     	});//$().ready(...
