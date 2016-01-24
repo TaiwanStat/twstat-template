@@ -3,9 +3,11 @@ import os.path
 import csv
 from statistics import mean
 
+dir = os.path.dirname(os.path.abspath(__file__))
+
 #--------------------------------------------------------------------------------
 def vg_csv_file(vagetable:str):
-    return './vagetable/' +vagetable+'.csv'
+    return dir + '/vagetable/' +vagetable+'.csv'
 #--------------------------------------------------------------------------------
 
 def average():

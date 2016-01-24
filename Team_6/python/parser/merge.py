@@ -2,9 +2,11 @@ from VG import VG_LIST
 import os.path
 import csv
 
+dir = os.path.dirname(os.path.abspath(__file__))
+
 #--------------------------------------------------------------------------------
 def vg_csv_file(vagetable:str):
-    return './vagetable/' +vagetable+'.csv'
+    return dir + '/vagetable/' +vagetable+'.csv'
 #--------------------------------------------------------------------------------
 
 def merge():

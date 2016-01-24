@@ -14,6 +14,7 @@ from transToJson import transToJson
 
 import VG
 
+dir = os.path.dirname(os.path.abspath(__file__))
 oneday = timedelta(days=1)
 default_start_date = VG.default_start_date
 end_date = date.today()
@@ -65,7 +66,7 @@ def get_oneday(vegetable_code:str, upload_date:datetime.date):
     return oneday_dict
 #--------------------------------------------------------------------------------
 def vg_csv_file(vagetable:str):
-    return './vagetable/' +vagetable+'.csv'
+    return dir + '/vagetable/' +vagetable+'.csv'
 #-------------------------------------------------------------------------------- 
 def least_day(csvfile):
     least_row = deque(csv.reader(csvfile), 1)[0]
