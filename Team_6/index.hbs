@@ -27,58 +27,69 @@
 			<div class="ui large text loader">Loading</div>
 		</div>
 
-		<div class="ui grid">
+		<div class="ui segment">
+			<div class="vgInfo">
 
-			<div class="row">
-				<div class="column">
-					<div class="ui segment">
-						<div class="ui  horizontal list">
+				<div class="ui  horizontal list">
 
-							<div class="item">
-								<div class="ui header" id="vgName">fsafasd</div>
-							</div>
-
-  							<div class="item">
-								<a>今日價格</a><a class='ui label todayprice tag'>100</a><a>$NT/kg</a>
-  							</div>
-
-  							<div class="item">
-								<a>今日漲幅</a><a class='ui label updownprice tag'>100</a><a>$NT/kg</a>
-  							</div>
-
-	  						<div class="item">
-  								<a>平均</a><a class='ui label averageprice tag'>100</a><a>$NT/kg</a>
-  							</div>
-
-  							<div class="item">
-								<a>特定</a><a class='ui label mouseprice tag'>100</a><a>$NT/kg</a>
-  							</div>
-
-  						</div>
+					<div class="item">
+						<div class="ui header" id="vgName">蔬果</div>
 					</div>
-				</div>
+
+  					<div class="item">
+						<a>今日價格</a><a class="ui label todayprice tag">-</a><a>$NT/kg</a>
+  					</div>
+
+  					<div class="item">
+						<a>今日漲幅</a><a class="ui label updownprice tag">-</a><a>$NT/kg</a>
+  					</div>
+
+	  				<div class="item">
+	  					<a>平均</a><a class="ui label averageprice tag">-</a><a>$NT/kg</a>
+  					</div>
+
+  					<div class="item">
+						<a>特定</a><a class="ui label mouseprice tag">-</a><a>$NT/kg</a>
+  					</div>
+
+  				</div>
+
+  			</div>
+		</div>
+
+		<div class='ui grid'>
+
+			<div class="ui twelve wide column">
+				<div class='ui segment multilineChart'></div>
 			</div>
-
-			<div class="row">
-				<div class="multilineChart twelve wide column"></div>
 				
-				<div class="multilineChartSelectorTop four wide column">
+			<div class="ui four wide column ">
 
-					<div class="row">
+				<div class=' ui segments multilineChartSelectorTop'>
+
+					<div class="ui segment">
+						<div class='ui header'>類別</div>
 						<select class="ui dropdown cate"></select>
+					</div>
+
+					<div class='ui segment'>
+						<div class='ui header'>種類</div>
 						<select class="ui dropdown eachVG"></select>
 					</div>
 
-					<div class="row">
+					<div class="ui segment">
+						<div class='ui header'>颱風</div>
 						<div class="typhoonbutton">
-							<button class="ui button typhoonbutton">OFF</button>
+							<button class="ui button typhoonbutton">不顯示</button>
 						</div>
 					</div>
 
 				</div>
+
 			</div>
+
 		</div>
-	</div>
+
 
 	<div class="outerborder mobile-container" style='display:none;'>
 
@@ -137,10 +148,10 @@
 		var isInSettingMode = false;
 		var increaseTag = "yesterday";
 
-    	$().ready(function (){
+    	$(document).ready(function (){
+
 			var $window = $(window);
 			var width = $window.width();
-			
 			var WIDTH_BOUNDARY = 500;
 
 			if ( width > WIDTH_BOUNDARY ) {
@@ -183,8 +194,8 @@
 				$(".stItem").css("height", itemHeight);
 				$(".stItem").css("padding-top", itemHeight/4);
 			}// if ( width > WIDTH_BOUNDARY) else ...
-	
-    	});//$().ready(...
+
+    	});//$(document).ready(function(){...});
 
     </script>
 

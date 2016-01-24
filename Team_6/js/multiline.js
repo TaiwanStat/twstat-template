@@ -33,6 +33,8 @@ var vgItem = {
 
 var TRANSF_TIME = 800;
 
+var DROPDOWN_DURATION = 400;
+
 function drawMultilineChart(domobj, domobjsel, _width){
 
     var dateParse = d3.time.format("%Y-%m-%d").parse;
@@ -136,10 +138,6 @@ function drawMultilineChart(domobj, domobjsel, _width){
                 v.start_date = dateParse(v.start_date),
                 v.end_date = dateParse(v.end_date)
         });
-
-		$('#wait').remove();
-
-        console.log(vgdata);
 
         var y_max = d3.max(
                 vgdata.filter( function(v) { return v.opacity===1;}),
@@ -412,6 +410,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
         $('.dropdown.cate')
             .dropdown({
                 action: 'activate',
+                duration: DROPDOWN_DURATION,
                 onChange: function(text, value, $selectedItem){
                     
                     $('option.myitem').remove();
@@ -435,7 +434,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
         $('.dropdown.eachVG')
             .dropdown({
                 action: 'activate',
-                duration: 800,
+                duration: DROPDOWN_DURATION,
                 onChange: function(text, value, $selectedItem){
                     vgdata.forEach(function(d){
                         if(d.opacity===1) {
@@ -457,6 +456,21 @@ function drawMultilineChart(domobj, domobjsel, _width){
 
                             d3.select(".tip#tag_"+d.name)
                                 .style("display", function(v) { return v.opacity===1 ?null:"none"; });
+
+                            d3.select("div.ui.header#vgName")
+                                .text('蔬果');
+                            
+                            d3.select("a.ui.label.todayprice")
+                                .text('-');
+
+                            d3.select("a.ui.label.updownprice")
+                                .text('-');
+
+                            d3.select("a.ui.label.averageprice")
+                                .text('-');
+
+                            d3.select("a.ui.label.mouseprice")
+                                .text('-');
                         }
                     });
 
@@ -541,12 +555,12 @@ function drawMultilineChart(domobj, domobjsel, _width){
             .on('click',function(){
                 if($(this).hasClass('active')) {
                     $(this).removeClass('active');
-                    $(this).text('OFF');
+                    $(this).text('不顯示');
                     tybar
                         .style('display','none');
                 } else {
                     $(this).addClass('active');
-                    $(this).text('ON');
+                    $(this).text('顯示');
                     tybar
                         .style('display',null);
                 }
@@ -624,6 +638,7 @@ function drawMultilineChart(domobj, domobjsel, _width){
             d3.select(".x.axis").call(xAxis);
         }
 
+        $('#wait').remove();
     });//csv-loader....
 }
 
