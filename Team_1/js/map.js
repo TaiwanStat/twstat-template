@@ -36,6 +36,7 @@ function checkboxCtrl(checkboxes) {
 			console.log("1 c");
 			deleteMarkers(busMarkers);
 			deleteMarkers(parkMarkers);
+			deleteMarkers(mrtMarkers);
 			markYoubike();
 		},
 		onUnchecked: function() {
@@ -59,6 +60,7 @@ function checkboxCtrl(checkboxes) {
 		onUnchecked: function() {
 			console.log("2 u");
 			if (markerOn) {
+				deleteMarkers(mrtMarkers);
 				markerOn = false;
 			}
 		}
@@ -70,6 +72,7 @@ function checkboxCtrl(checkboxes) {
 			console.log("3 c");
 			deleteMarkers(youbikeMarkers);
 			deleteMarkers(parkMarkers);
+			deleteMarkers(mrtMarkers);
 			if (busMarkersLoaded) {
 				busMarkAll();
 			}
@@ -93,6 +96,7 @@ function checkboxCtrl(checkboxes) {
 			console.log("4 c");
 			deleteMarkers(youbikeMarkers);
 			deleteMarkers(busMarkers);
+			deleteMarkers(mrtMarkers);
 			if (parkMarkersLoaded) {
 				markParking();
 			}
