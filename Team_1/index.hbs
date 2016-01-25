@@ -11,15 +11,49 @@
   {{> start}}
     <!-- my charts -->
     <div class="ui container">
-      <div class="ui active dimmer" id="loading">
+      <div class="ui dimmer" id="loading">
         <div class="ui text loader">Loading</div>
-      </div>      
+      </div>
+
       <div class="ui middle aligned grid">
         <div class="three column row">
           <div class="column"></div>
-          <div class="column" id="info"><p>台北<p></div>
+          <div class="column" id="info"><p><p></div>
           <div class="column"></div>
         </div>
+
+        <div class="ui form grouped fields eight column row">
+          <!-- <div class="grouped fields ui eight column"> -->
+            <div class="field column">
+              <div class="ui toggle checkbox">
+                <input type="radio" name="throughput" checked="checked">
+                <label>YouBike</label>
+              </div>
+            </div>
+            <div class="field column">
+              <div class="ui toggle checkbox">
+                <input type="radio" name="throughput">
+                <label>捷運</label>
+              </div>
+            </div>
+            <div class="field column">
+              <div class="ui toggle checkbox">
+                <input type="radio" name="throughput">
+                <label>公車</label>
+              </div>
+            </div>
+            <div class="field column">
+              <div class="ui toggle checkbox checked">
+                <input type="radio" name="throughput">
+                <label>停車場</label>
+              </div>
+            </div>
+            <div class="column" id="btn">
+              
+            </div>
+          <!-- </div> -->
+        </div>
+
       	<div class="sixteen wide column">
       		<div id="map"></div>
       	</div>
@@ -31,6 +65,10 @@
 	<script src="https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/leaflet.markercluster.js"></script>
 	<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/MarkerCluster.css' rel='stylesheet' />
 	<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/MarkerCluster.Default.css' rel='stylesheet' />
+  <script type="text/javascript" src="js/youbike.js"></script>
+  <script type="text/javascript" src="js/bus.js"></script>
+  <script type="text/javascript" src="js/parking.js"></script>
+  <script type="text/javascript" src="js/mrt.js"></script>
 	<script type="text/javascript" src="js/map.js"></script>
   {{> footer}}
 </body>
