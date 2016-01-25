@@ -1,3 +1,6 @@
+svg {
+  font: 10px sans-serif;
+}
 
 .axis path,
 .axis line {
@@ -26,7 +29,7 @@ rect.main_rect{
 }
 
 div.tooltip{
-	position: absolute;
+	position: fixed;
 	text-align: center;
 	width: 100px;
 	/*height: 28px;*/
@@ -43,15 +46,18 @@ div.tip{
 }
 
 .typhoon{
-	font: 12px sans-serif;
+	font: 15px sans-serif;
 }
 
 .raintip{
 	font: 12px sans-serif;
 }
 
+.vgInfo{
+	padding-left: 100px;
+}
+
 .area {
-  fill: steelblue;
   clip-path: url(#clip);
 }
 
