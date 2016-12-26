@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>103 Aged society</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+    <link rel=stylesheet type="text/css" href="css/index.css">
+
+    <script type="text/javascript" src="js/jquery-3.1.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://d3js.org/topojson.v2.min.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+
+</head>
+
+<body>
+
+    <div id="loading">
+        <div class="spinner">
+            <div class="double-bounce1"></div>
+            <div class="double-bounce2"></div>
+        </div>
+    </div>
+
+    <div id="text_div" name="info">
+        <h3 id="county_name">縣市</h3>
+        <p>
+            <span>老年人口依賴比：</span><span id="old_people"></span>
+        </p>
+        <p>
+            <span>安養機構工作人員數量：</span><span id="nursing_house"></span>&nbsp人
+        </p>
+    </div>
+
+    <div class="container main">
+        <div class="row">
+            <div name="info_div" class="col-md-6">
+                <div class="row" style="height: 85vh"></div>
+                <p class="col-md-offset-2">
+                    PS. 老年人口依賴比 = 65歲以上老年人口／ 15至64歲的工作人口
+                </p>
+                <div class="row">
+                    <button type="button" name="aged" class="btn btn-primary col-md-offset-2 col-md-4 active" disabled="disabled" style="border-radius: 10px 0px 0px 10px">老年人口依賴比</button>
+                    <button type="button" name="house" class="btn btn-primary col-md-4" style="border-radius: 0px 10px 10px 0px">安養機構工作人員分佈</button>
+                </div>
+            </div>
+            <div name="pie_div" class="col-md-6">
+                <h3 align="center">老年人口依賴比</h3>
+                <div class="row" name="aged" style="height: 40vh"></div>
+                <h3 align="center">安養機構工作人員數量<small>連江縣與金門縣數量 < 100</small></h3>
+                <div class="row" name="house" style="height: 40vh"></div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
