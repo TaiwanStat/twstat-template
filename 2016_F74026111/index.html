@@ -1,0 +1,55 @@
+<!--
+  All the D3 code lives in the JS tab above.
+  
+  If you don't see the visualization below immediately, your first 
+  DATA SNAPSHOT is still in progress! Wait a few seconds and click the
+  refresh icon below.
+-->
+<!DOCTYPE html>
+<head>
+<title>Data Visualization</title>
+<style type="text/css"></style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/0.7.13/webcomponents-lite.min.js"></script>
+  <link rel="import" href="https://components.cloudstitch.com/cloudstitch-d3.html" />
+<meta charset="UTF-8">
+<style>
+body {
+	
+}
+h3 {
+color: #143A6D;
+font-size: 50px;
+font-family: "Microsoft JhengHei";
+}
+h5 {
+font-size: 30px;
+font-family: "Microsoft JhengHei";
+}
+p {
+font-size: 15px;
+font-family: "Microsoft JhengHei";
+}
+.guide {
+font-size: 20px;
+}
+</style> 
+</head>
+<body>
+<div align="center">
+<h3>世界各國城市土地面積及人口數</h3>
+<h5>資料時間：2010年</h5>
+<p class="guide">將滑鼠游標移至方塊上方即可看到土地面積(單位：平方公里)</p>
+<p class="guide">點擊國家名稱會顯示居住在城市的人口數(單位：千)</p>
+</div>
+<div class="bc">
+<cloudstitch-d3 user="wyh410" app="d3-bubble-chart"></cloudstitch-d3>
+</div>
+<div align="bottom">
+<div align="center">
+<p>按照方塊顏色來區分為：亞洲、歐洲、歐盟、北美洲、中美洲、南美洲、加勒比海地區、大洋洲、東非、中非、北非、南非、西非、中東 等地區</p>
+</div>
+<div align="right">
+<p>資料來源：The World Bank</p>
+</div>
+</div>
+</body>
