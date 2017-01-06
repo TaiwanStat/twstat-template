@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>車禍原因</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.css" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" type="text/css" href="assets/main.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.js" charset="utf-8"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.min.js"></script>
+    <script type="text/javascript" src="//codeorigin.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    
+</head>
+
+<body>
+    <script src="assets/dist/chartist.min.js"></script>
+    <div class="page-header text-center">
+        <h1> 臺南市交通事故十大原因<br><small>採用104年及105年的月平均值</small></h1>
+    </div>
+    <div role="tabpanel" id="a">
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">104年</a></li>
+            <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">105年 <span class="badge">105年資料為1~5月平均</span></a>
+            </li>
+        </ul>
+        <!-- Tab panes -->
+        <div class="tab-content ">
+            <div role="tabpanel" class="tab-pane active" id="home">
+                <div class="ct-chart ct-golden-section" id="bar_chart2"></div>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="profile">
+                <div id="bar_chart3"></div>
+            </div>
+        </div>
+    </div>
+    <div class="page-header text">
+        <h6>資料來源: <a target="_blank" href="http://data.tainan.gov.tw/dataset/policedata016">臺南市政府資料開放平台</a></h6>
+    </div>
+    <script>
+    //var obj = new Array();
+
+
+    function getdata(data_url) {
+        var tmp = null;
+        $.ajax({
+            'async': false,
+            url: data_url,
+            type: 'GET',
+            success: function(data) {
+                tmp = data;
+            }
+        });
+        return tmp;
+    }
+    var obj = getdata("data/data.json");
+   //obj = jQuery.parseJSON(data);
+    //console.log(data);
+    for (i = 0; i < 12; i++) {
+        obj[i] = obj[i].filter(function(n) {
+            return n != undefined
+        });
+    }
+
+
+    var data_104_label = Array();
+    var data_104 = Array();
+    var k = 2;
+    var n = 0;
+    data_104[0] = Array();
+    data_104[0][0] = 'data1';
+    var flag = 0;
+
+    for (var i = k; i < 59; i++) {
+        flag = 0;
+        if (obj[1][i] < 500)
+            continue;
+
+        var a = Math.round(parseInt(obj[1][i]) / 12); //12 months
+        if (n == 0) {
+            data_104_label[n] = obj[0][i];
+            data_104[0][n + 1] = a;
+        } else {
+            for (var j = 0; j < n; j++) { //insertion sort
+                if (data_104[0][j + 1] < a) {
+                    for (var k = n; k >= j; k--) {
+                        data_104[0][k + 2] = data_104[0][k + 1];
+                        data_104_label[k + 1] = data_104_label[k];
+                    }
+
+                    data_104[0][j + 1] = a;
+                    data_104_label[j] = obj[0][i];
+                    flag = 1;
+                    break;
+                }
+            }
+            if (flag == 0) {
+                data_104[0][n + 1] = a;
+                data_104_label[n] = obj[0][i];
+            }
+        }
+
+        n++;
+    }
+    data_104[0] = data_104[0].filter(function(n) {
+        return n != undefined
+    });
+    data_104_label = data_104_label.filter(function(n) {
+        return n != undefined
+    });
+
+
+    //        console.log(z1);
+
+    var chart = c3.generate({
+        bindto: '#bar_chart2',
+        data: {
+            columns: data_104,
+            type: 'bar',
+            labels: true,
+            names: {
+                data1: '104年'
+            },
+
+            colors: {
+                data1: '#ff5050'
+            }
+
+
+        },
+        grid: {
+            x: {
+                //show: true
+            },
+            y: {
+                show: true
+            }
+        },
+        axis: {
+            x: {
+                type: 'category',
+                tick: {
+
+
+                    multiline: false
+                },
+                categories: data_104_label
+
+
+            },
+            y: {
+                label: {
+                    text: '月平均件數',
+                    position: 'outer-center'
+                }
+            },
+            rotated: true
+
+        },
+        size: {
+            height: 320
+        }
+
+    });
+
+
+    for (j = 3; j < 12; j = j + 2) {
+        for (i = 1; i < obj[j].length; i++) {
+            obj[j][i] = obj[j][i] || 0;
+            obj[j][i] = parseInt(obj[j][i]);
+            if (isNaN(obj[j][i]))
+                obj[j][i] = 0;
+        }
+    }
+
+    for (i = 4; i < 12; i = i + 2) {
+        for (j = 2; j < obj[i].length; j++) {
+            for (k = 2; k < obj[2].length; k++) {
+                if (obj[i][j] == obj[2][k]) {
+                    //parseInt(obj[3][k])+=parseInt(obj[i+1][j]);
+                    obj[3][k] += obj[i + 1][j];
+                }
+            }
+        }
+    }
+
+    k = 2;
+    n = 0;
+    var data_105_label = Array();
+
+    var data_105 = Array();
+    data_105[0] = Array();
+    data_105[0][0] = "data1";
+
+    for (var i = k; i < obj[3].length; i++) {
+        flag = 0;
+        if (obj[3][i] < 210)
+            continue;
+
+        var b = Math.round(obj[3][i] / 5);
+        // console.log(b);
+        if (n == 0) {
+            data_105_label[n] = obj[2][i];
+            data_105[0][n + 1] = b;
+        } else {
+            for (var j = 0; j < n; j++) {
+                if (data_105[0][j + 1] < b) {
+                    for (var l = n; l >= j; l--) {
+                        data_105[0][l + 2] = data_105[0][l + 1];
+                        data_105_label[l + 1] = data_105_label[l];
+                    }
+
+                    data_105[0][j + 1] = b;
+                    data_105_label[j] = obj[2][i];
+                    flag = 1;
+                    break;
+                }
+
+            }
+        }
+        if (flag == 0) {
+            data_105[0][n + 1] = b;
+            data_105_label[n] = obj[2][i];
+        }
+        //z[n] = obj[0][i];
+        //z1[0][n + 1] = obj[1][i];
+        n++;
+    }
+
+    data_105[0] = data_105[0].filter(function(n) {
+        return n != undefined
+    });
+    data_105_label = data_105_label.filter(function(n) {
+        return n != undefined
+    });
+
+
+    var chart1 = c3.generate({
+        bindto: '#bar_chart3',
+        data: {
+            columns: data_105,
+            type: 'bar',
+            labels: true,
+            names: {
+                data1: '105年'
+            },
+            colors: {
+                data1: '#ff7733'
+            }
+
+
+        },
+        grid: {
+            x: {
+                //show: true
+            },
+            y: {
+                show: true
+            }
+        },
+        axis: {
+            x: {
+
+                type: 'category',
+                tick: {
+
+
+                    multiline: false
+                },
+
+                categories: data_105_label
+            },
+            y: {
+                label: {
+                    text: '月平均件數',
+                    position: 'outer-center'
+                }
+            },
+            rotated: true
+        },
+
+        size: {
+            height: 320
+        }
+
+
+
+    });
+
+
+    
+    </script>
+</body>
+
+</html>

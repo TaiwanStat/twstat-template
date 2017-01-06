@@ -1,0 +1,40 @@
+
+@import url(http://fonts.googleapis.com/earlyaccess/notosanstc.css);
+
+#a {
+	height: 70%;
+    width: 80%;
+  
+    padding-left:20%;
+    margin-bottom: 0px;
+
+}
+.page-header {
+	
+
+	margin-top: 10px ;
+
+}
+h1{
+	margin: 0px;
+	font-family: 'Noto Sans TC', sans-serif;
+font-weight: 700;
+
+}
+tspan{
+	font-family: 'Noto Sans TC', sans-serif;
+	font-size: 12px;
+	
+}
+.c3 text{
+	font-family: 'Noto Sans TC', sans-serif;
+}
+body{
+	font-family: 'Noto Sans TC', sans-serif;
+	/*font-weight: bold;
+*/
+}
+.text{
+	margin: 0px;
+	padding-left: 40%;
+}
