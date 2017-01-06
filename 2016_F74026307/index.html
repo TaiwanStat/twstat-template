@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.arc text {
+  font: 10px sans-serif;
+  text-anchor: middle;
+}
+
+.arc path {
+  stroke: #fff;
+}
+
+</style>
+<body>
+	<h1>Top 25 Students Number in Tainan Junior High School</h1>
+	<h4>
+		<form name="my_form" method=POST style="display: inline;">
+			<input type="radio"  name="radio" value="1" checked>Total Number
+			<input type="radio"  name="radio" value="2">Boys Number
+			<input type="radio"  name="radio" value="3">Girls Number
+		</form>
+	</h4>
+	<h3 id = "pieName"></h3>
+	<div id = "pie"></div>
+</body>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script>
+d3.json("openDataTn.json", function(d){
+	var dataset = d;
+	var oData = new Array();
+	
+	for(var i = 0; i < dataset.length; i ++){
+		if(i % 2 == 0){
+			var temp = new Array();
+			temp.school = dataset[i].school;
+			temp.boys = parseInt(dataset[i].num);
+			temp.girls = parseInt(dataset[i+1].num);
+			temp.total = temp.boys + temp.girls;
+			oData.push(temp);
+		}
+	}
+	oData.sort(function(a, b){return a.total - b.total});
+	oData.splice(0, 35);
+	
+	var width = 960,
+		height = 500,
+		radius = Math.min(width, height) / 2;
+		
+	var color = d3.scaleOrdinal().range([
+		'#673ab7',
+		'#9c27b0',
+		'#e91e63',
+		'#f44336'
+		])
+		.domain(d3.range(1,4));
+				
+	var color1 = d3.scaleOrdinal().range([
+		'#cddc39',
+		'#8bc34a',
+		'#4caf50',
+		'#009688'
+		])
+		.domain(d3.range(1,4));
+		
+	var color2 = d3.scaleOrdinal().range([
+		'#ff5722',
+		'#ff9800',
+		'#ffc107',
+		'#ffeb3b'
+		])
+		.domain(d3.range(1,4));
+		
+	var arc = d3.arc()
+		.outerRadius(radius - 10)
+		.innerRadius(0);
+		
+	var labelArc = d3.arc()
+		.outerRadius(radius - 35)
+		.innerRadius(radius - 35);
+		
+	var labelArc2 = d3.arc()
+		.outerRadius(radius - 85)
+		.innerRadius(radius - 85);
+	
+	Init();
+	
+	$('input[name="radio"]').change(function(e){
+		Init();
+	});
+
+	function Init() {
+		var option = parseInt(d3.select('input[name="radio"]:checked').property('value'));
+		var p = d3.select('#pieName');
+		if(option == 1){
+			oData.sort(function(a, b){return a.total - b.total});
+			p.text("Total Number:");
+		}		
+		else if(option == 2){
+			oData.sort(function(a, b){return a.boys - b.boys});
+			p.text("Boys Number:");
+		}			
+		else if(option == 3){
+			oData.sort(function(a, b){return a.girls - b.girls});
+			p.text("Girls Number:");
+		}
+			
+		d3.select("svg").remove();
+		//*********************************************************************
+		//for id "pie"
+		//Pie chart for total number
+		var pie = d3.pie()
+			.sort(null)
+			.value(function(d) {
+				if(option == 1)
+					return d.total;
+				else if(option == 2)
+					return d.boys;
+				else if(option == 3)
+					return d.girls;
+			});
+
+		var svg = d3.select("#pie").append("svg")
+			.attr("width", width)
+			.attr("height", height)
+			.append("g")
+			.attr("transform", "translate(" + width / 3 + "," + height / 2 + ")");
+
+		var g = svg.selectAll(".arc")
+			.data(pie(oData))
+			.enter().append("g")
+			.attr("class", "arc");
+
+		g.append("path")
+			.attr("d", arc)
+			.on("mouseover", function(d) {
+                p.text("School:" + d.data.school + ", Total:" + d.data.total + ", Boys:" + d.data.boys + ", Girls:" + d.data.girls);
+			})
+			.on("mouseout", function(d) {
+				if(option == 1){
+					p.text("Total Number:");
+				}		
+				else if(option == 2){
+					p.text("Boys Number:");
+				}			
+				else if(option == 3){
+					p.text("Girls Number:");
+				}
+			})
+			.style("fill", function(d) {
+				if(option == 1)
+					return color(d.index); 
+				else if(option == 2)
+					return color1(d.index);
+				else if(option == 3)
+					return color2(d.index);
+			});
+		
+		g.append("text")
+			.attr("transform", function(d) {
+				var mid_angle = d.endAngle < Math.PI ? d.startAngle / 2 + d.endAngle / 2 : d.startAngle / 2 + d.endAngle / 2 + Math.PI;
+				return "translate(" + labelArc.centroid(d) + ") rotate(-90) rotate(" + (mid_angle * 180 / Math.PI) + ")";
+			})
+			.attr("dy", ".35em")
+			.text(function(d) {
+				return d.data.school
+			});
+		
+		g.append("text")
+			.attr("transform", function(d) {
+				var mid_angle = d.endAngle < Math.PI ? d.startAngle / 2 + d.endAngle / 2 : d.startAngle / 2 + d.endAngle / 2 + Math.PI;
+				return "translate(" + labelArc2.centroid(d) + ") rotate(-90) rotate(" + (mid_angle * 180 / Math.PI) + ")";
+			})
+			.attr("dy", ".35em")
+			.text(function(d) { 
+				return d.value;
+			});
+	//*********************************************************************
+	}
+
+});
+
+</script>
