@@ -1,0 +1,158 @@
+<div id="header" style="text-align:center;height:100px;">
+    <h1 style="margin-bottom:0;">台南古蹟旅遊人數</h1></div>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.css" rel="stylesheet" type="text/css">
+        
+  </head>
+  <body>
+    <div id="chart1" style="width:70%;float:left;"></div>
+    <div id="chart6" style="width:30%;float:left;"></div>
+    <div id="space1" style="height:30px;width:100%;float:left;">--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</div>
+    <div id="space2" style="height:500px;width:20%;float:left;">---------------------------------------------</div>
+    <div id="space3" style="height:500px;width:20%;float:right;">-----------------------------------------------</div>
+    <div id="chart2" style="width:30%;float:left;"></div>
+    <div id="chart3" style="width:30%;float:left;"></div>
+    <div id="chart4" style="width:30%;float:left;"></div>
+    <div id="chart5" style="width:30%;float:left;"></div>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.js" charset="utf-8"></script>
+    <script>
+     var line = c3.generate({
+        bindto: '#chart1',
+        title: {
+            text: '2015年'
+        },
+        padding: {
+            top: 40,
+            right: 100,
+            left: 100,
+        },
+        size: {
+            width: 900,
+        //    height:350
+        },
+        data: {
+            url: '/Users/yaki/Desktop/2016_F74036132/data/touristsstatis104.csv',
+            type: 'line',
+            x:'月份',
+            onclick: function () {
+                console.log(arguments);
+            }
+        },
+        axis: {
+            x: {
+                type: 'category', // this needed to load string x value
+                label: {
+                    text: '月份',
+                    position: 'outer-left'
+                }
+            },
+            y: {
+                label: {
+                    text: '人數',
+                    position: 'outer-middle'
+                }
+            }
+        }
+      });
+      var pie100 = c3.generate({
+        bindto: '#chart2',
+        title: {
+            text: '2011年'
+        },
+        data: {
+            url: '/Users/yaki/Desktop/2016_F74036132/data/03touristsstatis100.csv',
+            type: 'pie',
+            onclick: function () {
+                console.log(arguments);
+            }
+        }
+      });
+      var pie101 = c3.generate({
+            bindto: '#chart3',
+            title: {
+                text: '2012年'
+            },
+            data: {
+                url: '/Users/yaki/Desktop/2016_F74036132/data/03touristsstatis101.csv',
+                type: 'pie',
+                onclick: function () {
+                    console.log(arguments);
+                }
+            }
+      });
+      var pie102 = c3.generate({
+            bindto: '#chart4',
+            title: {
+                text: '2013年'
+            },
+            data: {
+                url: '/Users/yaki/Desktop/2016_F74036132/data/02touristsstatis102.csv',
+                type: 'pie',
+                onclick: function () {
+                console.log(arguments);
+                }
+            }
+      });
+      var pie103 = c3.generate({
+            bindto: '#chart5',
+            title: {
+                text: '2014年'
+            },
+            data: {
+                url: '/Users/yaki/Desktop/2016_F74036132/data/touristsstatis103.csv',
+                type: 'pie',
+                onclick: function () {
+                console.log(arguments);
+                }
+            }
+      });
+      var pie104 = c3.generate({
+            bindto: '#chart6',
+            title: {
+                text: '人數比例'
+            },
+            size: {
+                width: 250
+            },
+            data: {
+                url: '/Users/yaki/Desktop/2016_F74036132/data/touristsstatis104.csv',
+                type: 'pie',
+                onclick: function () {
+                console.log(arguments);
+                }
+            }
+      });
+      
+      setTimeout(function () {
+                 line.unload({
+                              ids: ['累計人數','每月旅遊人數','月份']
+                              });
+                 
+                 pie104.unload({
+                             ids: ['累計人數','每月旅遊人數','月份']
+                             });
+       }, 10);
+       setTimeout(function () {
+                pie101.unload({
+                              ids: ['累計人數','每月旅遊人數','月份']
+                             });
+                pie102.unload({
+                            ids: ['累計人數','每月旅遊人數','月份']
+                            });
+                  pie103.unload({
+                                ids: ['累計人數','每月旅遊人數','月份']
+                                });
+                  pie100.unload({
+                                ids: ['累計人數','每月旅遊人數','月份']
+                                });
+        }, 20);
+        
+                 
+    </script>
+  </body>
+</html>
