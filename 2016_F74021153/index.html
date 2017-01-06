@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html lang="en">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>PTTonitor</title>
+    <!-- Main CSS -->
+    <link href="main.css" rel="stylesheet">
+
+    <!-- Bootstrap Core CSS -->
+    <link href="main/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="main/css/half-slider.css" rel="stylesheet">
+
+    <script type='text/javascript' src="d3/d3.v3.min.js"></script>
+    <script type='text/javascript' src="d3/d3.tip.v0.6.3.js"></script>      
+    <script type='text/javascript' src="jQuery/jquery-ui.css"></script>
+    <script src="jQuery/jquery.min.js"></script>
+</head>
+
+<body style="background-color:#F0F0F0;">   
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container" >
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="./index.html">PTTonitor</a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+
+    <!-- Page Content -->
+    <br>
+    <br>
+    <br>
+    <div id="container" class="container" style="background-image:url(image/background.jpg); width:1440px; height:760px;">
+    <div style="width:250px; height:35px;">
+       <input id="search">
+        <button type="button" onclick="searchNode()">Search</button>
+    </div>
+
+    <div id="graph_legend_bar">
+      <img src="force_graph/legend_bar2.jpg" height="100%" width="100%">    
+    </div>
+    <div id="graph_legend">
+      <img src="force_graph/legend4.jpg" height="100%" width="100%">    
+    </div>
+
+    <div id="display_left" style="width:810px; height:700px; border:2px rgba(43, 63, 51, 0.2) dashed;">
+      <!-- Load the force layout js file-->
+      <script src="force_graph.js"></script>   
+    </div>
+
+    <div id="middle_line" style="width:1px; height:700px;">
+    </div>
+
+    <div id="display_right" style="width:595px; height:700px; border:0px #cccccc;">
+      <div id="display2" style="width:595px; height:100px; background: rgba(43, 63, 51, 0.75);">
+        <br><info></info>
+      </div>
+      <div id="display3" style="width:595px; height:600px; border:0px #cccccc outset; background: rgba(43, 43, 43, 0.8);">
+        <!-- Load the bubble chart js file-->
+        <script src="bubble_chart.js"></script> 
+      </div>  
+    </div>
+
+    </div>
+
+    <!-- graph legend -->
+    <script>
+        var graph_legend_flag = 0;
+
+        $( "#graph_legend_bar" ).click(function() {
+            if(graph_legend_flag == 0){
+                $('#graph_legend').animate({
+                  opacity: 0
+                }, 400, function() {
+                  // Animation complete.
+                  $('#graph_legend').hide();
+                });
+
+                graph_legend_flag = 1;
+            }
+            else if(graph_legend_flag == 1){
+                $('#graph_legend').show().animate({
+                  opacity: 0.8
+                }, 400, function() {
+                  // Animation complete.
+                });
+
+                graph_legend_flag = 0;
+            }
+
+        });
+        $( "#graph_legend_bar" ).mouseover(function() {
+              $('#graph_legend_bar').animate({
+                opacity: 1
+              }, 400, function() {
+                // Animation complete.
+              });
+        });
+        $( "#graph_legend_bar" ).mouseout(function() {
+              $('#graph_legend_bar').animate({
+                opacity: 0.8
+              }, 400, function() {
+                // Animation complete.
+              });
+        });       
+    </script>
+</body>
+
+</html>

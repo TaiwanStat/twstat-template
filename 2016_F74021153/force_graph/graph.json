@@ -1,0 +1,126 @@
+{
+  "nodes": [
+    {
+      "group": 1, 
+      "name": "be11eaya"
+    }, 
+    {
+      "group": 1, 
+      "name": "DogNoseBro"
+    }, 
+    {
+      "group": 1, 
+      "name": "TakuyaBro"
+    }, 
+    {
+      "group": 1, 
+      "name": "aratna"
+    }, 
+    {
+      "group": 1, 
+      "name": "Ganam56Style"
+    }, 
+    {
+      "group": 1, 
+      "name": "fvhs"
+    }, 
+    {
+      "group": 1, 
+      "name": "belleaya"
+    }, 
+    {
+      "group": 1, 
+      "name": "NTDlOO"
+    }, 
+    {
+      "group": 1, 
+      "name": "she76017"
+    }, 
+    {
+      "group": 1, 
+      "name": "LeoDiCaprio"
+    }, 
+    {
+      "group": 1, 
+      "name": "lakegoddess"
+    }, 
+    {
+      "group": 1, 
+      "name": "AIDSpositive"
+    }
+  ], 
+  "links": [
+    {
+      "target": 6, 
+      "width": 0.0952, 
+      "value": 1, 
+      "source": 0, 
+      "comment_rate": 0.1413, 
+      "fan_comment": 13, 
+      "total_comment": 92
+    }, 
+    {
+      "target": 3, 
+      "width": 0.7071, 
+      "value": 0, 
+      "source": 1, 
+      "comment_rate": 0.0, 
+      "fan_comment": 0, 
+      "total_comment": 0
+    }, 
+    {
+      "target": 6, 
+      "width": 0.0, 
+      "value": 0, 
+      "source": 1, 
+      "comment_rate": 1.0, 
+      "fan_comment": 2, 
+      "total_comment": 2
+    }, 
+    {
+      "target": 6, 
+      "width": 0.0143, 
+      "value": 0, 
+      "source": 2, 
+      "comment_rate": 1.0, 
+      "fan_comment": 2, 
+      "total_comment": 2
+    }, 
+    {
+      "target": 6, 
+      "width": 0.0, 
+      "value": 0, 
+      "source": 3, 
+      "comment_rate": 0.75, 
+      "fan_comment": 3, 
+      "total_comment": 4
+    }, 
+    {
+      "target": 6, 
+      "width": 0.1861, 
+      "value": 0, 
+      "source": 4, 
+      "comment_rate": 0.0, 
+      "fan_comment": 0, 
+      "total_comment": 0
+    }, 
+    {
+      "target": 6, 
+      "width": 0.0, 
+      "value": 0, 
+      "source": 8, 
+      "comment_rate": 1.0, 
+      "fan_comment": 1, 
+      "total_comment": 1
+    }, 
+    {
+      "target": 6, 
+      "width": 0.0536, 
+      "value": 0, 
+      "source": 11, 
+      "comment_rate": 0.6, 
+      "fan_comment": 6, 
+      "total_comment": 10
+    }
+  ]
+}
